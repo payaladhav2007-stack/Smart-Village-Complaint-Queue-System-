@@ -123,7 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-<<<<<<< HEAD
+
 # CORS Settings
 CORS_ALLOWED_ORIGINS = []
 CORS_ALLOW_ALL_ORIGINS = False  # Block all cross-origin by default
@@ -140,4 +140,5 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 
 AUTH_USER_MODEL = 'accounts.User'
->>>>>>> origin/main
+
+
