@@ -39,16 +39,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',  # ADD THIS
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # ADD - must be at top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # CSRF protection
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Clickjacking
 ]
 
 ROOT_URLCONF = 'gramsmart.urls'
@@ -120,3 +122,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# CORS Settings
+CORS_ALLOWED_ORIGINS = []
+CORS_ALLOW_ALL_ORIGINS = False  # Block all cross-origin by default
+
+# CSRF Settings
+CSRF_COOKIE_SECURE = False  # Set True in production
+CSRF_COOKIE_HTTPONLY = True
+
+# Clickjacking Protection
+X_FRAME_OPTIONS = 'DENY'
+
+# Security Headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
