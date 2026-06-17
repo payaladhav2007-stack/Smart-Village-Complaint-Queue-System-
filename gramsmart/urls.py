@@ -1,22 +1,22 @@
-"""
-URL configuration for gramsmart project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.http import JsonResponse
+
+# Health check view to verify routing is working
+def health_check(request):
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'GramSmart server is running'
+    })
 
 urlpatterns = [
+    # Admin panel route
     path('admin/', admin.site.urls),
+
+    # Health check route
+    path('', health_check, name='health-check'),
+
+    # Future module routes will be added here
+    # path('api/grievances/', include('grievances.urls')),
+    # path('api/appointments/', include('appointments.urls')),
 ]
