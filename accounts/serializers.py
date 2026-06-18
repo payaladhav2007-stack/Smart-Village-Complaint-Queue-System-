@@ -34,3 +34,17 @@ class RegisterSerializer(serializers.ModelSerializer):
             role='citizen'
         )
         return user
+from django.contrib.auth import authenticate
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = authenticate(username=data['username'], password=data['password'])
+        if not user:
+            raise serializers.ValidationError("Invalid username or password.")
+        if not user.is_active:
+            raise serializers.ValidationError("This account is inactive.")
+        data['user'] = user
+        return data
