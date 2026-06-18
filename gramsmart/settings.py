@@ -31,18 +31,17 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'accounts',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # ADD THIS
+    'rest_framework',
+    'corsheaders',
+    'accounts',
 ]
-
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # ADD - must be at top
     'django.middleware.security.SecurityMiddleware',
