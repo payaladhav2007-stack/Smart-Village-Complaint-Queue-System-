@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('verify/', views.sms_auth_endpoint, name='sms_auth_verify'),
+    path('request-otp/', views.request_otp, name='sms_request_otp'),
+    path('verify/', views.verify_otp, name='sms_auth_verify'),
 ]
