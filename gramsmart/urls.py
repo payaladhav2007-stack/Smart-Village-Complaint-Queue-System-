@@ -8,5 +8,6 @@ def health_check(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', health_check),
-    path('sms/', include('sms_auth.urls')),  # 👈 add this lines
+    path('sms/', include('sms_auth.urls')),
+    path('api/auth/', include('accounts.urls')),  # GS-105/106 routing
 ]
