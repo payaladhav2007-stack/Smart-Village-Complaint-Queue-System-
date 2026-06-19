@@ -8,5 +8,5 @@ def health_check(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', health_check),
-    path('api/auth/', include('accounts.urls')),
+    path('sms/', include('sms_auth.urls')),  # 👈 add this lines
 ]

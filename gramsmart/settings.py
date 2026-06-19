@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders',
     'accounts',
+    'sms_auth',
 ]
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # ADD - must be at top
