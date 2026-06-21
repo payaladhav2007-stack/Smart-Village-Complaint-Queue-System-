@@ -55,6 +55,146 @@
     </p>
 
   </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.querySelector('form');
+    const contactInput = document.getElementById('contact_number');
+    const passwordInput = document.getElementById('password');
+
+    // --- Helper: show error below a field ---
+    function showError(input, message) {
+      clearError(input);
+      const error = document.createElement('p');
+      error.className = 'text-red-500 text-sm mt-1';
+      error.setAttribute('data-error-for', input.id);
+      error.textContent = message;
+      input.parentNode.appendChild(error);
+      input.classList.add('border-red-500');
+    }
+
+    // --- Helper: clear error ---
+    function clearError(input) {
+      const existing = document.querySelector('[data-error-for="' + input.id + '"]');
+      if (existing) existing.remove();
+      input.classList.remove('border-red-500');
+    }
+
+    // --- Helper: show general message ---
+    function showMessage(message, isError) {
+      const existing = document.getElementById('general-message');
+      if (existing) existing.remove();
+      const msg = document.createElement('p');
+      msg.id = 'general-message';
+      msg.className = isError
+        ? 'text-red-500 text-sm text-center mt-3'
+        : 'text-green-500 text-sm text-center mt-3';
+      msg.textContent = message;
+      form.appendChild(msg);
+    }
+
+    // --- Live clearing ---
+    [contactInput, passwordInput].forEach(function (input) {
+      input.addEventListener('input', function () { clearError(input); });
+    });
+
+    // --- Form submit handler ---
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      let isValid = true;
+
+      // Validate contact number
+      const contactVal = contactInput.value.trim();
+      if (!contactVal) {
+        showError(contactInput, 'Contact number is required.');
+        isValid = false;
+      } else if (!/^\d+$/.test(contactVal)) {
+        showError(contactInput, 'Contact number must contain digits only.');
+        isValid = false;
+      } else if (contactVal.length !== 10) {
+        showError(contactInput, 'Contact number must be exactly 10 digits.');
+        isValid = false;
+      }
+
+      // Validate password
+      if (!passwordInput.value) {
+        showError(passwordInput, 'Password is required.');
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      // --- AJAX dispatch to backend login API ---
+      const loginButton = form.querySelector('button[type="submit"]');
+      loginButton.textContent = 'Logging in...';
+      loginButton.disabled = true;
+
+      fetch('/api/auth/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+          username: contactVal,
+          password: passwordInput.value
+        }),
+        credentials: 'same-origin'
+      })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          return { status: response.status, data: data };
+        });
+      })
+      .then(function (result) {
+        loginButton.textContent = 'Log In';
+        loginButton.disabled = false;
+
+        if (result.status === 200) {
+          // Store session info
+          sessionStorage.setItem('gramsmart_role', result.data.role);
+          sessionStorage.setItem('gramsmart_user', result.data.username);
+          sessionStorage.setItem('gramsmart_logged_in', 'true');
+
+          // Route based on role
+          const role = result.data.role;
+          if (role === 'admin') {
+            window.location.href = '/admin/';
+          } else if (role === 'staff') {
+            window.location.href = '/staff/dashboard/';
+          } else {
+            window.location.href = '/citizen/dashboard/';
+          }
+
+        } else {
+          // Show error from server
+          const errorMsg = result.data.detail || result.data.non_field_errors || 'Invalid credentials. Please try again.';
+          showMessage(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg, true);
+        }
+      })
+      .catch(function () {
+        loginButton.textContent = 'Log In';
+        loginButton.disabled = false;
+        showMessage('Network error. Please check your connection and try again.', true);
+      });
+    });
+
+    // --- Helper: get CSRF cookie ---
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function (cookie) {
+          const trimmed = cookie.trim();
+          if (trimmed.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
+    }
+
+  });
+</script>
 
 </body>
 </html>
