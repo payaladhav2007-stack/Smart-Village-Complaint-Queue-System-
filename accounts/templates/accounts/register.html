@@ -16,7 +16,7 @@
     </div>
 
     <form method="POST" action="" class="space-y-5">
-
+      {% csrf_token %}
       <div>
         <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
         <input type="text" id="full_name" name="full_name" required
@@ -84,7 +84,7 @@
 
     // --- Grab all input fields ---
     const fullName     = document.getElementById('full_name');
-    const phone        = document.getElementById('phone_number');
+    const phone        = document.getElementById('contact_number');
     const ward         = document.getElementById('ward_number');
     const password     = document.getElementById('password');
     const confirmPass  = document.getElementById('confirm_password');
