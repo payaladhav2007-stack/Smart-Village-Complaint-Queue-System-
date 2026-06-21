@@ -77,5 +77,99 @@
     </p>
 
   </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.querySelector('form');
+
+    // --- Grab all input fields ---
+    const fullName     = document.getElementById('full_name');
+    const phone        = document.getElementById('phone_number');
+    const ward         = document.getElementById('ward_number');
+    const password     = document.getElementById('password');
+    const confirmPass  = document.getElementById('confirm_password');
+
+    // --- Helper: show error below a field ---
+    function showError(input, message) {
+      clearError(input);
+      const error = document.createElement('p');
+      error.className = 'text-red-500 text-sm mt-1';
+      error.setAttribute('data-error-for', input.id);
+      error.textContent = message;
+      input.parentNode.appendChild(error);
+      input.classList.add('border-red-500');
+    }
+
+    // --- Helper: clear error for a field ---
+    function clearError(input) {
+      const existing = document.querySelector('[data-error-for="' + input.id + '"]');
+      if (existing) existing.remove();
+      input.classList.remove('border-red-500');
+    }
+
+    // --- Live clearing: error disappears as user fixes the field ---
+    [fullName, phone, ward, password, confirmPass].forEach(function(input) {
+      if (input) {
+        input.addEventListener('input', function () { clearError(input); });
+        input.addEventListener('change', function () { clearError(input); });
+      }
+    });
+
+    // --- Main validation on submit ---
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      let isValid = true;
+
+      // Full Name — must not be empty
+      if (!fullName.value.trim()) {
+        showError(fullName, 'Full name is required.');
+        isValid = false;
+      }
+
+      // Phone — digits only, exactly 10 digits
+      const phoneVal = phone.value.trim();
+      if (!phoneVal) {
+        showError(phone, 'Contact number is required.');
+        isValid = false;
+      } else if (!/^\d+$/.test(phoneVal)) {
+        showError(phone, 'Contact number must contain digits only.');
+        isValid = false;
+      } else if (phoneVal.length !== 10) {
+        showError(phone, 'Contact number must be exactly 10 digits.');
+        isValid = false;
+      }
+
+      // Ward — must be selected (not empty/default)
+      if (!ward.value || ward.value === '') {
+        showError(ward, 'Please select your Ward number.');
+        isValid = false;
+      }
+
+      // Password — minimum 8 characters
+      if (!password.value) {
+        showError(password, 'Password is required.');
+        isValid = false;
+      } else if (password.value.length < 8) {
+        showError(password, 'Password must be at least 8 characters.');
+        isValid = false;
+      }
+
+      // Confirm Password — must match password
+      if (!confirmPass.value) {
+        showError(confirmPass, 'Please confirm your password.');
+        isValid = false;
+      } else if (confirmPass.value !== password.value) {
+        showError(confirmPass, 'Passwords do not match.');
+        isValid = false;
+      }
+
+      // --- All checks passed: submit to API ---
+      if (isValid) {
+        form.submit();
+      }
+    });
+
+  });
+</script>
 
 </body>
