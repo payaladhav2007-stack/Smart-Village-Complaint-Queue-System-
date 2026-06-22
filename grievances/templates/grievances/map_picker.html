@@ -110,6 +110,11 @@
 
     // Initialize map
     var map = L.map('map').setView([defaultLat, defaultLng], defaultZoom);
+    
+    // Force map to recalculate size after popup renders
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 300);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -154,7 +159,13 @@
         alert('Please click on the map to select a location first.');
         return;
       }
-      alert('Location confirmed!\nLatitude: ' + lat + '\nLongitude: ' + lng);
+      // Send coordinates back to the parent complaint form
+      if (window.opener && !window.opener.closed) {
+        window.opener.receiveLocation(lat, lng);
+        window.close();
+      } else {
+        alert('Location confirmed!\nLatitude: ' + lat + '\nLongitude: ' + lng);
+      }
     }
   </script>
 
