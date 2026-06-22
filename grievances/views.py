@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -14,16 +15,11 @@ class SubmitComplaintView(APIView):
     def post(self, request):
         media_file = request.data.get('media_path')
         serializer = ComplaintSerializer(data=request.data)
-
         if serializer.is_valid():
-            # Save first without the file so the complaint gets a real id
             complaint = serializer.save(user=request.user, media_path=None)
-
-            # Now attach the file (if provided) — id exists, so upload_to resolves correctly
             if media_file:
                 complaint.media_path = media_file
                 complaint.save()
-
             return Response({
                 "message": "Grievance submitted successfully.",
                 "complaint": {
@@ -38,3 +34,19 @@ class SubmitComplaintView(APIView):
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListComplaintsView(ListAPIView):
+    serializer_class = ComplaintSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Complaint.objects.all() if user.role in ('admin', 'staff') else Complaint.objects.filter(user=user)
+        category = self.request.query_params.get('category')
+        status_param = self.request.query_params.get('status')
+        if category:
+            queryset = queryset.filter(category=category)
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+        return queryset
