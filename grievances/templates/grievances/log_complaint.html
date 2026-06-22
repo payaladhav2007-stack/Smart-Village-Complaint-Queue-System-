@@ -112,6 +112,27 @@
         </div>
       </div>
 
+      <!-- Hidden Geolocation Fields -->
+      <input type="hidden" id="latitude" name="latitude" />
+      <input type="hidden" id="longitude" name="longitude" />
+
+      <!-- Location Picker -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Complaint Location
+        </label>
+        <div id="location-display" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-50 text-gray-400 mb-2">
+          No location selected yet. Click below to pick on map.
+        </div>
+        <button
+          type="button"
+          onclick="openMapPicker()"
+          class="w-full border border-green-600 text-green-600 font-semibold py-2.5 rounded-lg text-sm hover:bg-green-50 transition"
+        >
+          📍 Pick Location on Map
+        </button>
+      </div>
+
       <!-- Submit Button -->
       <div>
         <button
@@ -132,4 +153,24 @@
   </div>
 
 </body>
+<script>
+    // Open map picker in a popup window
+    function openMapPicker() {
+      var popup = window.open(
+        '/grievances/map/',
+        'MapPicker',
+        'width=700,height=600,scrollbars=yes'
+      );
+    }
+
+    // Called by map_picker.html when location is confirmed
+    function receiveLocation(lat, lng) {
+      document.getElementById('latitude').value = lat;
+      document.getElementById('longitude').value = lng;
+      document.getElementById('location-display').innerHTML =
+        '✅ Location selected: <strong>' + lat + ', ' + lng + '</strong>';
+      document.getElementById('location-display').className =
+        'w-full border border-green-300 rounded-lg px-4 py-2 text-sm bg-green-50 text-green-700 mb-2';
+    }
+  </script>
 </html>
