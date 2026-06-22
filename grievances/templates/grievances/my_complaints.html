@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — My Complaints</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen px-4 py-10">
+
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-green-700">GramSmart</h1>
+      <p class="text-gray-500 text-sm mt-1">My Grievance Tracking Dashboard</p>
+      <p class="text-gray-600 text-sm mt-1">Welcome, <strong>{{ user.username }}</strong></p>
+    </div>
+
+    <!-- Summary Pills -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow p-4 text-center">
+        <p class="text-2xl font-bold text-gray-800">{{ total }}</p>
+        <p class="text-xs text-gray-500 mt-1">Total Submitted</p>
+      </div>
+      <div class="bg-yellow-50 rounded-xl shadow p-4 text-center">
+        <p class="text-2xl font-bold text-yellow-600">{{ pending }}</p>
+        <p class="text-xs text-yellow-600 mt-1">Pending</p>
+      </div>
+      <div class="bg-blue-50 rounded-xl shadow p-4 text-center">
+        <p class="text-2xl font-bold text-blue-600">{{ in_progress }}</p>
+        <p class="text-xs text-blue-600 mt-1">In Progress</p>
+      </div>
+      <div class="bg-green-50 rounded-xl shadow p-4 text-center">
+        <p class="text-2xl font-bold text-green-600">{{ resolved }}</p>
+        <p class="text-xs text-green-600 mt-1">Resolved</p>
+      </div>
+    </div>
+
+    <!-- Complaints List -->
+    {% if complaints %}
+      <div class="space-y-4">
+        {% for complaint in complaints %}
+        <div class="bg-white rounded-xl shadow p-5">
+
+          <!-- Top Row: Category + Status Pill -->
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-sm font-semibold text-gray-800">
+                {{ complaint.get_category_display }}
+              </span>
+              <span class="text-xs text-gray-400 ml-2">#{{ complaint.id }}</span>
+            </div>
+
+            <!-- Status Pill -->
+            {% if complaint.status == 'pending' %}
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                🕐 Pending
+              </span>
+            {% elif complaint.status == 'in_progress' %}
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                🔧 In Progress
+              </span>
+            {% elif complaint.status == 'resolved' %}
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                ✅ Resolved
+              </span>
+            {% elif complaint.status == 'rejected' %}
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                ❌ Rejected
+              </span>
+            {% endif %}
+          </div>
+
+          <!-- Description -->
+          <p class="text-sm text-gray-600 mb-3">{{ complaint.description }}</p>
+
+          <!-- Timeline / Metadata -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-gray-500 border-t pt-3">
+            <div>
+              <span class="font-medium text-gray-600">Submitted:</span><br/>
+              {{ complaint.created_at|date:"d M Y, h:i A" }}
+            </div>
+            <div>
+              <span class="font-medium text-gray-600">Last Updated:</span><br/>
+              {{ complaint.updated_at|date:"d M Y, h:i A" }}
+            </div>
+            {% if complaint.latitude and complaint.longitude %}
+            <div>
+              <span class="font-medium text-gray-600">Location:</span><br/>
+              {{ complaint.latitude }}, {{ complaint.longitude }}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Timeline Status Bar -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between text-xs text-gray-400 mb-1">
+              <span>Submitted</span>
+              <span>In Progress</span>
+              <span>Resolved</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              {% if complaint.status == 'pending' %}
+                <div class="bg-yellow-400 h-2 rounded-full" style="width: 15%"></div>
+              {% elif complaint.status == 'in_progress' %}
+                <div class="bg-blue-500 h-2 rounded-full" style="width: 55%"></div>
+              {% elif complaint.status == 'resolved' %}
+                <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+              {% elif complaint.status == 'rejected' %}
+                <div class="bg-red-400 h-2 rounded-full" style="width: 100%"></div>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="bg-white rounded-xl shadow p-10 text-center">
+        <p class="text-4xl mb-3">📭</p>
+        <p class="text-gray-600 font-medium">No complaints submitted yet.</p>
+        <p class="text-gray-400 text-sm mt-1">Use the button below to log your first grievance.</p>
+        <a href="/grievances/log/"
+           class="inline-block mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition">
+          + Log a Complaint
+        </a>
+      </div>
+    {% endif %}
+
+    <!-- Footer Actions -->
+    <div class="mt-6 flex gap-3 justify-center">
+      <a href="/grievances/log/"
+         class="border border-green-600 text-green-600 font-semibold px-5 py-2 rounded-lg text-sm hover:bg-green-50 transition">
+        + New Complaint
+      </a>
+      <a href="/accounts/logout/"
+         class="border border-gray-300 text-gray-500 font-semibold px-5 py-2 rounded-lg text-sm hover:bg-gray-50 transition">
+        Logout
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-xs text-gray-400 mt-6">
+      GramSmart — Unified Rural Governance Platform
+    </p>
+
+  </div>
+
+</body>
+</html>
