@@ -1,22 +1,25 @@
 from django.db import models
 from django.conf import settings
 
-class Complaint(models.Model):
 
+def complaint_media_path(instance, filename):
+    # Files stored at: complaints/media/<complaint_id>/<filename>
+    return f'complaints/media/{instance.id}/{filename}'
+
+
+class Complaint(models.Model):
     CATEGORY_CHOICES = [
         ('roads', 'Roads/Potholes'),
         ('sanitation', 'Sanitation/Garbage'),
         ('water', 'Water Supply'),
         ('electricity', 'Electricity'),
     ]
-
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('in_progress', 'In Progress'),
         ('resolved', 'Resolved'),
         ('rejected', 'Rejected'),
     ]
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -28,7 +31,7 @@ class Complaint(models.Model):
     )
     description = models.TextField()
     media_path = models.FileField(
-        upload_to='complaints/media/',
+        upload_to=complaint_media_path,
         null=True,
         blank=True
     )
