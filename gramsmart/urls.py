@@ -10,4 +10,5 @@ urlpatterns = [
     path('', health_check),
     path('sms/', include('sms_auth.urls')),
     path('api/auth/', include('accounts.urls')),  # GS-105/106 routing
+    path('api/grievances/', include('grievances.urls')),
 ]
