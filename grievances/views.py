@@ -4,41 +4,21 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .models import Complaint
-from .serializers import ComplaintSerializer
 
 
 class SubmitComplaintView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
-
-    def post(self, request):
-        media_file = request.data.get('media_path')
-        serializer = ComplaintSerializer(data=request.data)
-        if serializer.is_valid():
-            complaint = serializer.save(user=request.user, media_path=None)
-            if media_file:
-                complaint.media_path = media_file
-                complaint.save()
-            return Response({
-                "message": "Grievance submitted successfully.",
-                "complaint": {
-                    "id": complaint.id,
-                    "category": complaint.category,
-                    "description": complaint.description,
-                    "status": complaint.status,
-                    "latitude": str(complaint.latitude),
-                    "longitude": str(complaint.longitude),
-                    "media_path": complaint.media_path.url if complaint.media_path else None,
-                    "created_at": str(complaint.created_at)
-                }
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def log_complaint(request):
+    return render(request, 'grievances/log_complaint.html')
 
 
-class ListComplaintsView(ListAPIView):
-    serializer_class = ComplaintSerializer
-    permission_classes = [IsAuthenticated]
+def map_picker(request):
+    return render(request, 'grievances/map_picker.html')
+
 
     def get_queryset(self):
         user = self.request.user
@@ -50,3 +30,21 @@ class ListComplaintsView(ListAPIView):
         if status_param:
             queryset = queryset.filter(status=status_param)
         return queryset
+@login_required
+def my_complaints(request):
+    complaints = Complaint.objects.filter(user=request.user).order_by('-created_at')
+    total = complaints.count()
+    pending = complaints.filter(status='pending').count()
+    in_progress = complaints.filter(status='in_progress').count()
+    resolved = complaints.filter(status='resolved').count()
+    rejected = complaints.filter(status='rejected').count()
+
+    context = {
+        'complaints': complaints,
+        'total': total,
+        'pending': pending,
+        'in_progress': in_progress,
+        'resolved': resolved,
+        'rejected': rejected,
+    }
+    return render(request, 'grievances/my_complaints.html', context)
