@@ -10,17 +10,15 @@
 
   <!-- Leaflet.js CSS -->
   <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
   />
 
   <!-- Leaflet.js Script -->
   <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLcE="
-    crossorigin=""
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
   ></script>
 
   <style>
@@ -86,7 +84,7 @@
     <!-- Action Buttons -->
     <div class="mt-6 flex flex-col sm:flex-row gap-3">
       
-        href="/grievances/log/"
+      <a href="/grievances/log/"
         class="w-full text-center border border-green-600 text-green-600 font-semibold py-2.5 rounded-lg text-sm hover:bg-green-50 transition"
       >
         ← Back to Complaint Form
@@ -113,8 +111,18 @@
     
     // Force map to recalculate size after popup renders
     setTimeout(function() {
-      map.invalidateSize();
-    }, 300);
+       map.invalidateSize();
+    }, 800);
+
+    window.addEventListener('resize', function() {
+       map.invalidateSize();
+    });
+
+    window.addEventListener('load', function() {
+       setTimeout(function() {
+          map.invalidateSize();
+       }, 500);
+    });
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
