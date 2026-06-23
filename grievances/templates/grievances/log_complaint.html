@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,26 +152,23 @@
     </p>
 
   </div>
-
+    <script>
+        function openMapPicker() {
+          var popup = window.open(
+            '/grievances/map/',
+            'MapPicker',
+            'width=700,height=600,scrollbars=yes'
+          );
+        }
+        function receiveLocation(lat, lng) {
+          document.getElementById('latitude').value = lat;
+          document.getElementById('longitude').value = lng;
+          document.getElementById('location-display').innerHTML =
+            '✅ Location selected: <strong>' + lat + ', ' + lng + '</strong>';
+          document.getElementById('location-display').className =
+            'w-full border border-green-300 rounded-lg px-4 py-2 text-sm bg-green-50 text-green-700 mb-2';
+        }
+    </script>
+    <script src="{% static 'grievances/js/file_upload_validation.js' %}"></script>
 </body>
-<script>
-    // Open map picker in a popup window
-    function openMapPicker() {
-      var popup = window.open(
-        '/grievances/map/',
-        'MapPicker',
-        'width=700,height=600,scrollbars=yes'
-      );
-    }
-
-    // Called by map_picker.html when location is confirmed
-    function receiveLocation(lat, lng) {
-      document.getElementById('latitude').value = lat;
-      document.getElementById('longitude').value = lng;
-      document.getElementById('location-display').innerHTML =
-        '✅ Location selected: <strong>' + lat + ', ' + lng + '</strong>';
-      document.getElementById('location-display').className =
-        'w-full border border-green-300 rounded-lg px-4 py-2 text-sm bg-green-50 text-green-700 mb-2';
-    }
-  </script>
 </html>
