@@ -171,5 +171,111 @@
     </script>
     <script src="{% static 'grievances/js/file_upload_validation.js' %}"></script>
     <script src="{% static 'grievances/js/geolocation_validation.js' %}"></script>
+<script>
+  document.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    // --- Remove any previous success/error message ---
+    const existing = document.getElementById('submission-message');
+    if (existing) existing.remove();
+
+    // --- Get CSRF token ---
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function (cookie) {
+          const trimmed = cookie.trim();
+          if (trimmed.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
+    }
+
+    // --- Build FormData from form fields ---
+    const formData = new FormData();
+    formData.append('category', form.querySelector('[name="category"]').value);
+    formData.append('description', form.querySelector('[name="description"]').value);
+    formData.append('latitude', document.getElementById('latitude').value);
+    formData.append('longitude', document.getElementById('longitude').value);
+
+    // --- Attach media file if selected ---
+    const mediaInput = form.querySelector('[name="media"]');
+    if (mediaInput && mediaInput.files.length > 0) {
+      formData.append('media_path', mediaInput.files[0]);
+    }
+
+    // --- Get auth token from sessionStorage ---
+    const token = sessionStorage.getItem('gramsmart_token') || '';
+
+    // --- Show loading state ---
+    submitBtn.textContent = 'Submitting...';
+    submitBtn.disabled = true;
+
+    // --- AJAX POST to grievance submit API ---
+    fetch('/api/grievances/submit/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Authorization': token ? 'Token ' + token : ''
+      },
+      body: formData,
+      credentials: 'same-origin'
+    })
+    .then(function (response) {
+      return response.json().then(function (data) {
+        return { status: response.status, data: data };
+      });
+    })
+    .then(function (result) {
+      submitBtn.textContent = 'Submit Complaint';
+      submitBtn.disabled = false;
+
+      const msg = document.createElement('p');
+      msg.id = 'submission-message';
+
+      if (result.status === 201) {
+        // --- Success: clear all fields ---
+        form.querySelector('[name="category"]').value = '';
+        form.querySelector('[name="description"]').value = '';
+        form.querySelector('[name="full_name"]').value = '';
+        form.querySelector('[name="phone_number"]').value = '';
+        form.querySelector('[name="ward_number"]').value = '';
+        if (mediaInput) mediaInput.value = '';
+        document.getElementById('latitude').value = '';
+        document.getElementById('longitude').value = '';
+        document.getElementById('location-display').textContent = 'No location selected yet. Click below to pick on map.';
+        document.getElementById('location-display').className = 'w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-50 text-gray-400 mb-2';
+
+        msg.className = 'text-green-600 text-sm text-center mt-4 font-medium';
+        msg.textContent = '✅ Complaint submitted successfully! Your complaint ID is #' + result.data.id;
+
+      } else {
+        // --- Error from server ---
+        const errorMsg = result.data.detail || result.data.non_field_errors || 'Submission failed. Please try again.';
+        msg.className = 'text-red-500 text-sm text-center mt-4';
+        msg.textContent = '❌ ' + (Array.isArray(errorMsg) ? errorMsg[0] : errorMsg);
+      }
+
+      form.appendChild(msg);
+      msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    })
+    .catch(function () {
+      submitBtn.textContent = 'Submit Complaint';
+      submitBtn.disabled = false;
+      const msg = document.createElement('p');
+      msg.id = 'submission-message';
+      msg.className = 'text-red-500 text-sm text-center mt-4';
+      msg.textContent = '❌ Network error. Please check your connection and try again.';
+      form.appendChild(msg);
+    });
+
+  }, true);
+</script>
 </body>
 </html>
