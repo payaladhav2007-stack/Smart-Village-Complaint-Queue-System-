@@ -221,7 +221,7 @@
     fetch('/api/grievances/submit/', {
       method: 'POST',
       headers: {
-        'X-CSRFToken': getCookie('csrftoken'),
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
         'Authorization': token ? 'Token ' + token : ''
       },
       body: formData,
