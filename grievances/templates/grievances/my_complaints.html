@@ -69,7 +69,7 @@
               <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
                 ❌ Rejected
               </span>
-            
+            {% endif %}            
           </div>
 
           <!-- Description -->
@@ -90,7 +90,7 @@
               <span class="font-medium text-gray-600">Location:</span><br/>
               {{ complaint.latitude }}, {{ complaint.longitude }}
             </div>
-            
+            {% endif %}            
           </div>
 
           <!-- Timeline Status Bar -->
@@ -109,12 +109,12 @@
                 <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
               {% elif complaint.status == 'rejected' %}
                 <div class="bg-red-400 h-2 rounded-full" style="width: 100%"></div>
-              
+              {% endif %}                
             </div>
           </div>
 
         </div>
-        
+        {% endfor %}        
       </div>
 
     {% else %}
@@ -128,7 +128,7 @@
           + Log a Complaint
         </a>
       </div>
-    
+    {% endif %}    
 
     <!-- Footer Actions -->
     <div class="mt-6 flex gap-3 justify-center">
