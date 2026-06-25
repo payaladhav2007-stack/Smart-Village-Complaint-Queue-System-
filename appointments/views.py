@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .serializers import AppointmentSerializer
 from .utils import book_appointment_in_slot
+from .models import Appointment
 
 
 class BookAppointmentView(APIView):
@@ -18,10 +20,8 @@ class BookAppointmentView(APIView):
                 scheduled_time=serializer.validated_data['scheduled_time'],
                 form_data_jsonb=serializer.validated_data['form_data_jsonb'],
             )
-
             if error:
                 return Response({"error": error}, status=status.HTTP_409_CONFLICT)
-
             return Response({
                 "message": "Appointment booked successfully.",
                 "appointment": {
@@ -35,3 +35,13 @@ class BookAppointmentView(APIView):
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListMyAppointmentsView(ListAPIView):
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Appointment.objects.filter(
+            user=self.request.user
+        ).select_related('user').order_by('-scheduled_time')
