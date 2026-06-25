@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import BookAppointmentView, ListMyAppointmentsView
+from .views import certificate_request
 
 urlpatterns = [
-    path('book/', BookAppointmentView.as_view(), name='book-appointment'),
-    path('my-tokens/', ListMyAppointmentsView.as_view(), name='my-tokens'),
+    path('request/', certificate_request, name='certificate_request'),
 ]
