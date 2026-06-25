@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Queue Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      70% { transform: scale(1.1); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+    .live-pulse::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: #16a34a;
+      animation: pulse-ring 1.5s ease-out infinite;
+    }
+    .live-pulse {
+      position: relative;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen px-4 py-8">
+
+  <div class="max-w-2xl mx-auto space-y-5">
+
+    <!-- Header -->
+    <div class="text-center mb-2">
+      <h1 class="text-2xl font-bold text-green-700">GramSmart</h1>
+      <p class="text-gray-500 text-sm mt-1">Queue Visibility Dashboard</p>
+    </div>
+
+    <!-- My Ticket Card -->
+    <div class="bg-white rounded-2xl shadow-lg p-5 border-l-4 border-green-500">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wide font-medium">Your Token</p>
+          <h2 class="text-4xl font-black text-green-600 mt-1">T - 042</h2>
+        </div>
+        <div class="text-right">
+          <span class="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+            <span class="w-2 h-2 rounded-full bg-yellow-500 live-pulse inline-block"></span>
+            Processing
+          </span>
+          <p class="text-xs text-gray-400 mt-2">Income Certificate</p>
+        </div>
+      </div>
+
+      <!-- Wait Info -->
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <div class="bg-green-50 rounded-xl px-4 py-3 text-center">
+          <p class="text-xs text-gray-500 mb-1">Estimated Wait</p>
+          <p class="text-xl font-bold text-green-700">~12 min</p>
+        </div>
+        <div class="bg-blue-50 rounded-xl px-4 py-3 text-center">
+          <p class="text-xs text-gray-500 mb-1">Scheduled Arrival</p>
+          <p class="text-xl font-bold text-blue-700">10:30 AM</p>
+        </div>
+      </div>
+
+      <!-- Counter Info -->
+      <div class="mt-4 bg-gray-50 rounded-xl px-4 py-3 flex items-center justify-between">
+        <span class="text-sm text-gray-600">Reporting Counter</span>
+        <span class="text-sm font-bold text-gray-800">Counter No. 3</span>
+      </div>
+    </div>
+
+    <!-- Live Queue Status -->
+    <div class="bg-white rounded-2xl shadow p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-gray-700">Live Queue Status</h3>
+        <span class="flex items-center gap-1.5 text-xs text-green-600 font-medium">
+          <span class="w-2 h-2 rounded-full bg-green-500 live-pulse inline-block"></span>
+          Live
+        </span>
+      </div>
+
+      <!-- Queue Stream -->
+      <div class="space-y-3">
+
+        <!-- Completed -->
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl opacity-60">
+          <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">
+            T-040
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-500">Token 040</p>
+            <p class="text-xs text-gray-400">Domicile Certificate</p>
+          </div>
+          <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full font-medium">
+            ✓ Done
+          </span>
+        </div>
+
+        <!-- Completed -->
+        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl opacity-60">
+          <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">
+            T-041
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-500">Token 041</p>
+            <p class="text-xs text-gray-400">Birth Certificate</p>
+          </div>
+          <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full font-medium">
+            ✓ Done
+          </span>
+        </div>
+
+        <!-- YOUR TOKEN - Active -->
+        <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl border-2 border-green-400">
+          <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-sm font-bold text-white">
+            T-042
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-bold text-green-700">Token 042 — YOU</p>
+            <p class="text-xs text-green-600">Income Certificate</p>
+          </div>
+          <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold animate-pulse">
+            ⚡ Now
+          </span>
+        </div>
+
+        <!-- Waiting -->
+        <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-600">
+            T-043
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-700">Token 043</p>
+            <p class="text-xs text-gray-400">Caste Certificate</p>
+          </div>
+          <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">
+            ~15 min
+          </span>
+        </div>
+
+        <!-- Waiting -->
+        <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-600">
+            T-044
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-700">Token 044</p>
+            <p class="text-xs text-gray-400">NOC Certificate</p>
+          </div>
+          <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">
+            ~28 min
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Queue Summary Badges -->
+    <div class="grid grid-cols-3 gap-3">
+      <div class="bg-white rounded-2xl shadow p-4 text-center">
+        <p class="text-2xl font-black text-gray-400">2</p>
+        <p class="text-xs text-gray-400 mt-1">Completed</p>
+        <span class="inline-block mt-2 w-2 h-2 rounded-full bg-gray-300"></span>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-4 text-center border-2 border-green-400">
+        <p class="text-2xl font-black text-green-600">1</p>
+        <p class="text-xs text-green-600 mt-1">Processing</p>
+        <span class="inline-block mt-2 w-2 h-2 rounded-full bg-green-500 live-pulse"></span>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-4 text-center">
+        <p class="text-2xl font-black text-blue-500">2</p>
+        <p class="text-xs text-blue-500 mt-1">Waiting</p>
+        <span class="inline-block mt-2 w-2 h-2 rounded-full bg-blue-400"></span>
+      </div>
+    </div>
+
+    <!-- Notification Banner -->
+    <div class="bg-yellow-50 border border-yellow-300 rounded-2xl p-4 flex items-start gap-3">
+      <span class="text-xl">🔔</span>
+      <div>
+        <p class="text-sm font-semibold text-yellow-800">Your turn is approaching!</p>
+        <p class="text-xs text-yellow-600 mt-1">
+          Please be ready at Counter No. 3 by <strong>10:30 AM</strong>. Carry your original documents.
+        </p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-3 pb-6">
+      
+        href="/appointments/request/"
+        class="w-full text-center border border-green-600 text-green-600 font-semibold py-2.5 rounded-xl text-sm hover:bg-green-50 transition"
+      >
+        ← New Request
+      </a>
+      <button
+        onclick="window.location.reload()"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl text-sm transition"
+      >
+        🔄 Refresh Queue
+      </button>
+    </div>
+
+  </div>
+
+</body>
+</html>
