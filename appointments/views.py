@@ -2,10 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.utils import timezone
-import uuid
-from .models import Appointment
 from .serializers import AppointmentSerializer
+from .utils import book_appointment_in_slot
+
 
 class BookAppointmentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -13,15 +12,15 @@ class BookAppointmentView(APIView):
     def post(self, request):
         serializer = AppointmentSerializer(data=request.data)
         if serializer.is_valid():
-            # Generate unique token number
-            token_number = f"TKN-{uuid.uuid4().hex[:6].upper()}"
-
-            # Save appointment with user and token
-            appointment = serializer.save(
+            appointment, error = book_appointment_in_slot(
                 user=request.user,
-                token_number=token_number,
-                status='pending'
+                service_type=serializer.validated_data['service_type'],
+                scheduled_time=serializer.validated_data['scheduled_time'],
+                form_data_jsonb=serializer.validated_data['form_data_jsonb'],
             )
+
+            if error:
+                return Response({"error": error}, status=status.HTTP_409_CONFLICT)
 
             return Response({
                 "message": "Appointment booked successfully.",
