@@ -46,7 +46,7 @@
             <span class="w-2 h-2 rounded-full bg-yellow-500 live-pulse inline-block"></span>
             Processing
           </span>
-          <p class="text-xs text-gray-400 mt-2">Income Certificate</p>
+          <p class="text-xs text-gray-400 mt-2" id="live-service-type">Income Certificate</p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@
         </div>
         <div class="bg-blue-50 rounded-xl px-4 py-3 text-center">
           <p class="text-xs text-gray-500 mb-1">Scheduled Arrival</p>
-          <p class="text-xl font-bold text-blue-700">10:30 AM</p>
+          <p class="text-xl font-bold text-blue-700" id="live-scheduled-time">10:30 AM</p>
         </div>
       </div>
 
@@ -158,17 +158,17 @@
     <!-- Queue Summary Badges -->
     <div class="grid grid-cols-3 gap-3">
       <div class="bg-white rounded-2xl shadow p-4 text-center">
-        <p class="text-2xl font-black text-gray-400">2</p>
+        <p class="text-2xl font-black text-gray-400" id="live-count-completed">2</p>
         <p class="text-xs text-gray-400 mt-1">Completed</p>
         <span class="inline-block mt-2 w-2 h-2 rounded-full bg-gray-300"></span>
       </div>
       <div class="bg-white rounded-2xl shadow p-4 text-center border-2 border-green-400">
-        <p class="text-2xl font-black text-green-600">1</p>
+        <p class="text-2xl font-black text-green-600" id="live-count-processing">1</p>
         <p class="text-xs text-green-600 mt-1">Processing</p>
         <span class="inline-block mt-2 w-2 h-2 rounded-full bg-green-500 live-pulse"></span>
       </div>
       <div class="bg-white rounded-2xl shadow p-4 text-center">
-        <p class="text-2xl font-black text-blue-500">2</p>
+        <p class="text-2xl font-black text-blue-500" id="live-count-waiting">2</p>
         <p class="text-xs text-blue-500 mt-1">Waiting</p>
         <span class="inline-block mt-2 w-2 h-2 rounded-full bg-blue-400"></span>
       </div>
@@ -180,7 +180,7 @@
       <div>
         <p class="text-sm font-semibold text-yellow-800">Your turn is approaching!</p>
         <p class="text-xs text-yellow-600 mt-1">
-          Please be ready at Counter No. 3 by <strong>10:30 AM</strong>. Carry your original documents.
+          Please be ready at your counter by <strong id="live-banner-time">10:30 AM</strong>. Carry your original documents.
         </p>
       </div>
     </div>
@@ -202,6 +202,150 @@
     </div>
 
   </div>
+<script>
+  // --- Helper: get CSRF cookie ---
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      document.cookie.split(';').forEach(function (cookie) {
+        const trimmed = cookie.trim();
+        if (trimmed.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+        }
+      });
+    }
+    return cookieValue;
+  }
 
+  // --- Helper: format time from datetime string ---
+  function formatTime(dateStr) {
+    if (!dateStr) return 'N/A';
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // --- Helper: format service type display ---
+  function getServiceLabel(serviceType) {
+    const labels = {
+      'birth_certificate':     'Birth Certificate',
+      'death_certificate':     'Death Certificate',
+      'income_certificate':    'Income Certificate',
+      'residence_certificate': 'Residence Certificate',
+      'caste_certificate':     'Caste Certificate',
+      'property_certificate':  'Property Certificate',
+      'domicile':              'Domicile Certificate',
+      'income':                'Income Certificate',
+      'caste':                 'Caste Certificate',
+      'birth':                 'Birth Certificate',
+      'death':                 'Death Certificate',
+      'noc':                   'No Objection Certificate'
+    };
+    return labels[serviceType] || serviceType;
+  }
+
+  // --- Helper: get status badge HTML ---
+  function getStatusBadge(status) {
+    const badges = {
+      'pending':   '<span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">🕐 Pending</span>',
+      'confirmed': '<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold animate-pulse">⚡ Confirmed</span>',
+      'completed': '<span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full font-medium">✓ Done</span>',
+      'cancelled': '<span class="text-xs bg-red-100 text-red-500 px-2 py-1 rounded-full font-medium">✗ Cancelled</span>'
+    };
+    return badges[status] || '<span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">Unknown</span>';
+  }
+
+  // --- Update My Ticket Card with latest appointment ---
+  function updateMyTicketCard(appointments) {
+    if (!appointments || appointments.length === 0) return;
+
+    // Get most recent active appointment
+    const active = appointments.find(function (a) {
+      return a.status === 'confirmed' || a.status === 'pending';
+    }) || appointments[0];
+
+    // Update token number
+    const tokenEl = document.getElementById('live-token-number');
+    if (tokenEl) tokenEl.textContent = active.token_number || 'N/A';
+
+    // Update service type
+    const serviceEl = document.getElementById('live-service-type');
+    if (serviceEl) serviceEl.textContent = getServiceLabel(active.service_type);
+
+    // Update scheduled time
+    const timeEl = document.getElementById('live-scheduled-time');
+    if (timeEl) timeEl.textContent = formatTime(active.scheduled_time);
+
+    // Update status badge
+    const statusEl = document.getElementById('live-status-badge');
+    if (statusEl) statusEl.innerHTML = getStatusBadge(active.status);
+
+    // Update notification banner
+    const bannerEl = document.getElementById('live-banner-time');
+    if (bannerEl) bannerEl.textContent = formatTime(active.scheduled_time);
+
+    const bannerTokenEl = document.getElementById('live-banner-token');
+    if (bannerTokenEl) bannerTokenEl.textContent = active.token_number || '';
+  }
+
+  // --- Render live queue stream ---
+  function renderQueueStream(appointments) {
+    const queueEl = document.getElementById('live-queue-stream');
+    if (!queueEl || !appointments || appointments.length === 0) return;
+
+    // Count summary
+    const completed  = appointments.filter(function (a) { return a.status === 'completed'; }).length;
+    const processing = appointments.filter(function (a) { return a.status === 'confirmed'; }).length;
+    const waiting    = appointments.filter(function (a) { return a.status === 'pending'; }).length;
+
+    // Update summary badges
+    const compEl = document.getElementById('live-count-completed');
+    if (compEl) compEl.textContent = completed;
+    const procEl = document.getElementById('live-count-processing');
+    if (procEl) procEl.textContent = processing;
+    const waitEl = document.getElementById('live-count-waiting');
+    if (waitEl) waitEl.textContent = waiting;
+
+    // Render queue cards
+    queueEl.innerHTML = appointments.map(function (appt) {
+      const isActive = appt.status === 'confirmed';
+      const isDone   = appt.status === 'completed';
+
+      if (isDone) {
+        return '<div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl opacity-60">' +
+          '<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">' + appt.token_number + '</div>' +
+          '<div class="flex-1"><p class="text-sm font-medium text-gray-500">' + appt.token_number + '</p>' +
+          '<p class="text-xs text-gray-400">' + getServiceLabel(appt.service_type) + '</p></div>' +
+          '<span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full font-medium">✓ Done</span></div>';
+      } else if (isActive) {
+        return '<div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl border-2 border-green-400">' +
+          '<div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xs font-bold text-white">' + appt.token_number + '</div>' +
+          '<div class="flex-1"><p class="text-sm font-bold text-green-700">' + appt.token_number + ' — YOU</p>' +
+          '<p class="text-xs text-green-600">' + getServiceLabel(appt.service_type) + '</p></div>' +
+          '<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold animate-pulse">⚡ Now</span></div>';
+      } else {
+        return '<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200">' +
+          '<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">' + appt.token_number + '</div>' +
+          '<div class="flex-1"><p class="text-sm font-medium text-gray-700">' + appt.token_number + '</p>' +
+          '<p class="text-xs text-gray-400">' + getServiceLabel(appt.service_type) + '</p></div>' +
+          '<span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">Pending</span></div>';
+      }
+    }).join('');
+  }
+
+  // --- Fetch live appointments from API ---
+  function fetchLiveQueueData() {
+    const token = sessionStorage.getItem('gramsmart_token') || '';
+
+    fetch('/api/appointments/my-tokens/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Authorization': token ? 'Token ' + token : ''
+      },
+      credentials: 'same-origin'
+    })
+    .then(function (response) { return response.json(); })
+    .then(function
 </body>
 </html>
