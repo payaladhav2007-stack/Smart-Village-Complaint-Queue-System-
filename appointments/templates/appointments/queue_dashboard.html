@@ -39,7 +39,7 @@
       <div class="flex items-center justify-between mb-3">
         <div>
           <p class="text-xs text-gray-400 uppercase tracking-wide font-medium">Your Token</p>
-          <h2 class="text-4xl font-black text-green-600 mt-1">T - 042</h2>
+          <h2 id="live-token-number" class="text-4xl font-black text-green-600 mt-1">T - 042</h2>
         </div>
         <div class="text-right">
           <span class="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1.5 rounded-full">
@@ -331,21 +331,79 @@
       }
     }).join('');
   }
-
-  // --- Fetch live appointments from API ---
+    // --- Fetch live appointments from API ---
   function fetchLiveQueueData() {
     const token = sessionStorage.getItem('gramsmart_token') || '';
-
     fetch('/api/appointments/my-tokens/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken'),
         'Authorization': token ? 'Token ' + token : ''
-      },
-      credentials: 'same-origin'
+      }
     })
-    .then(function (response) { return response.json(); })
-    .then(function
+    .then(function(response) { return response.json(); })
+    .then(function(appointments) {
+      if (!appointments || appointments.length === 0) return;
+
+      // Find most recent active appointment
+      const active = appointments.find(a => a.status === 'confirmed' || a.status === 'pending') || appointments[0];
+
+      // Update token number
+      const tokenEl = document.getElementById('live-token-number');
+      if (tokenEl) tokenEl.textContent = active.token_number;
+
+      // Update service type
+      const serviceEl = document.getElementById('live-service-type');
+      if (serviceEl) serviceEl.textContent = getServiceLabel(active.service_type);
+
+      // Update scheduled time
+      const timeEl = document.getElementById('live-scheduled-time');
+      if (timeEl) timeEl.textContent = new Date(active.scheduled_time).toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit'});
+
+      // Update status badge
+      const statusEl = document.getElementById('live-status-badge');
+      if (statusEl) statusEl.innerHTML = getStatusBadge(active.status);
+
+      // Update summary counts
+      const compEl = document.getElementById('live-count-completed');
+      if (compEl) compEl.textContent = appointments.filter(a => a.status === 'completed').length;
+      const procEl = document.getElementById('live-count-processing');
+      if (procEl) procEl.textContent = appointments.filter(a => a.status === 'confirmed').length;
+      const waitEl = document.getElementById('live-count-waiting');
+      if (waitEl) waitEl.textContent = appointments.filter(a => a.status === 'pending').length;
+
+      // Update queue stream
+      const queueEl = document.getElementById('live-queue-stream');
+      if (queueEl) queueEl.innerHTML = appointments.map(function(appt) {
+        if (appt.status === 'completed') {
+          return '<div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 opacity-60">' +
+            '<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">' + appt.token_number + '</div>' +
+            '<div class="flex-1"><p class="text-sm font-medium text-gray-500">' + appt.token_number + '</p>' +
+            '<p class="text-xs text-gray-400">' + getServiceLabel(appt.service_type) + '</p></div>' +
+            '<span class="text-xs text-gray-400">✓ Done</span></div>';
+        } else if (appt.status === 'confirmed') {
+          return '<div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl border-2 border-green-400">' +
+            '<div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xs font-bold text-white">' + appt.token_number + '</div>' +
+            '<div class="flex-1"><p class="text-sm font-bold text-green-700">' + appt.token_number + ' — YOU</p>' +
+            '<p class="text-xs text-green-600">' + getServiceLabel(appt.service_type) + '</p></div>' +
+            '<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold animate-pulse">⚡ Now</span></div>';
+        } else {
+          return '<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200">' +
+            '<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">' + appt.token_number + '</div>' +
+            '<div class="flex-1"><p class="text-sm font-medium text-gray-700">' + appt.token_number + '</p>' +
+            '<p class="text-xs text-gray-400">' + getServiceLabel(appt.service_type) + '</p></div>' +
+            '<span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">Pending</span></div>';
+        }
+      }).join('');
+    })
+    .catch(function(err) { console.warn('Queue fetch failed:', err); });
+  }
+
+  // --- Add id to token number element ---
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchLiveQueueData();
+    setInterval(fetchLiveQueueData, 20000);
+  });
+</script>
 </body>
 </html>
