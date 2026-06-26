@@ -55,7 +55,7 @@
 
           <!-- Domicile Certificate -->
           <div class="service-card">
-            <input type="radio" name="service_type" id="domicile" value="domicile" class="hidden" required />
+            <input type="radio" name="service_type" id="domicile" value="residence_certificate" class="hidden" required />
             <label for="domicile" class="block border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-green-400 transition text-sm font-medium text-gray-700">
               🏠 Domicile Certificate
               <p class="text-xs text-gray-400 font-normal mt-1">Proof of local residence</p>
@@ -64,7 +64,7 @@
 
           <!-- Income Certificate -->
           <div class="service-card">
-            <input type="radio" name="service_type" id="income" value="income" class="hidden" />
+            <input type="radio" name="service_type" id="income" value="income_certificate" class="hidden" />
             <label for="income" class="block border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-green-400 transition text-sm font-medium text-gray-700">
               💰 Income Certificate
               <p class="text-xs text-gray-400 font-normal mt-1">Annual family income proof</p>
@@ -73,7 +73,7 @@
 
           <!-- Caste Certificate -->
           <div class="service-card">
-            <input type="radio" name="service_type" id="caste" value="caste" class="hidden" />
+            <input type="radio" name="service_type" id="caste" value="caste_certificate" class="hidden" />
             <label for="caste" class="block border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-green-400 transition text-sm font-medium text-gray-700">
               📋 Caste Certificate
               <p class="text-xs text-gray-400 font-normal mt-1">Official caste verification</p>
@@ -82,7 +82,7 @@
 
           <!-- Birth Certificate -->
           <div class="service-card">
-            <input type="radio" name="service_type" id="birth" value="birth" class="hidden" />
+            <input type="radio" name="service_type" id="birth" value="birth_certificate" class="hidden" />
             <label for="birth" class="block border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-green-400 transition text-sm font-medium text-gray-700">
               👶 Birth Certificate
               <p class="text-xs text-gray-400 font-normal mt-1">Date of birth official record</p>
@@ -91,7 +91,7 @@
 
           <!-- Death Certificate -->
           <div class="service-card">
-            <input type="radio" name="service_type" id="death" value="death" class="hidden" />
+            <input type="radio" name="service_type" id="death" value="death_certificate" class="hidden" />
             <label for="death" class="block border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-green-400 transition text-sm font-medium text-gray-700">
               🕊️ Death Certificate
               <p class="text-xs text-gray-400 font-normal mt-1">Official death registration</p>
@@ -100,7 +100,7 @@
 
           <!-- No Objection Certificate -->
           <div class="service-card">
-            <input type="radio" name="service_type" id="noc" value="noc" class="hidden" />
+            <input type="radio" name="service_type" id="noc" value="property_certificate" class="hidden" />
             <label for="noc" class="block border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-green-400 transition text-sm font-medium text-gray-700">
               ✅ No Objection Certificate
               <p class="text-xs text-gray-400 font-normal mt-1">NOC for official purposes</p>
@@ -368,10 +368,9 @@
 
       if (result.status === 201) {
         // --- Success: redirect to confirmation page ---
-        const tokenNumber   = result.data.token_number || '';
-        const serviceLabel  = result.data.service_type || '';
-        const scheduledVal  = result.data.scheduled_time || '';
-
+        const tokenNumber   = result.data.appointment.token_number || '';
+        const serviceLabel  = result.data.appointment.service_type || '';
+        const scheduledVal  = result.data.appointment.scheduled_time || '';
         window.location.href = '/appointments/confirmation/?token='
           + encodeURIComponent(tokenNumber)
           + '&service=' + encodeURIComponent(serviceLabel)
@@ -417,7 +416,16 @@
       window.open('/appointments/slots/', 'SlotPicker', 'width=650,height=700,scrollbars=yes');
     }
     function receiveTimeSlot(slot) {
-      document.getElementById('scheduled_time').value = slot;
+      // Convert "10:30 AM" to ISO datetime for today
+      const today = new Date();
+      today.setDate(today.getDate() + 1);
+      const [time, modifier] = slot.split(' ');
+      let [hours, minutes] = time.split(':').map(Number);
+      if (modifier === 'PM' && hours !== 12) hours += 12;
+      if (modifier === 'AM' && hours === 12) hours = 0;
+      today.setHours(hours, minutes, 0, 0);
+      const isoTime = today.toISOString();
+      document.getElementById('scheduled_time').value = isoTime;
       document.getElementById('slot-display').textContent = '✅ Selected: ' + slot;
       document.getElementById('slot-display').className =
         'w-full border border-green-300 rounded-lg px-4 py-2 text-sm bg-green-50 text-green-700 mb-2';
