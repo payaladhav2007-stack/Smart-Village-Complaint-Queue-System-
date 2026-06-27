@@ -10,6 +10,7 @@ from grievances.models import Complaint
 from appointments.models import Appointment
 from .models import ReassignmentLog
 from .permissions import IsStaffOrAdmin
+from .state_machine import is_valid_transition
 
 class WorkbenchSummaryView(APIView):
     permission_classes = [IsStaffOrAdmin]
@@ -166,3 +167,47 @@ class ReassignView(APIView):
             return Response({
                 'error': f'Appointment #{ticket_id} not found.'
             }, status=status.HTTP_404_NOT_FOUND)
+class TicketTransitionView(APIView):
+    permission_classes = [IsStaffOrAdmin]
+
+    def post(self, request):
+        ticket_id = request.data.get('ticket_id')
+        ticket_type = request.data.get('type')
+        new_status = request.data.get('new_status')
+
+        if not ticket_id or not ticket_type or not new_status:
+            return Response({
+                'error': 'ticket_id, type, and new_status are all required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if ticket_type not in ('grievance', 'appointment'):
+            return Response({
+                'error': "type must be 'grievance' or 'appointment'."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        model = Complaint if ticket_type == 'grievance' else Appointment
+
+        with transaction.atomic():
+            try:
+                ticket = model.objects.select_for_update().get(id=ticket_id)
+            except model.DoesNotExist:
+                return Response({
+                    'error': f'No {ticket_type} found with id {ticket_id}.'
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            current_status = ticket.status
+            valid, error_message = is_valid_transition(ticket_type, current_status, new_status)
+
+            if not valid:
+                return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
+
+            ticket.status = new_status
+            ticket.save()
+
+            return Response({
+                'message': f'{ticket_type.capitalize()} #{ticket_id} transitioned successfully.',
+                'ticket_id': ticket.id,
+                'type': ticket_type,
+                'previous_status': current_status,
+                'new_status': ticket.status,
+            }, status=status.HTTP_200_OK)
