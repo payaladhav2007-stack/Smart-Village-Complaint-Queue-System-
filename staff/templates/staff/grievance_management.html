@@ -8,13 +8,9 @@
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
   />
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLcE="
-    crossorigin=""
   ></script>
   <style>
     #modal-map { height: 200px; width: 100%; border-radius: 10px; z-index: 0; }
@@ -482,7 +478,7 @@
           .addTo(modalMap)
           .bindPopup('📍 ' + title)
           .openPopup();
-        modalMap.invalidateSize();
+        setTimeout(function() { modalMap.invalidateSize(); }, 300);
       }, 100);
     }
 
