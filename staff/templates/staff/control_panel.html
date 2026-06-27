@@ -1,564 +1,207 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GramSmart — Traffic Control Panel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .main-height { height: calc(100vh - 64px); }
-    .panel-scroll { overflow-y: auto; height: calc(100vh - 130px); }
-    @keyframes pulse-ring {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      70% { transform: scale(1.1); opacity: 0; }
-      100% { transform: scale(0.95); opacity: 0; }
-    }
-    .live-dot::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 9999px;
-      background: #16a34a;
-      animation: pulse-ring 1.5s ease-out infinite;
-    }
-    .live-dot { position: relative; }
-    .dropdown-menu { display: none; }
-    .dropdown-menu.open { display: block; }
-    .status-btn { transition: all 0.15s ease; }
-    .status-btn:hover { transform: translateY(-1px); }
-  </style>
-</head>
-<body class="bg-gray-100 font-sans">
+// GS-409: Client-Side Reassignment and Control Validations
+// Works with existing control_panel.html structure — hooks into
+// Anushka's existing reassign(), setStatus(), setGrievanceStatus() functions
 
-  <!-- STICKY TOP NAVBAR -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 flex items-center px-6 justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-        <span class="text-white font-black text-sm">GS</span>
-      </div>
-      <div>
-        <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
-        <p class="text-xs text-gray-400">Traffic Metrics & Control Panel</p>
-      </div>
-    </div>
+(function () {
 
-    <!-- Center: Live Status -->
-    <div class="hidden md:flex items-center gap-3">
-      <span class="flex items-center gap-1.5 text-xs text-green-600 font-semibold">
-        <span class="w-2 h-2 rounded-full bg-green-500 live-dot inline-block"></span>
-        Live Controls
-      </span>
-      <span class="text-xs text-gray-400" id="panel-date">—</span>
-    </div>
+  // --- Track current assignments per dropdown ---
+  // Key: dropdown id, Value: assigned value or empty string
+  var assignments = {};
 
-    <!-- Right -->
-    <div class="flex items-center gap-3">
-      <div class="text-right hidden sm:block">
-        <p class="text-xs font-semibold text-gray-700">Gram Sevak</p>
-        <p class="text-xs text-gray-400">Ward No. 4</p>
-      </div>
-      <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-        <span class="text-green-700 font-bold text-sm">GS</span>
-      </div>
-      <a href="/staff/workbench/"
-        class="text-xs text-green-600 hover:text-green-800 font-medium border border-green-200 px-3 py-1 rounded-lg transition">
-        ← Workbench
-      </a>
-    </div>
-  </nav>
+  // --- Helper: show red toast error ---
+  function showErrorToast(message) {
+    var toast = document.getElementById('toast');
+    var toastIcon = document.getElementById('toast-icon');
+    var toastMsg  = document.getElementById('toast-message');
 
-  <!-- MAIN LAYOUT -->
-  <div class="pt-16">
+    if (!toast || !toastIcon || !toastMsg) return;
 
-    <!-- Traffic Metrics Bar -->
-    <div class="bg-white border-b border-gray-200 px-6 py-4">
-      <div class="max-w-7xl mx-auto">
-        <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3">Today's Traffic Metrics</p>
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
-            <p class="text-2xl font-black text-gray-700">9</p>
-            <p class="text-xs text-gray-400 mt-0.5">Total Files</p>
-          </div>
-          <div class="bg-yellow-50 rounded-xl p-3 text-center border border-yellow-100">
-            <p class="text-2xl font-black text-yellow-600">3</p>
-            <p class="text-xs text-yellow-500 mt-0.5">Pending</p>
-          </div>
-          <div class="bg-blue-50 rounded-xl p-3 text-center border border-blue-100">
-            <p class="text-2xl font-black text-blue-600">2</p>
-            <p class="text-xs text-blue-500 mt-0.5">In Progress</p>
-          </div>
-          <div class="bg-green-50 rounded-xl p-3 text-center border border-green-100">
-            <p class="text-2xl font-black text-green-600">2</p>
-            <p class="text-xs text-green-500 mt-0.5">Completed</p>
-          </div>
-          <div class="bg-red-50 rounded-xl p-3 text-center border border-red-100">
-            <p class="text-2xl font-black text-red-500">1</p>
-            <p class="text-xs text-red-400 mt-0.5">Rejected</p>
-          </div>
-          <div class="bg-orange-50 rounded-xl p-3 text-center border border-orange-100">
-            <p class="text-2xl font-black text-orange-500">1</p>
-            <p class="text-xs text-orange-400 mt-0.5">No Show</p>
-          </div>
-          <div class="bg-purple-50 rounded-xl p-3 text-center border border-purple-100">
-            <p class="text-2xl font-black text-purple-600">3</p>
-            <p class="text-xs text-purple-400 mt-0.5">Counters Active</p>
-          </div>
-          <div class="bg-teal-50 rounded-xl p-3 text-center border border-teal-100">
-            <p class="text-2xl font-black text-teal-600">~14m</p>
-            <p class="text-xs text-teal-400 mt-0.5">Avg Wait</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONTROL PANEL GRID -->
-    <div class="max-w-7xl mx-auto px-4 py-6 panel-scroll">
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <!-- ===== LEFT COLUMN: APPOINTMENT STATUS CONTROLS ===== -->
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-              📋 Appointment Status Controls
-              <span class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">5 Active</span>
-            </h2>
-          </div>
-
-          <div class="space-y-4">
-
-            <!-- Control Card 1 — In Progress -->
-            <div class="bg-white rounded-xl shadow-sm border border-blue-100 p-4">
-              <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xs font-black text-white animate-pulse">
-                    #003
-                  </div>
-                  <div>
-                    <p class="text-sm font-bold text-gray-800">Manoj Kumar</p>
-                    <p class="text-xs text-gray-400">Birth Certificate · 10:00 AM</p>
-                    <p class="text-xs text-gray-400">📞 9654321012 · Ward 4</p>
-                  </div>
-                </div>
-                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold animate-pulse">⚡ Processing</span>
-              </div>
-
-              <!-- JSONB Details -->
-              <div class="bg-gray-50 rounded-lg px-3 py-2 mb-3 text-xs text-gray-500 space-y-0.5">
-                <p><span class="font-medium text-gray-600">Purpose:</span> Passport application</p>
-                <p><span class="font-medium text-gray-600">DOB:</span> 22/07/1995</p>
-                <p><span class="font-medium text-gray-600">Address:</span> Ward 4, Near Temple</p>
-              </div>
-
-              <!-- Status Action Button Group -->
-              <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setStatus(this, 'in-progress')"
-                  class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  🔧 In Progress
-                </button>
-                <button onclick="setStatus(this, 'completed')"
-                  class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✔ Completed
-                </button>
-                <button onclick="setStatus(this, 'rejected')"
-                  class="status-btn flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✕ Rejected
-                </button>
-              </div>
-
-              <!-- Reassignment Panel -->
-              <div class="border-t border-gray-100 pt-3">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-500 font-medium">Reassign Counter:</p>
-                  <div class="relative">
-                    <button onclick="toggleDropdown('dd1')"
-                      class="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition font-medium">
-                      Counter No. 3 ▾
-                    </button>
-                    <div id="dd1" class="dropdown-menu absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
-                      <button onclick="reassign('dd1', 'Counter No. 1')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 1</button>
-                      <button onclick="reassign('dd1', 'Counter No. 2')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 2</button>
-                      <button onclick="reassign('dd1', 'Counter No. 3')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 3 ✔</button>
-                      <button onclick="reassign('dd1', 'Counter No. 4')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 4</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Control Card 2 — Pending -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-black text-blue-600">
-                    #004
-                  </div>
-                  <div>
-                    <p class="text-sm font-bold text-gray-800">Priya Sharma</p>
-                    <p class="text-xs text-gray-400">Caste Certificate · 10:30 AM</p>
-                    <p class="text-xs text-gray-400">📞 9543210123 · Ward 4</p>
-                  </div>
-                </div>
-                <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">~15 min</span>
-              </div>
-
-              <div class="bg-gray-50 rounded-lg px-3 py-2 mb-3 text-xs text-gray-500 space-y-0.5">
-                <p><span class="font-medium text-gray-600">Purpose:</span> Government job application</p>
-                <p><span class="font-medium text-gray-600">DOB:</span> 15/03/1998</p>
-                <p><span class="font-medium text-gray-600">Address:</span> Ward 4, Main Street</p>
-              </div>
-
-              <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setStatus(this, 'in-progress')"
-                  class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  🔧 In Progress
-                </button>
-                <button onclick="setStatus(this, 'completed')"
-                  class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✔ Completed
-                </button>
-                <button onclick="setStatus(this, 'rejected')"
-                  class="status-btn flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✕ Rejected
-                </button>
-              </div>
-
-              <div class="border-t border-gray-100 pt-3">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-500 font-medium">Reassign Counter:</p>
-                  <div class="relative">
-                    <button onclick="toggleDropdown('dd2')"
-                      class="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition font-medium">
-                      Counter No. 2 ▾
-                    </button>
-                    <div id="dd2" class="dropdown-menu absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
-                      <button onclick="reassign('dd2', 'Counter No. 1')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 1</button>
-                      <button onclick="reassign('dd2', 'Counter No. 2')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 2 ✔</button>
-                      <button onclick="reassign('dd2', 'Counter No. 3')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 3</button>
-                      <button onclick="reassign('dd2', 'Counter No. 4')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 4</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Control Card 3 — Upcoming -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-black text-blue-600">
-                    #005
-                  </div>
-                  <div>
-                    <p class="text-sm font-bold text-gray-800">Anita Joshi</p>
-                    <p class="text-xs text-gray-400">NOC Certificate · 11:00 AM</p>
-                    <p class="text-xs text-gray-400">📞 9432101234 · Ward 4</p>
-                  </div>
-                </div>
-                <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">~30 min</span>
-              </div>
-
-              <div class="bg-gray-50 rounded-lg px-3 py-2 mb-3 text-xs text-gray-500 space-y-0.5">
-                <p><span class="font-medium text-gray-600">Purpose:</span> Property sale NOC</p>
-                <p><span class="font-medium text-gray-600">DOB:</span> 08/09/1982</p>
-                <p><span class="font-medium text-gray-600">Address:</span> Ward 4, Lake Road</p>
-              </div>
-
-              <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setStatus(this, 'in-progress')"
-                  class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  🔧 In Progress
-                </button>
-                <button onclick="setStatus(this, 'completed')"
-                  class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✔ Completed
-                </button>
-                <button onclick="setStatus(this, 'rejected')"
-                  class="status-btn flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✕ Rejected
-                </button>
-              </div>
-
-              <div class="border-t border-gray-100 pt-3">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-500 font-medium">Reassign Counter:</p>
-                  <div class="relative">
-                    <button onclick="toggleDropdown('dd3')"
-                      class="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition font-medium">
-                      Counter No. 1 ▾
-                    </button>
-                    <div id="dd3" class="dropdown-menu absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
-                      <button onclick="reassign('dd3', 'Counter No. 1')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 1 ✔</button>
-                      <button onclick="reassign('dd3', 'Counter No. 2')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 2</button>
-                      <button onclick="reassign('dd3', 'Counter No. 3')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 3</button>
-                      <button onclick="reassign('dd3', 'Counter No. 4')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Counter No. 4</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- ===== RIGHT COLUMN: GRIEVANCE STATUS CONTROLS ===== -->
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-              🔧 Grievance Status Controls
-              <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">4 Active</span>
-            </h2>
-          </div>
-
-          <div class="space-y-4">
-
-            <!-- Grievance Card 1 — High Priority -->
-            <div class="bg-white rounded-xl shadow-sm border border-red-100 p-4">
-              <div class="flex items-start justify-between mb-3">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">🚨 High Priority</span>
-                    <span class="text-xs text-gray-400">2h ago</span>
-                  </div>
-                  <p class="text-sm font-bold text-gray-800">Large pothole on Main Road</p>
-                  <p class="text-xs text-gray-500 mt-0.5">Near bus stop, Ward 4</p>
-                  <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium mt-1 inline-block">Roads / Potholes</span>
-                </div>
-                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Pending</span>
-              </div>
-
-              <!-- Status Button Group -->
-              <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setGrievanceStatus(this, 'in-progress')"
-                  class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  🔧 In Progress
-                </button>
-                <button onclick="setGrievanceStatus(this, 'completed')"
-                  class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✔ Resolved
-                </button>
-                <button onclick="setGrievanceStatus(this, 'rejected')"
-                  class="status-btn flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✕ Rejected
-                </button>
-              </div>
-
-              <!-- Field Worker Reassignment -->
-              <div class="border-t border-gray-100 pt-3">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-500 font-medium">Assign Field Worker:</p>
-                  <div class="relative">
-                    <button onclick="toggleDropdown('gdd1')"
-                      class="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition font-medium">
-                      Unassigned ▾
-                    </button>
-                    <div id="gdd1" class="dropdown-menu absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
-                      <button onclick="reassign('gdd1', 'Rajan (Roads Team)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Rajan (Roads Team)</button>
-                      <button onclick="reassign('gdd1', 'Suresh (Water Team)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Suresh (Water Team)</button>
-                      <button onclick="reassign('gdd1', 'Deepak (Electrical)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Deepak (Electrical)</button>
-                      <button onclick="reassign('gdd1', 'Mohan (Sanitation)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Mohan (Sanitation)</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Grievance Card 2 -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div class="flex items-start justify-between mb-3">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">⚠️ Medium</span>
-                    <span class="text-xs text-gray-400">5h ago</span>
-                  </div>
-                  <p class="text-sm font-bold text-gray-800">Water pipeline leakage</p>
-                  <p class="text-xs text-gray-500 mt-0.5">Street 12, Ward 4</p>
-                  <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium mt-1 inline-block">Water Supply</span>
-                </div>
-                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">In Progress</span>
-              </div>
-
-              <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setGrievanceStatus(this, 'in-progress')"
-                  class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  🔧 In Progress
-                </button>
-                <button onclick="setGrievanceStatus(this, 'completed')"
-                  class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✔ Resolved
-                </button>
-                <button onclick="setGrievanceStatus(this, 'rejected')"
-                  class="status-btn flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✕ Rejected
-                </button>
-              </div>
-
-              <div class="border-t border-gray-100 pt-3">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-500 font-medium">Assign Field Worker:</p>
-                  <div class="relative">
-                    <button onclick="toggleDropdown('gdd2')"
-                      class="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition font-medium">
-                      Suresh (Water Team) ▾
-                    </button>
-                    <div id="gdd2" class="dropdown-menu absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
-                      <button onclick="reassign('gdd2', 'Rajan (Roads Team)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Rajan (Roads Team)</button>
-                      <button onclick="reassign('gdd2', 'Suresh (Water Team)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Suresh (Water Team) ✔</button>
-                      <button onclick="reassign('gdd2', 'Deepak (Electrical)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Deepak (Electrical)</button>
-                      <button onclick="reassign('gdd2', 'Mohan (Sanitation)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Mohan (Sanitation)</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Grievance Card 3 -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div class="flex items-start justify-between mb-3">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">⚠️ Medium</span>
-                    <span class="text-xs text-gray-400">1d ago</span>
-                  </div>
-                  <p class="text-sm font-bold text-gray-800">Street lights not working</p>
-                  <p class="text-xs text-gray-500 mt-0.5">Near school gate, Ward 4</p>
-                  <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full font-medium mt-1 inline-block">Electricity</span>
-                </div>
-                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Pending</span>
-              </div>
-
-              <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setGrievanceStatus(this, 'in-progress')"
-                  class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  🔧 In Progress
-                </button>
-                <button onclick="setGrievanceStatus(this, 'completed')"
-                  class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✔ Resolved
-                </button>
-                <button onclick="setGrievanceStatus(this, 'rejected')"
-                  class="status-btn flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                  ✕ Rejected
-                </button>
-              </div>
-
-              <div class="border-t border-gray-100 pt-3">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-500 font-medium">Assign Field Worker:</p>
-                  <div class="relative">
-                    <button onclick="toggleDropdown('gdd3')"
-                      class="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition font-medium">
-                      Deepak (Electrical) ▾
-                    </button>
-                    <div id="gdd3" class="dropdown-menu absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
-                      <button onclick="reassign('gdd3', 'Rajan (Roads Team)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Rajan (Roads Team)</button>
-                      <button onclick="reassign('gdd3', 'Suresh (Water Team)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Suresh (Water Team)</button>
-                      <button onclick="reassign('gdd3', 'Deepak (Electrical)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Deepak (Electrical) ✔</button>
-                      <button onclick="reassign('gdd3', 'Mohan (Sanitation)')" class="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition">Mohan (Sanitation)</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Grievance Card 4 — Resolved -->
-            <div class="bg-white rounded-xl shadow-sm border border-green-100 p-4 opacity-70">
-              <div class="flex items-start justify-between mb-3">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">✔ Resolved</span>
-                    <span class="text-xs text-gray-400">3d ago</span>
-                  </div>
-                  <p class="text-sm font-semibold text-gray-500">Broken footpath repaired</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Ward 4 market area</p>
-                  <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium mt-1 inline-block">Roads / Potholes</span>
-                </div>
-                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">✔ Resolved</span>
-              </div>
-              <div class="text-xs text-gray-400 text-center py-1">
-                No further actions required
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- Status Change Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
-    <div class="bg-gray-800 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg flex items-center gap-2">
-      <span id="toast-icon">✔</span>
-      <span id="toast-message">Status updated</span>
-    </div>
-  </div>
-
-  <script>
-    // Set today's date
-    var today = new Date();
-    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('panel-date').textContent = today.toLocaleDateString('en-IN', options);
-
-    // Toggle dropdown
-    function toggleDropdown(id) {
-      document.querySelectorAll('.dropdown-menu').forEach(function(el) {
-        if (el.id !== id) el.classList.remove('open');
-      });
-      document.getElementById(id).classList.toggle('open');
+    // Override styling to red for error
+    var innerDiv = toast.querySelector('div');
+    if (innerDiv) {
+      innerDiv.style.background = '#fef2f2';
+      innerDiv.style.color      = '#dc2626';
+      innerDiv.style.border     = '1px solid #fecaca';
     }
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.relative')) {
-        document.querySelectorAll('.dropdown-menu').forEach(function(el) {
-          el.classList.remove('open');
-        });
+    toastIcon.textContent  = '⚠';
+    toastMsg.textContent   = message;
+    toast.classList.remove('hidden');
+
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(function () {
+      toast.classList.add('hidden');
+      // Restore original dark styling for next success toast
+      if (innerDiv) {
+        innerDiv.style.background = '#1f2937';
+        innerDiv.style.color      = '#f9fafb';
+        innerDiv.style.border     = 'none';
       }
+    }, 3500);
+  }
+
+  // --- Helper: show inline red error below a target element ---
+  function showInlineError(targetEl, message, errorId) {
+    clearInlineError(errorId);
+
+    var errorEl = document.createElement('div');
+    errorEl.id  = errorId;
+    errorEl.style.cssText = [
+      'margin-top: 8px',
+      'padding: 8px 12px',
+      'background: #fef2f2',
+      'border: 1px solid #fecaca',
+      'border-radius: 8px',
+      'font-size: 0.8rem',
+      'color: #dc2626',
+      'font-weight: 500'
+    ].join(';');
+    errorEl.textContent = '⚠ ' + message;
+
+    if (targetEl && targetEl.parentNode) {
+      targetEl.parentNode.insertBefore(errorEl, targetEl.nextSibling);
+    }
+
+    // Auto-remove after 4 seconds
+    setTimeout(function () { clearInlineError(errorId); }, 4000);
+  }
+
+  // --- Helper: clear inline error ---
+  function clearInlineError(errorId) {
+    var existing = document.getElementById(errorId);
+    if (existing) existing.remove();
+  }
+
+  // --- Get the dropdown button label text for a card ---
+  function getDropdownLabel(card, dropdownBtnSelector) {
+    var btn = card.querySelector(dropdownBtnSelector);
+    if (!btn) return '';
+    return btn.textContent.replace('▾', '').trim();
+  }
+
+  // --- Validate appointment card before status change ---
+  function validateAppointmentCard(card) {
+    var counterBtn = card.querySelector('[onclick^="toggleDropdown(\'dd"]');
+    if (!counterBtn) return true; // no dropdown found, skip
+
+    var counterLabel = counterBtn.textContent.replace('▾', '').trim();
+
+    // Counter No. X is valid — "Unassigned" or empty is not
+    if (!counterLabel || counterLabel === '' || counterLabel === 'Unassigned') {
+      showInlineError(
+        counterBtn,
+        'Please select a Counter Number before updating this appointment status.',
+        'error-appt-' + (card.querySelector('[class*="font-black"]') || {}).textContent
+      );
+      showErrorToast('Select a Counter Number before updating status.');
+      return false;
+    }
+
+    return true;
+  }
+
+  // --- Validate grievance card before status change ---
+  function validateGrievanceCard(card) {
+    var workerBtn = card.querySelector('[onclick^="toggleDropdown(\'gdd"]');
+    if (!workerBtn) return true; // resolved card or no dropdown, skip
+
+    var workerLabel = workerBtn.textContent.replace('▾', '').trim();
+
+    // "Unassigned" or empty means no worker picked yet
+    if (!workerLabel || workerLabel === '' || workerLabel === 'Unassigned') {
+      showInlineError(
+        workerBtn,
+        'Please assign a Field Worker before updating this grievance status.',
+        'error-grv-' + Math.random().toString(36).substr(2, 5)
+      );
+      showErrorToast('Assign a Field Worker before updating grievance status.');
+      return false;
+    }
+
+    return true;
+  }
+
+  // --- Intercept all status buttons ---
+  function interceptStatusButtons() {
+
+    // Appointment status buttons (onclick contains setStatus)
+    document.querySelectorAll('[onclick^="setStatus"]').forEach(function (btn) {
+      btn.addEventListener('click', function (event) {
+        var card = btn.closest('.bg-white');
+        if (!card) return;
+
+        var isValid = validateAppointmentCard(card);
+        if (!isValid) {
+          event.stopImmediatePropagation();
+          // We can't fully prevent onclick= handlers with preventDefault
+          // so we temporarily override setStatus to block execution
+          var originalSetStatus = window.setStatus;
+          window.setStatus = function () {
+            window.setStatus = originalSetStatus; // restore immediately after
+          };
+          setTimeout(function () {
+            window.setStatus = originalSetStatus;
+          }, 100);
+        }
+      }, true); // capture phase — fires before onclick
     });
 
-    // Reassign counter/worker
-    function reassign(dropdownId, value) {
-      var btn = document.querySelector('[onclick="toggleDropdown(\'' + dropdownId + '\')"]');
-      btn.textContent = value + ' ▾';
-      document.getElementById(dropdownId).classList.remove('open');
-      showToast('🔄', 'Reassigned to ' + value);
-    }
+    // Grievance status buttons (onclick contains setGrievanceStatus)
+    document.querySelectorAll('[onclick^="setGrievanceStatus"]').forEach(function (btn) {
+      btn.addEventListener('click', function (event) {
+        var card = btn.closest('.bg-white');
+        if (!card) return;
 
-    // Set appointment status
-    function setStatus(btn, status) {
-      var card = btn.closest('.bg-white');
-      var statusBadge = card.querySelector('.rounded-full.font-medium:not(.bg-orange-100):not(.bg-blue-100.text-blue-600):not(.animate-pulse)');
-      var labels = { 'in-progress': ['🔧 In Progress', 'bg-blue-100', 'text-blue-700'],
-                     'completed': ['✔ Completed', 'bg-green-100', 'text-green-700'],
-                     'rejected': ['✕ Rejected', 'bg-red-100', 'text-red-600'] };
-      var label = labels[status];
-      showToast(label[0].split(' ')[0], 'Status set to ' + label[0]);
-      if (status === 'completed') { card.style.opacity = '0.6'; }
-    }
+        // Skip resolved cards (they have opacity-70 and show "No further actions")
+        if (card.classList.contains('opacity-70')) return;
 
-    // Set grievance status
-    function setGrievanceStatus(btn, status) {
-      var card = btn.closest('.bg-white');
-      var labels = { 'in-progress': '🔧 In Progress',
-                     'completed': '✔ Resolved',
-                     'rejected': '✕ Rejected' };
-      showToast('✔', 'Grievance marked as ' + labels[status]);
-      if (status === 'completed') { card.style.opacity = '0.6'; }
-    }
+        var isValid = validateGrievanceCard(card);
+        if (!isValid) {
+          event.stopImmediatePropagation();
+          var originalFn = window.setGrievanceStatus;
+          window.setGrievanceStatus = function () {
+            window.setGrievanceStatus = originalFn;
+          };
+          setTimeout(function () {
+            window.setGrievanceStatus = originalFn;
+          }, 100);
+        }
+      }, true); // capture phase
+    });
+  }
 
-    // Toast notification
-    function showToast(icon, message) {
-      var toast = document.getElementById('toast');
-      document.getElementById('toast-icon').textContent = icon;
-      document.getElementById('toast-message').textContent = message;
-      toast.classList.remove('hidden');
-      setTimeout(function() { toast.classList.add('hidden'); }, 2500);
+  // --- Track reassignment selections to clear errors ---
+  function trackReassignments() {
+    // When reassign() is called, clear any related inline errors
+    var originalReassign = window.reassign;
+    if (originalReassign) {
+      window.reassign = function (dropdownId, value) {
+        // Clear inline errors on the card containing this dropdown
+        var dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+          var card = dropdown.closest('.bg-white');
+          if (card) {
+            card.querySelectorAll('[id^="error-"]').forEach(function (el) {
+              el.remove();
+            });
+          }
+        }
+        // Call original reassign
+        originalReassign(dropdownId, value);
+      };
     }
-  </script>
-<script src="{% static 'staff/js/control_validations.js' %}"></script>
+  }
 
-</body>
-</html>
+  // --- Main init ---
+  function init() {
+    interceptStatusButtons();
+    trackReassignments();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
