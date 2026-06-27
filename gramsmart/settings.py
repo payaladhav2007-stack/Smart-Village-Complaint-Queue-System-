@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'accounts',
     'grievances',  # ADD THIS
     'appointments',  # ADD THIS
+    'workbench',  # ADD THIS
 ]
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # ADD - must be at top
