@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Grievance Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLcE="
+    crossorigin=""
+  ></script>
+  <style>
+    #modal-map { height: 200px; width: 100%; border-radius: 10px; z-index: 0; }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- TOP NAVBAR -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 flex items-center px-6 justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+        <span class="text-white font-black text-sm">GS</span>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
+        <p class="text-xs text-gray-400">Infrastructure Management</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/staff/workbench/" class="text-xs text-green-600 hover:text-green-800 font-medium transition">← Back to Workbench</a>
+      <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+        <span class="text-green-700 font-bold text-sm">GS</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="pt-20 px-4 pb-8 max-w-5xl mx-auto">
+
+    <!-- Page Header -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Infrastructure Complaints</h2>
+        <p class="text-sm text-gray-500 mt-0.5">Manage and track all incoming public grievances</p>
+      </div>
+      <!-- Summary Badges -->
+      <div class="flex gap-2 flex-wrap">
+        <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-full">🔴 3 High</span>
+        <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-3 py-1.5 rounded-full">🟡 3 Medium</span>
+        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-full">⚪ 1 Low</span>
+        <span class="bg-green-100 text-green-600 text-xs font-bold px-3 py-1.5 rounded-full">✅ 2 Resolved</span>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-5 flex flex-col sm:flex-row gap-3">
+      <input
+        type="text"
+        placeholder="🔍 Search complaints..."
+        class="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+      />
+      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+        <option>All Categories</option>
+        <option>Roads / Potholes</option>
+        <option>Water Supply</option>
+        <option>Electricity</option>
+        <option>Sanitation</option>
+      </select>
+      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+        <option>All Priorities</option>
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+      </select>
+      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+        <option>All Status</option>
+        <option>Open</option>
+        <option>In Progress</option>
+        <option>Resolved</option>
+      </select>
+    </div>
+
+    <!-- Grievance List Grid -->
+    <div class="space-y-3">
+
+      <!-- Row 1 - High Priority -->
+      <div
+        onclick="openModal('GRV-001', 'Large pothole on Main Road', 'Roads / Potholes', 'High', '2 hours ago', 'Jun 25, 2026', 'Ramesh Patil', '9876543210', 'Ward 4, Near Bus Stop, Main Road — Large pothole causing accidents daily. Vehicles are getting damaged. Urgent repair needed.', 21.1458, 79.0882, true, 'roads')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-lg flex-shrink-0">🚧</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-001</span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
+                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-bold text-gray-800">Large pothole on Main Road</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Ward 4, Near Bus Stop — Ramesh Patil • 2 hours ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2 - High Priority -->
+      <div
+        onclick="openModal('GRV-002', 'Sewage overflow on Street 5', 'Sanitation / Garbage', 'High', '4 hours ago', 'Jun 25, 2026', 'Sunita Deshmukh', '9765432101', 'Sewage water overflowing on Street 5 near the primary school. Very unhygienic situation affecting students and residents.', 21.1490, 79.0910, true, 'sanitation')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-lg flex-shrink-0">🗑️</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-002</span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
+                <span class="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">Sanitation</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-bold text-gray-800">Sewage overflow on Street 5</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Near Primary School — Sunita Deshmukh • 4 hours ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3 - High Priority -->
+      <div
+        onclick="openModal('GRV-003', 'No electricity for 3 days', 'Electricity', 'High', '6 hours ago', 'Jun 25, 2026', 'Manoj Kumar', '9654321012', 'Entire lane 7 has had no electricity for 3 days. Transformer issue reported to electric board but no action taken yet.', 21.1420, 79.0850, false, 'electricity')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-lg flex-shrink-0">💡</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-003</span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs px-2 py-0.5 rounded-full font-medium">Electricity</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-bold text-gray-800">No electricity for 3 days</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Lane 7, Ward 4 — Manoj Kumar • 6 hours ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">In Progress</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4 - Medium -->
+      <div
+        onclick="openModal('GRV-004', 'Water pipeline leakage', 'Water Supply', 'Medium', '1 day ago', 'Jun 24, 2026', 'Priya Sharma', '9543210123', 'Water pipeline leaking on Street 12. Water wasting for 2 days. Road also getting damaged due to continuous water flow.', 21.1470, 79.0900, true, 'water')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointer"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-lg flex-shrink-0">💧</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-004</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
+                <span class="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">Water Supply</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-bold text-gray-800">Water pipeline leakage</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Street 12, Ward 4 — Priya Sharma • 1 day ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5 - Medium -->
+      <div
+        onclick="openModal('GRV-005', 'Street lights not working', 'Electricity', 'Medium', '1 day ago', 'Jun 24, 2026', 'Anita Joshi', '9432101234', 'Street lights near school gate not working for 5 days. Very unsafe at night for students and residents walking home.', 21.1435, 79.0865, false, 'electricity')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointer"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-lg flex-shrink-0">🌙</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-005</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs px-2 py-0.5 rounded-full font-medium">Electricity</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-bold text-gray-800">Street lights not working</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Near School Gate — Anita Joshi • 1 day ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 6 - Medium -->
+      <div
+        onclick="openModal('GRV-006', 'Garbage pile near market', 'Sanitation / Garbage', 'Medium', '2 days ago', 'Jun 23, 2026', 'Vikram Nair', '9321012345', 'Garbage not collected for 4 days near the main market area. Very bad smell affecting shopkeepers and customers.', 21.1500, 79.0920, true, 'sanitation')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointer"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-lg flex-shrink-0">🗑️</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-006</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
+                <span class="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">Sanitation</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-bold text-gray-800">Garbage pile near market</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Main Market Area — Vikram Nair • 2 days ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">In Progress</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 7 - Low -->
+      <div
+        onclick="openModal('GRV-007', 'Broken footpath tiles', 'Roads / Potholes', 'Low', '3 days ago', 'Jun 22, 2026', 'Kavita Rao', '9210123456', 'Footpath tiles broken near the community hall. Minor inconvenience but could cause tripping hazard for elderly citizens.', 21.1445, 79.0875, false, 'roads')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-gray-300 p-4 hover:shadow-md transition cursor-pointer"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-lg flex-shrink-0">🚶</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-007</span>
+                <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">⚪ Low</span>
+                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-bold text-gray-800">Broken footpath tiles</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Near Community Hall — Kavita Rao • 3 days ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 8 - Resolved -->
+      <div
+        onclick="openModal('GRV-008', 'Road repair completed', 'Roads / Potholes', 'Resolved', '5 days ago', 'Jun 20, 2026', 'Suresh Mehta', '9109876543', 'Road repair near market completed by field team. Pothole filled and surface leveled properly.', 21.1455, 79.0888, false, 'roads')"
+        class="bg-white rounded-xl shadow-sm border-l-4 border-green-400 p-4 hover:shadow-md transition cursor-pointer opacity-70"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-lg flex-shrink-0">✅</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-xs font-bold text-gray-400">GRV-008</span>
+                <span class="bg-green-100 text-green-600 text-xs font-bold px-2 py-0.5 rounded-full">✅ Resolved</span>
+                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+              </div>
+              <h3 class="text-sm font-semibold text-gray-500">Road repair completed</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Market Area — Suresh Mehta • 5 days ago</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">✓ Resolved</span>
+            <span class="text-xs text-green-600 font-medium">View Details →</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== DETAIL MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-screen overflow-y-auto" id="modal-box">
+
+      <!-- Modal Header -->
+      <div class="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between rounded-t-2xl">
+        <div>
+          <p class="text-xs text-gray-400 font-medium" id="modal-id">GRV-001</p>
+          <h3 class="text-sm font-bold text-gray-800" id="modal-title">Complaint Title</h3>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 font-bold transition">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 space-y-4">
+
+        <!-- Status & Priority Badges -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="modal-priority" class="text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-600">High</span>
+          <span id="modal-category" class="text-xs font-medium px-3 py-1 rounded-full bg-orange-100 text-orange-600">Category</span>
+          <span id="modal-status-badge" class="text-xs font-medium px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">Open</span>
+        </div>
+
+        <!-- Citizen Info -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Citizen Information</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-gray-400">Name</p>
+              <p class="text-sm font-semibold text-gray-800" id="modal-name">—</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400">Phone</p>
+              <p class="text-sm font-semibold text-gray-800" id="modal-phone">—</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400">Submitted</p>
+              <p class="text-sm font-semibold text-gray-800" id="modal-date">—</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400">Time Ago</p>
+              <p class="text-sm font-semibold text-gray-800" id="modal-time">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Complaint Description</p>
+          <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4" id="modal-description">—</p>
+        </div>
+
+        <!-- Media Attachment Block -->
+        <div id="modal-media-block">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 Media Attachments</p>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-2xl cursor-pointer hover:bg-gray-200 transition">🖼️</div>
+            <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-2xl cursor-pointer hover:bg-gray-200 transition">🖼️</div>
+            <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-gray-400 text-xs font-medium cursor-pointer hover:bg-gray-200 transition">+ Add</div>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">2 photos attached by citizen</p>
+        </div>
+
+        <!-- No Media Block -->
+        <div id="modal-no-media-block" class="hidden">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 Media Attachments</p>
+          <div class="bg-gray-50 rounded-xl p-4 text-center">
+            <p class="text-sm text-gray-400">No media attached for this complaint</p>
+          </div>
+        </div>
+
+        <!-- Geospatial Location Block -->
+        <div>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📍 Complaint Location</p>
+          <div id="modal-map"></div>
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <div class="bg-purple-50 rounded-lg px-3 py-2">
+              <p class="text-xs text-gray-400">Latitude</p>
+              <p class="text-sm font-bold text-purple-700" id="modal-lat">—</p>
+            </div>
+            <div class="bg-purple-50 rounded-lg px-3 py-2">
+              <p class="text-xs text-gray-400">Longitude</p>
+              <p class="text-sm font-bold text-purple-700" id="modal-lng">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="border-t pt-4 space-y-2">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Actions</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+              ✓ Mark Resolved
+            </button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+              👷 Assign Field Worker
+            </button>
+            <button class="border border-yellow-400 text-yellow-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-yellow-50 transition">
+              ⚡ Escalate Priority
+            </button>
+            <button class="border border-gray-200 text-gray-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition">
+              💬 Add Note
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    var modalMap = null;
+    var modalMarker = null;
+
+    function openModal(id, title, category, priority, timeAgo, date, name, phone, description, lat, lng, hasMedia, type) {
+
+      // Populate modal fields
+      document.getElementById('modal-id').textContent = id;
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-name').textContent = name;
+      document.getElementById('modal-phone').textContent = phone;
+      document.getElementById('modal-date').textContent = date;
+      document.getElementById('modal-time').textContent = timeAgo;
+      document.getElementById('modal-description').textContent = description;
+      document.getElementById('modal-lat').textContent = lat.toFixed(6);
+      document.getElementById('modal-lng').textContent = lng.toFixed(6);
+      document.getElementById('modal-category').textContent = category;
+
+      // Priority badge color
+      var priorityEl = document.getElementById('modal-priority');
+      priorityEl.textContent = priority;
+      priorityEl.className = 'text-xs font-bold px-3 py-1 rounded-full ';
+      if (priority === 'High') priorityEl.className += 'bg-red-100 text-red-600';
+      else if (priority === 'Medium') priorityEl.className += 'bg-yellow-100 text-yellow-600';
+      else if (priority === 'Low') priorityEl.className += 'bg-gray-100 text-gray-500';
+      else priorityEl.className += 'bg-green-100 text-green-600';
+
+      // Media blocks
+      if (hasMedia) {
+        document.getElementById('modal-media-block').classList.remove('hidden');
+        document.getElementById('modal-no-media-block').classList.add('hidden');
+      } else {
+        document.getElementById('modal-media-block').classList.add('hidden');
+        document.getElementById('modal-no-media-block').classList.remove('hidden');
+      }
+
+      // Show modal
+      document.getElementById('modal-overlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Initialize or update map
+      setTimeout(function() {
+        if (!modalMap) {
+          modalMap = L.map('modal-map').setView([lat, lng], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+          }).addTo(modalMap);
+        } else {
+          modalMap.setView([lat, lng], 15);
+          if (modalMarker) modalMap.removeLayer(modalMarker);
+        }
+        modalMarker = L.marker([lat, lng])
+          .addTo(modalMap)
+          .bindPopup('📍 ' + title)
+          .openPopup();
+        modalMap.invalidateSize();
+      }, 100);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function closeModalOutside(event) {
+      if (event.target === document.getElementById('modal-overlay')) {
+        closeModal();
+      }
+    }
+  </script>
+
+</body>
+</html>
