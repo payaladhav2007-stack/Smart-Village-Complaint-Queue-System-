@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,23 +70,24 @@
     <div class="bg-white rounded-xl shadow-sm p-4 mb-5 flex flex-col sm:flex-row gap-3">
       <input
         type="text"
+        id="gs-search"
         placeholder="🔍 Search complaints..."
         class="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
       />
-      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+      <select id="gs-category" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
         <option>All Categories</option>
         <option>Roads / Potholes</option>
         <option>Water Supply</option>
         <option>Electricity</option>
         <option>Sanitation</option>
       </select>
-      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+      <select id="gs-priority" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
         <option>All Priorities</option>
         <option>High</option>
         <option>Medium</option>
         <option>Low</option>
       </select>
-      <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+      <select id="gs-status" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
         <option>All Status</option>
         <option>Open</option>
         <option>In Progress</option>
@@ -99,7 +101,7 @@
       <!-- Row 1 - High Priority -->
       <div
         onclick="openModal('GRV-001', 'Large pothole on Main Road', 'Roads / Potholes', 'High', '2 hours ago', 'Jun 25, 2026', 'Ramesh Patil', '9876543210', 'Ward 4, Near Bus Stop, Main Road — Large pothole causing accidents daily. Vehicles are getting damaged. Urgent repair needed.', 21.1458, 79.0882, true, 'roads')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -126,7 +128,7 @@
       <!-- Row 2 - High Priority -->
       <div
         onclick="openModal('GRV-002', 'Sewage overflow on Street 5', 'Sanitation / Garbage', 'High', '4 hours ago', 'Jun 25, 2026', 'Sunita Deshmukh', '9765432101', 'Sewage water overflowing on Street 5 near the primary school. Very unhygienic situation affecting students and residents.', 21.1490, 79.0910, true, 'sanitation')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -153,7 +155,7 @@
       <!-- Row 3 - High Priority -->
       <div
         onclick="openModal('GRV-003', 'No electricity for 3 days', 'Electricity', 'High', '6 hours ago', 'Jun 25, 2026', 'Manoj Kumar', '9654321012', 'Entire lane 7 has had no electricity for 3 days. Transformer issue reported to electric board but no action taken yet.', 21.1420, 79.0850, false, 'electricity')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -179,7 +181,7 @@
       <!-- Row 4 - Medium -->
       <div
         onclick="openModal('GRV-004', 'Water pipeline leakage', 'Water Supply', 'Medium', '1 day ago', 'Jun 24, 2026', 'Priya Sharma', '9543210123', 'Water pipeline leaking on Street 12. Water wasting for 2 days. Road also getting damaged due to continuous water flow.', 21.1470, 79.0900, true, 'water')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointe
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -206,7 +208,7 @@
       <!-- Row 5 - Medium -->
       <div
         onclick="openModal('GRV-005', 'Street lights not working', 'Electricity', 'Medium', '1 day ago', 'Jun 24, 2026', 'Anita Joshi', '9432101234', 'Street lights near school gate not working for 5 days. Very unsafe at night for students and residents walking home.', 21.1435, 79.0865, false, 'electricity')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointe
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -232,7 +234,7 @@
       <!-- Row 6 - Medium -->
       <div
         onclick="openModal('GRV-006', 'Garbage pile near market', 'Sanitation / Garbage', 'Medium', '2 days ago', 'Jun 23, 2026', 'Vikram Nair', '9321012345', 'Garbage not collected for 4 days near the main market area. Very bad smell affecting shopkeepers and customers.', 21.1500, 79.0920, true, 'sanitation')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointe
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -259,7 +261,7 @@
       <!-- Row 7 - Low -->
       <div
         onclick="openModal('GRV-007', 'Broken footpath tiles', 'Roads / Potholes', 'Low', '3 days ago', 'Jun 22, 2026', 'Kavita Rao', '9210123456', 'Footpath tiles broken near the community hall. Minor inconvenience but could cause tripping hazard for elderly citizens.', 21.1445, 79.0875, false, 'roads')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-gray-300 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-gray-300 p-4 hover:shadow-md transition cursor-pointer"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -285,7 +287,7 @@
       <!-- Row 8 - Resolved -->
       <div
         onclick="openModal('GRV-008', 'Road repair completed', 'Roads / Potholes', 'Resolved', '5 days ago', 'Jun 20, 2026', 'Suresh Mehta', '9109876543', 'Road repair near market completed by field team. Pothole filled and surface leveled properly.', 21.1455, 79.0888, false, 'roads')"
-        class="bg-white rounded-xl shadow-sm border-l-4 border-green-400 p-4 hover:shadow-md transition cursor-pointer opacity-70"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-green-400 p-4 hover:shadow-md transition cursor-pointer
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -420,6 +422,10 @@
       </div>
     </div>
   </div>
+<div id="gs-empty-state" style="display:none;" class="text-center py-12">
+        <p class="text-gray-400 text-sm font-medium">No complaints match your current filters.</p>
+        <p class="text-gray-300 text-xs mt-1">Try adjusting the search or filter options above.</p>
+      </div>
 
   <!-- JAVASCRIPT -->
   <script>
@@ -493,6 +499,6 @@
       }
     }
   </script>
-
+<script src="{% static 'staff/js/live_search_filter.js' %}"></script>
 </body>
 </html>
