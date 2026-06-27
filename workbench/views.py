@@ -5,7 +5,11 @@ from django.utils import timezone
 from grievances.models import Complaint
 from appointments.models import Appointment
 from .permissions import IsStaffOrAdmin
-
+from django.db import transaction
+from grievances.models import Complaint
+from appointments.models import Appointment
+from .models import ReassignmentLog
+from .permissions import IsStaffOrAdmin
 
 class WorkbenchSummaryView(APIView):
     permission_classes = [IsStaffOrAdmin]
@@ -82,3 +86,83 @@ class WorkbenchSummaryView(APIView):
                 'upcoming_token_slots': appointments_data,
             }
         }, status=status.HTTP_200_OK)
+
+class ReassignView(APIView):
+    permission_classes = [IsStaffOrAdmin]
+
+    def post(self, request):
+        ticket_type = request.data.get('ticket_type')
+        ticket_id = request.data.get('ticket_id')
+        new_status = request.data.get('new_status')
+        notes = request.data.get('notes', '')
+
+        # Validate required fields
+        if not ticket_type or not ticket_id or not new_status:
+            return Response({
+                'error': 'ticket_type, ticket_id and new_status are required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate ticket type
+        if ticket_type not in ['complaint', 'appointment']:
+            return Response({
+                'error': 'ticket_type must be either complaint or appointment.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                if ticket_type == 'complaint':
+                    valid_statuses = ['pending', 'in_progress', 'resolved', 'rejected']
+                    if new_status not in valid_statuses:
+                        return Response({
+                            'error': f'Invalid status for complaint. Must be one of: {", ".join(valid_statuses)}'
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    ticket = Complaint.objects.select_for_update().get(id=ticket_id)
+                    previous_status = ticket.status
+                    ticket.status = new_status
+                    ticket.save()
+
+                elif ticket_type == 'appointment':
+                    valid_statuses = ['pending', 'confirmed', 'completed', 'cancelled']
+                    if new_status not in valid_statuses:
+                        return Response({
+                            'error': f'Invalid status for appointment. Must be one of: {", ".join(valid_statuses)}'
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    ticket = Appointment.objects.select_for_update().get(id=ticket_id)
+                    previous_status = ticket.status
+                    ticket.status = new_status
+                    ticket.save()
+
+                # Record reassignment history
+                log = ReassignmentLog.objects.create(
+                    ticket_type=ticket_type,
+                    ticket_id=ticket_id,
+                    previous_status=previous_status,
+                    new_status=new_status,
+                    reassigned_by=request.user,
+                    notes=notes
+                )
+
+                return Response({
+                    'message': f'{ticket_type.capitalize()} #{ticket_id} successfully reassigned.',
+                    'reassignment': {
+                        'log_id': log.id,
+                        'ticket_type': ticket_type,
+                        'ticket_id': ticket_id,
+                        'previous_status': previous_status,
+                        'new_status': new_status,
+                        'reassigned_by': request.user.username,
+                        'notes': notes,
+                        'reassigned_at': log.reassigned_at.isoformat()
+                    }
+                }, status=status.HTTP_200_OK)
+
+        except Complaint.DoesNotExist:
+            return Response({
+                'error': f'Complaint #{ticket_id} not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Appointment.DoesNotExist:
+            return Response({
+                'error': f'Appointment #{ticket_id} not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
