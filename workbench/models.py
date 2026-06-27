@@ -29,3 +29,22 @@ class ReassignmentLog(models.Model):
 
     def __str__(self):
         return f"{self.ticket_type} #{self.ticket_id} → {self.new_status} by {self.reassigned_by}"
+
+class NotificationLog(models.Model):
+    ticket_type = models.CharField(max_length=20)
+    ticket_id = models.IntegerField()
+    recipient_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='notifications'
+    )
+    message = models.TextField()
+    status_at_dispatch = models.CharField(max_length=20)
+    dispatched_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-dispatched_at']
+
+    def __str__(self):
+        return f"Notification to {self.recipient_user} - {self.ticket_type} #{self.ticket_id}"
