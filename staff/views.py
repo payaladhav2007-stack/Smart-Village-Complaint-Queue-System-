@@ -8,3 +8,6 @@ def grievance_management(request):
 
 def token_tracking_console(request):
     return render(request, 'staff/token_tracking_console.html')
+
+def control_panel(request):
+    return render(request, 'staff/control_panel.html')
