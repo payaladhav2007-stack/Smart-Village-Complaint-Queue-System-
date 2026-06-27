@@ -1,37 +1,23 @@
 // GS-409: Client-Side Reassignment and Control Validations
-// Works with existing control_panel.html structure — hooks into
-// Anushka's existing reassign(), setStatus(), setGrievanceStatus() functions
-
 (function () {
 
-  // --- Track current assignments per dropdown ---
-  // Key: dropdown id, Value: assigned value or empty string
-  var assignments = {};
-
-  // --- Helper: show red toast error ---
   function showErrorToast(message) {
     var toast = document.getElementById('toast');
     var toastIcon = document.getElementById('toast-icon');
     var toastMsg  = document.getElementById('toast-message');
-
     if (!toast || !toastIcon || !toastMsg) return;
-
-    // Override styling to red for error
     var innerDiv = toast.querySelector('div');
     if (innerDiv) {
       innerDiv.style.background = '#fef2f2';
       innerDiv.style.color      = '#dc2626';
       innerDiv.style.border     = '1px solid #fecaca';
     }
-
-    toastIcon.textContent  = '⚠';
-    toastMsg.textContent   = message;
+    toastIcon.textContent = 'Warning';
+    toastMsg.textContent  = message;
     toast.classList.remove('hidden');
-
     clearTimeout(toast._hideTimer);
     toast._hideTimer = setTimeout(function () {
       toast.classList.add('hidden');
-      // Restore original dark styling for next success toast
       if (innerDiv) {
         innerDiv.style.background = '#1f2937';
         innerDiv.style.color      = '#f9fafb';
@@ -40,143 +26,98 @@
     }, 3500);
   }
 
-  // --- Helper: show inline red error below a target element ---
   function showInlineError(targetEl, message, errorId) {
-    clearInlineError(errorId);
-
+    var old = document.getElementById(errorId);
+    if (old) old.remove();
     var errorEl = document.createElement('div');
-    errorEl.id  = errorId;
+    errorEl.id = errorId;
     errorEl.style.cssText = [
-      'margin-top: 8px',
-      'padding: 8px 12px',
-      'background: #fef2f2',
-      'border: 1px solid #fecaca',
-      'border-radius: 8px',
-      'font-size: 0.8rem',
-      'color: #dc2626',
-      'font-weight: 500'
+      'margin-top:8px',
+      'padding:8px 12px',
+      'background:#fef2f2',
+      'border:1px solid #fecaca',
+      'border-radius:8px',
+      'font-size:0.8rem',
+      'color:#dc2626',
+      'font-weight:500'
     ].join(';');
-    errorEl.textContent = '⚠ ' + message;
-
+    errorEl.textContent = 'Warning: ' + message;
     if (targetEl && targetEl.parentNode) {
       targetEl.parentNode.insertBefore(errorEl, targetEl.nextSibling);
     }
-
-    // Auto-remove after 4 seconds
-    setTimeout(function () { clearInlineError(errorId); }, 4000);
+    setTimeout(function () {
+      var el = document.getElementById(errorId);
+      if (el) el.remove();
+    }, 4000);
   }
 
-  // --- Helper: clear inline error ---
-  function clearInlineError(errorId) {
-    var existing = document.getElementById(errorId);
-    if (existing) existing.remove();
-  }
-
-  // --- Get the dropdown button label text for a card ---
-  function getDropdownLabel(card, dropdownBtnSelector) {
-    var btn = card.querySelector(dropdownBtnSelector);
-    if (!btn) return '';
-    return btn.textContent.replace('▾', '').trim();
-  }
-
-  // --- Validate appointment card before status change ---
   function validateAppointmentCard(card) {
     var counterBtn = card.querySelector('[onclick^="toggleDropdown(\'dd"]');
-    if (!counterBtn) return true; // no dropdown found, skip
-
-    var counterLabel = counterBtn.textContent.replace('▾', '').trim();
-
-    // Counter No. X is valid — "Unassigned" or empty is not
+    if (!counterBtn) return true;
+    var counterLabel = counterBtn.textContent.replace('\u25be', '').trim();
     if (!counterLabel || counterLabel === '' || counterLabel === 'Unassigned') {
       showInlineError(
         counterBtn,
         'Please select a Counter Number before updating this appointment status.',
-        'error-appt-' + (card.querySelector('[class*="font-black"]') || {}).textContent
+        'error-appt-' + Date.now()
       );
       showErrorToast('Select a Counter Number before updating status.');
       return false;
     }
-
     return true;
   }
 
-  // --- Validate grievance card before status change ---
   function validateGrievanceCard(card) {
     var workerBtn = card.querySelector('[onclick^="toggleDropdown(\'gdd"]');
-    if (!workerBtn) return true; // resolved card or no dropdown, skip
-
-    var workerLabel = workerBtn.textContent.replace('▾', '').trim();
-
-    // "Unassigned" or empty means no worker picked yet
+    if (!workerBtn) return true;
+    var workerLabel = workerBtn.textContent.replace('\u25be', '').trim();
     if (!workerLabel || workerLabel === '' || workerLabel === 'Unassigned') {
       showInlineError(
         workerBtn,
         'Please assign a Field Worker before updating this grievance status.',
-        'error-grv-' + Math.random().toString(36).substr(2, 5)
+        'error-grv-' + Date.now()
       );
       showErrorToast('Assign a Field Worker before updating grievance status.');
       return false;
     }
-
     return true;
   }
 
-  // --- Intercept all status buttons ---
   function interceptStatusButtons() {
-
-    // Appointment status buttons (onclick contains setStatus)
     document.querySelectorAll('[onclick^="setStatus"]').forEach(function (btn) {
       btn.addEventListener('click', function (event) {
         var card = btn.closest('.bg-white');
         if (!card) return;
-
         var isValid = validateAppointmentCard(card);
         if (!isValid) {
           event.stopImmediatePropagation();
-          // We can't fully prevent onclick= handlers with preventDefault
-          // so we temporarily override setStatus to block execution
-          var originalSetStatus = window.setStatus;
-          window.setStatus = function () {
-            window.setStatus = originalSetStatus; // restore immediately after
-          };
-          setTimeout(function () {
-            window.setStatus = originalSetStatus;
-          }, 100);
+          var orig = window.setStatus;
+          window.setStatus = function () { window.setStatus = orig; };
+          setTimeout(function () { window.setStatus = orig; }, 100);
         }
-      }, true); // capture phase — fires before onclick
+      }, true);
     });
 
-    // Grievance status buttons (onclick contains setGrievanceStatus)
     document.querySelectorAll('[onclick^="setGrievanceStatus"]').forEach(function (btn) {
       btn.addEventListener('click', function (event) {
         var card = btn.closest('.bg-white');
         if (!card) return;
-
-        // Skip resolved cards (they have opacity-70 and show "No further actions")
         if (card.classList.contains('opacity-70')) return;
-
         var isValid = validateGrievanceCard(card);
         if (!isValid) {
           event.stopImmediatePropagation();
-          var originalFn = window.setGrievanceStatus;
-          window.setGrievanceStatus = function () {
-            window.setGrievanceStatus = originalFn;
-          };
-          setTimeout(function () {
-            window.setGrievanceStatus = originalFn;
-          }, 100);
+          var orig = window.setGrievanceStatus;
+          window.setGrievanceStatus = function () { window.setGrievanceStatus = orig; };
+          setTimeout(function () { window.setGrievanceStatus = orig; }, 100);
         }
-      }, true); // capture phase
+      }, true);
     });
   }
 
-  // --- Track reassignment selections to clear errors ---
   function trackReassignments() {
-    // When reassign() is called, clear any related inline errors
     var originalReassign = window.reassign;
     if (originalReassign) {
       window.reassign = function (dropdownId, value) {
-        // Clear inline errors on the card containing this dropdown
         var dropdown = document.getElementById(dropdownId);
         if (dropdown) {
           var card = dropdown.closest('.bg-white');
@@ -186,13 +127,11 @@
             });
           }
         }
-        // Call original reassign
         originalReassign(dropdownId, value);
       };
     }
   }
 
-  // --- Main init ---
   function init() {
     interceptStatusButtons();
     trackReassignments();
