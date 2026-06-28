@@ -6,32 +6,16 @@
   <title>GramSmart — Staff Workbench</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Sticky sidebar height fix */
-    .sidebar-height {
-      height: calc(100vh - 64px);
-    }
-    .main-height {
-      height: calc(100vh - 64px);
-    }
-    /* Active nav item */
-    .nav-active {
-      background-color: #f0fdf4;
-      color: #16a34a;
-      border-left: 3px solid #16a34a;
-    }
-    /* Column scroll */
-    .col-scroll {
-      overflow-y: auto;
-      height: calc(100vh - 130px);
-    }
+    .sidebar-height { height: calc(100vh - 64px); }
+    .main-height { height: calc(100vh - 64px); }
+    .nav-active { background-color: #f0fdf4; color: #16a34a; border-left: 3px solid #16a34a; }
+    .col-scroll { overflow-y: auto; height: calc(100vh - 130px); }
   </style>
 </head>
 <body class="bg-gray-100 font-sans">
 
-  <!-- ===== STICKY TOP NAVBAR ===== -->
+  <!-- STICKY TOP NAVBAR -->
   <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 flex items-center px-6 justify-between">
-
-    <!-- Left: Logo -->
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
         <span class="text-white font-black text-sm">GS</span>
@@ -41,33 +25,11 @@
         <p class="text-xs text-gray-400">Staff Workbench</p>
       </div>
     </div>
-
-    <!-- Center: Toggle View Buttons -->
     <div class="hidden md:flex items-center bg-gray-100 rounded-xl p-1 gap-1">
-      <button
-        onclick="showView('both')"
-        id="btn-both"
-        class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-green-700 shadow transition"
-      >
-        ⊞ Dual View
-      </button>
-      <button
-        onclick="showView('grievances')"
-        id="btn-grievances"
-        class="px-4 py-1.5 text-xs font-semibold rounded-lg text-gray-500 hover:bg-white transition"
-      >
-        🔧 Grievances
-      </button>
-      <button
-        onclick="showView('appointments')"
-        id="btn-appointments"
-        class="px-4 py-1.5 text-xs font-semibold rounded-lg text-gray-500 hover:bg-white transition"
-      >
-        📅 Appointments
-      </button>
+      <button onclick="showView('both')" id="btn-both" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-green-700 shadow transition">⊞ Dual View</button>
+      <button onclick="showView('grievances')" id="btn-grievances" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-gray-500 hover:bg-white transition">🔧 Grievances</button>
+      <button onclick="showView('appointments')" id="btn-appointments" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-gray-500 hover:bg-white transition">📅 Appointments</button>
     </div>
-
-    <!-- Right: Officer Info -->
     <div class="flex items-center gap-3">
       <div class="text-right hidden sm:block">
         <p class="text-xs font-semibold text-gray-700">Gram Sevak</p>
@@ -76,65 +38,42 @@
       <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
         <span class="text-green-700 font-bold text-sm">GS</span>
       </div>
-      <button class="text-xs text-red-500 hover:text-red-700 font-medium transition">
-        Logout
-      </button>
+      <button class="text-xs text-red-500 hover:text-red-700 font-medium transition">Logout</button>
     </div>
-
   </nav>
 
-  <!-- ===== MAIN LAYOUT (below navbar) ===== -->
+  <!-- MAIN LAYOUT -->
   <div class="flex pt-16 main-height">
 
-    <!-- ===== LEFT SIDEBAR ===== -->
+    <!-- LEFT SIDEBAR -->
     <aside class="hidden lg:flex flex-col w-56 bg-white border-r border-gray-200 sidebar-height sticky top-16">
-
-      <!-- Sidebar Nav -->
       <div class="p-4 space-y-1 flex-1">
         <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 px-2">Navigation</p>
-
-        <a href="#" class="nav-active flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition">
-          <span>🏠</span> Dashboard
-        </a>
-        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
-          <span>🔧</span> Grievances
-          <span class="ml-auto bg-red-100 text-red-600 text-xs font-bold px-1.5 py-0.5 rounded-full">8</span>
-        </a>
-        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
-          <span>📅</span> Appointments
-          <span class="ml-auto bg-blue-100 text-blue-600 text-xs font-bold px-1.5 py-0.5 rounded-full">5</span>
-        </a>
-        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
-          <span>📊</span> Analytics
-        </a>
-        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
-          <span>⭐</span> Feedback
-        </a>
+        <a href="#" class="nav-active flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition"><span>🏠</span> Dashboard</a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition"><span>🔧</span> Grievances<span class="ml-auto bg-red-100 text-red-600 text-xs font-bold px-1.5 py-0.5 rounded-full">8</span></a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition"><span>📅</span> Appointments<span class="ml-auto bg-blue-100 text-blue-600 text-xs font-bold px-1.5 py-0.5 rounded-full">5</span></a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition"><span>📊</span> Analytics</a>
+        <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition"><span>⭐</span> Feedback</a>
       </div>
-
-      <!-- Sidebar Footer -->
       <div class="p-4 border-t border-gray-100">
         <div class="bg-green-50 rounded-xl p-3">
           <p class="text-xs font-semibold text-green-700">Today's Summary</p>
-          <p class="text-xs text-gray-500 mt-1">8 pending grievances</p>
-          <p class="text-xs text-gray-500">5 upcoming tokens</p>
+          <p class="text-xs text-gray-500 mt-1" id="live-summary-grievances">8 pending grievances</p>
+          <p class="text-xs text-gray-500" id="live-summary-appointments">5 upcoming tokens</p>
         </div>
       </div>
-
     </aside>
 
-    <!-- ===== DUAL COLUMN WORKSPACE ===== -->
+    <!-- DUAL COLUMN WORKSPACE -->
     <main class="flex-1 flex gap-0 overflow-hidden">
 
-      <!-- LEFT COLUMN: Infrastructure Grievances -->
+      <!-- LEFT COLUMN: Grievances -->
       <div id="col-grievances" class="flex-1 border-r border-gray-200 bg-gray-50">
-
-        <!-- Column Header -->
         <div class="sticky top-16 z-10 bg-white border-b border-gray-200 px-5 py-3 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="text-base">🔧</span>
             <h2 class="text-sm font-bold text-gray-800">Infrastructure Repairs</h2>
-            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">8 Pending</span>
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full" id="live-grievance-count">8 Pending</span>
           </div>
           <select class="text-xs border border-gray-200 rounded-lg px-2 py-1 text-gray-600 focus:outline-none">
             <option>All Categories</option>
@@ -144,17 +83,10 @@
             <option>Sanitation</option>
           </select>
         </div>
-
-        <!-- Grievance Cards -->
-        <div class="col-scroll p-4 space-y-3">
-
-          <!-- Card 1 - High Priority -->
+        <div class="col-scroll p-4 space-y-3" id="live-grievances-container">
           <div class="bg-white rounded-xl shadow-sm border border-red-100 p-4 hover:shadow-md transition">
             <div class="flex items-start justify-between mb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🚧</span>
-                <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">High Priority</span>
-              </div>
+              <div class="flex items-center gap-2"><span class="text-sm">🚧</span><span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">High Priority</span></div>
               <span class="text-xs text-gray-400">2h ago</span>
             </div>
             <h3 class="text-sm font-semibold text-gray-800 mb-1">Large pothole on Main Road</h3>
@@ -162,176 +94,32 @@
             <div class="flex items-center justify-between">
               <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
               <div class="flex gap-2">
-                <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition font-medium">
-                  Assign
-                </button>
-                <button class="text-xs border border-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50 transition">
-                  View
-                </button>
+                <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition font-medium">Assign</button>
+                <button class="text-xs border border-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50 transition">View</button>
               </div>
             </div>
           </div>
-
-          <!-- Card 2 -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition">
-            <div class="flex items-start justify-between mb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">💧</span>
-                <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">Medium</span>
-              </div>
-              <span class="text-xs text-gray-400">5h ago</span>
-            </div>
-            <h3 class="text-sm font-semibold text-gray-800 mb-1">Water pipeline leakage</h3>
-            <p class="text-xs text-gray-500 mb-3">Street 12, Ward 4 — water wasting since 2 days</p>
-            <div class="flex items-center justify-between">
-              <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Water Supply</span>
-              <div class="flex gap-2">
-                <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition font-medium">
-                  Assign
-                </button>
-                <button class="text-xs border border-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50 transition">
-                  View
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition">
-            <div class="flex items-start justify-between mb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">💡</span>
-                <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">Medium</span>
-              </div>
-              <span class="text-xs text-gray-400">1d ago</span>
-            </div>
-            <h3 class="text-sm font-semibold text-gray-800 mb-1">Street lights not working</h3>
-            <p class="text-xs text-gray-500 mb-3">Near school gate — unsafe at night for students</p>
-            <div class="flex items-center justify-between">
-              <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full font-medium">Electricity</span>
-              <div class="flex gap-2">
-                <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition font-medium">
-                  Assign
-                </button>
-                <button class="text-xs border border-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50 transition">
-                  View
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition">
-            <div class="flex items-start justify-between mb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🗑️</span>
-                <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Low</span>
-              </div>
-              <span class="text-xs text-gray-400">2d ago</span>
-            </div>
-            <h3 class="text-sm font-semibold text-gray-800 mb-1">Garbage not collected</h3>
-            <p class="text-xs text-gray-500 mb-3">Ward 4 corner — pile growing for 3 days</p>
-            <div class="flex items-center justify-between">
-              <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium">Sanitation</span>
-              <div class="flex gap-2">
-                <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition font-medium">
-                  Assign
-                </button>
-                <button class="text-xs border border-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50 transition">
-                  View
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 5 - Resolved -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 opacity-60">
-            <div class="flex items-start justify-between mb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">✅</span>
-                <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Resolved</span>
-              </div>
-              <span class="text-xs text-gray-400">3d ago</span>
-            </div>
-            <h3 class="text-sm font-semibold text-gray-500 mb-1">Broken footpath repaired</h3>
-            <p class="text-xs text-gray-400 mb-3">Ward 4 market area — completed by field team</p>
-            <div class="flex items-center justify-between">
-              <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
-              <button class="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-lg">
-                View
-              </button>
-            </div>
-          </div>
-
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: Appointment Queue -->
+      <!-- RIGHT COLUMN: Appointments -->
       <div id="col-appointments" class="flex-1 bg-white">
-
-        <!-- Column Header -->
         <div class="sticky top-16 z-10 bg-white border-b border-gray-200 px-5 py-3 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="text-base">📅</span>
             <h2 class="text-sm font-bold text-gray-800">Appointment Queue</h2>
-            <span class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">5 Today</span>
+            <span class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full" id="live-appointment-count">5 Today</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-xs text-gray-400">Now Serving:</span>
-            <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">#003</span>
+            <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full" id="live-now-serving">#003</span>
           </div>
         </div>
-
-        <!-- Appointment Cards -->
-        <div class="col-scroll p-4 space-y-3">
-
-          <!-- Token 001 - Completed -->
-          <div class="bg-gray-50 rounded-xl border border-gray-100 p-4 opacity-60">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-black text-gray-500">
-                  #001
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500">Ramesh Patil</p>
-                  <p class="text-xs text-gray-400">Income Certificate</p>
-                </div>
-              </div>
-              <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full font-medium">✓ Done</span>
-            </div>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>📞 9876543210</span>
-              <span>9:00 AM — 9:30 AM</span>
-            </div>
-          </div>
-
-          <!-- Token 002 - Completed -->
-          <div class="bg-gray-50 rounded-xl border border-gray-100 p-4 opacity-60">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-black text-gray-500">
-                  #002
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500">Sunita Deshmukh</p>
-                  <p class="text-xs text-gray-400">Domicile Certificate</p>
-                </div>
-              </div>
-              <span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full font-medium">✓ Done</span>
-            </div>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>📞 9765432101</span>
-              <span>9:30 AM — 10:00 AM</span>
-            </div>
-          </div>
-
-          <!-- Token 003 - Now Serving -->
+        <div class="col-scroll p-4 space-y-3" id="live-appointments-container">
           <div class="bg-green-50 rounded-xl border-2 border-green-400 p-4">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xs font-black text-white animate-pulse">
-                  #003
-                </div>
+                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xs font-black text-white animate-pulse">#003</div>
                 <div>
                   <p class="text-sm font-bold text-green-800">Manoj Kumar</p>
                   <p class="text-xs text-green-600">Birth Certificate</p>
@@ -339,67 +127,18 @@
               </div>
               <span class="text-xs bg-green-200 text-green-700 px-2 py-1 rounded-full font-bold animate-pulse">⚡ Now</span>
             </div>
-            <div class="flex items-center justify-between text-xs text-green-600 mt-1 mb-3">
-              <span>📞 9654321012</span>
-              <span>10:00 AM — 10:30 AM</span>
-            </div>
-            <div class="flex gap-2">
-              <button class="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 rounded-lg transition">
-                ✓ Mark Complete
-              </button>
-              <button class="flex-1 border border-gray-200 text-gray-600 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 transition">
-                Reassign
-              </button>
+            <div class="flex gap-2 mt-3">
+              <button class="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 rounded-lg transition">✓ Mark Complete</button>
+              <button class="flex-1 border border-gray-200 text-gray-600 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 transition">Reassign</button>
             </div>
           </div>
-
-          <!-- Token 004 - Waiting -->
-          <div class="bg-white rounded-xl border border-gray-200 p-4">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-black text-blue-600">
-                  #004
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-700">Priya Sharma</p>
-                  <p class="text-xs text-gray-400">Caste Certificate</p>
-                </div>
-              </div>
-              <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">~15 min</span>
-            </div>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>📞 9543210123</span>
-              <span>10:30 AM — 11:00 AM</span>
-            </div>
-          </div>
-
-          <!-- Token 005 - Waiting -->
-          <div class="bg-white rounded-xl border border-gray-200 p-4">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-black text-blue-600">
-                  #005
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-700">Anita Joshi</p>
-                  <p class="text-xs text-gray-400">NOC Certificate</p>
-                </div>
-              </div>
-              <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">~30 min</span>
-            </div>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>📞 9432101234</span>
-              <span>11:00 AM — 11:30 AM</span>
-            </div>
-          </div>
-
         </div>
       </div>
 
     </main>
   </div>
 
-  <!-- ===== TOGGLE VIEW JAVASCRIPT ===== -->
+  <!-- TOGGLE VIEW SCRIPT -->
   <script>
     function showView(view) {
       const colGrievances = document.getElementById('col-grievances');
@@ -407,13 +146,10 @@
       const btnBoth = document.getElementById('btn-both');
       const btnGrievances = document.getElementById('btn-grievances');
       const btnAppointments = document.getElementById('btn-appointments');
-
-      // Reset all buttons
-      [btnBoth, btnGrievances, btnAppointments].forEach(btn => {
+      [btnBoth, btnGrievances, btnAppointments].forEach(function(btn) {
         btn.classList.remove('bg-white', 'text-green-700', 'shadow');
         btn.classList.add('text-gray-500');
       });
-
       if (view === 'both') {
         colGrievances.classList.remove('hidden');
         colAppointments.classList.remove('hidden');
@@ -421,15 +157,159 @@
       } else if (view === 'grievances') {
         colGrievances.classList.remove('hidden');
         colAppointments.classList.add('hidden');
-        colGrievances.classList.add('flex-1');
         btnGrievances.classList.add('bg-white', 'text-green-700', 'shadow');
       } else if (view === 'appointments') {
         colGrievances.classList.add('hidden');
         colAppointments.classList.remove('hidden');
-        colAppointments.classList.add('flex-1');
         btnAppointments.classList.add('bg-white', 'text-green-700', 'shadow');
       }
     }
+  </script>
+
+  <!-- GS-411: LIVE DATA FETCH SCRIPT -->
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function (cookie) {
+          const trimmed = cookie.trim();
+          if (trimmed.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
+    }
+
+    function timeAgo(dateStr) {
+      if (!dateStr) return 'N/A';
+      const diff = Math.floor((new Date() - new Date(dateStr)) / 1000);
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      return Math.floor(diff / 86400) + 'd ago';
+    }
+
+    function formatTime(dateStr) {
+      if (!dateStr) return 'N/A';
+      const d = new Date(dateStr);
+      return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function getCategoryIcon(category) {
+      const icons = { 'roads': '🚧', 'sanitation': '🗑️', 'water': '💧', 'electricity': '💡' };
+      return icons[category] || '📋';
+    }
+
+    function getCategoryLabel(category) {
+      const labels = { 'roads': 'Roads / Potholes', 'sanitation': 'Sanitation', 'water': 'Water Supply', 'electricity': 'Electricity' };
+      return labels[category] || category;
+    }
+
+    function getPriorityBadge(status) {
+      if (status === 'pending') return '<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">High Priority</span>';
+      if (status === 'in_progress') return '<span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">In Progress</span>';
+      if (status === 'resolved') return '<span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Resolved</span>';
+      return '<span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Low</span>';
+    }
+
+    function getServiceLabel(serviceType) {
+      const labels = {
+        'birth_certificate': 'Birth Certificate', 'death_certificate': 'Death Certificate',
+        'income_certificate': 'Income Certificate', 'residence_certificate': 'Residence Certificate',
+        'caste_certificate': 'Caste Certificate', 'property_certificate': 'Property Certificate',
+        'domicile': 'Domicile Certificate', 'income': 'Income Certificate',
+        'caste': 'Caste Certificate', 'birth': 'Birth Certificate',
+        'death': 'Death Certificate', 'noc': 'NOC Certificate'
+      };
+      return labels[serviceType] || serviceType;
+    }
+
+    function renderGrievances(complaints) {
+      const container = document.getElementById('live-grievances-container');
+      if (!container) return;
+      if (!complaints || complaints.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No grievances found.</div>';
+        return;
+      }
+      const pendingCount = complaints.filter(function (c) { return c.status === 'pending'; }).length;
+      const badge = document.getElementById('live-grievance-count');
+      if (badge) badge.textContent = pendingCount + ' Pending';
+      const summaryEl = document.getElementById('live-summary-grievances');
+      if (summaryEl) summaryEl.textContent = pendingCount + ' pending grievances';
+      container.innerHTML = complaints.map(function (complaint) {
+        const isResolved = complaint.status === 'resolved';
+        const cardClass = isResolved
+          ? 'bg-white rounded-xl shadow-sm border border-gray-100 p-4 opacity-60'
+          : 'bg-white rounded-xl shadow-sm border border-red-100 p-4 hover:shadow-md transition';
+        return '<div class="' + cardClass + '">' +
+          '<div class="flex items-start justify-between mb-2"><div class="flex items-center gap-2"><span class="text-sm">' + getCategoryIcon(complaint.category) + '</span>' + getPriorityBadge(complaint.status) + '</div><span class="text-xs text-gray-400">' + timeAgo(complaint.created_at) + '</span></div>' +
+          '<h3 class="text-sm font-semibold text-gray-800 mb-1">' + complaint.description.substring(0, 60) + '...</h3>' +
+          '<p class="text-xs text-gray-500 mb-3">Complaint #' + complaint.id + '</p>' +
+          '<div class="flex items-center justify-between"><span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">' + getCategoryLabel(complaint.category) + '</span>' +
+          (isResolved ? '<button class="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-lg">View</button>' : '<div class="flex gap-2"><button class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition font-medium">Assign</button><button class="text-xs border border-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50 transition">View</button></div>') +
+          '</div></div>';
+      }).join('');
+    }
+
+    function renderAppointments(appointments) {
+      const container = document.getElementById('live-appointments-container');
+      if (!container) return;
+      if (!appointments || appointments.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No appointments found.</div>';
+        return;
+      }
+      const badge = document.getElementById('live-appointment-count');
+      if (badge) badge.textContent = appointments.length + ' Today';
+      const summaryEl = document.getElementById('live-summary-appointments');
+      if (summaryEl) summaryEl.textContent = appointments.length + ' upcoming tokens';
+      const nowServing = appointments.find(function (a) { return a.status === 'confirmed'; });
+      const nowServingEl = document.getElementById('live-now-serving');
+      if (nowServingEl && nowServing) nowServingEl.textContent = nowServing.token_number;
+      container.innerHTML = appointments.map(function (appt) {
+        const isCompleted = appt.status === 'completed';
+        const isActive = appt.status === 'confirmed';
+        const name = appt.form_data_jsonb && appt.form_data_jsonb.applicant ? appt.form_data_jsonb.applicant.full_name : 'Citizen';
+        const phone = appt.form_data_jsonb && appt.form_data_jsonb.applicant ? appt.form_data_jsonb.applicant.phone_number : 'N/A';
+        if (isCompleted) {
+          return '<div class="bg-gray-50 rounded-xl border border-gray-100 p-4 opacity-60"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-black text-gray-500">' + appt.token_number + '</div><div><p class="text-sm font-semibold text-gray-500">' + name + '</p><p class="text-xs text-gray-400">' + getServiceLabel(appt.service_type) + '</p></div></div><span class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded-full font-medium">✓ Done</span></div><div class="flex items-center justify-between text-xs text-gray-400 mt-1"><span>📞 ' + phone + '</span><span>' + formatTime(appt.scheduled_time) + '</span></div></div>';
+        } else if (isActive) {
+          return '<div class="bg-green-50 rounded-xl border-2 border-green-400 p-4"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xs font-black text-white animate-pulse">' + appt.token_number + '</div><div><p class="text-sm font-bold text-green-800">' + name + '</p><p class="text-xs text-green-600">' + getServiceLabel(appt.service_type) + '</p></div></div><span class="text-xs bg-green-200 text-green-700 px-2 py-1 rounded-full font-bold animate-pulse">⚡ Now</span></div><div class="flex items-center justify-between text-xs text-green-600 mt-1 mb-3"><span>📞 ' + phone + '</span><span>' + formatTime(appt.scheduled_time) + '</span></div><div class="flex gap-2"><button class="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 rounded-lg transition">✓ Mark Complete</button><button class="flex-1 border border-gray-200 text-gray-600 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 transition">Reassign</button></div></div>';
+        } else {
+          return '<div class="bg-white rounded-xl border border-gray-200 p-4"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xs font-black text-blue-600">' + appt.token_number + '</div><div><p class="text-sm font-semibold text-gray-700">' + name + '</p><p class="text-xs text-gray-400">' + getServiceLabel(appt.service_type) + '</p></div></div><span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">Pending</span></div><div class="flex items-center justify-between text-xs text-gray-400 mt-1"><span>📞 ' + phone + '</span><span>' + formatTime(appt.scheduled_time) + '</span></div></div>';
+        }
+      }).join('');
+    }
+
+    function fetchGrievances() {
+      const token = sessionStorage.getItem('gramsmart_token') || '';
+      fetch('/api/grievances/list/', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken'), 'Authorization': token ? 'Token ' + token : '' },
+        credentials: 'same-origin'
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { renderGrievances(Array.isArray(data) ? data : (data.results || [])); })
+      .catch(function () { console.warn('GS-411: Failed to fetch grievances.'); });
+    }
+
+    function fetchAppointments() {
+      const token = sessionStorage.getItem('gramsmart_token') || '';
+      fetch('/api/appointments/my-tokens/', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken'), 'Authorization': token ? 'Token ' + token : '' },
+        credentials: 'same-origin'
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { renderAppointments(Array.isArray(data) ? data : (data.results || [])); })
+      .catch(function () { console.warn('GS-411: Failed to fetch appointments.'); });
+    }
+
+    window.addEventListener('load', function () {
+      fetchGrievances();
+      fetchAppointments();
+      setInterval(fetchGrievances, 30000);
+      setInterval(fetchAppointments, 30000);
+    });
   </script>
 
 </body>
