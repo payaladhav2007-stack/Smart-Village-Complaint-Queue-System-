@@ -152,7 +152,7 @@
 
               <!-- Status Action Button Group -->
               <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setStatus(this, 'in-progress')"
+                <button onclick="transitionTicket(this, '5', 'appointment', 'confirmed')"
                   class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   🔧 In Progress
                 </button>
@@ -209,7 +209,7 @@
               </div>
 
               <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setStatus(this, 'in-progress')"
+                <button onclick="transitionTicket(this, '5', 'appointment', 'confirmed')"
                   class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   🔧 In Progress
                 </button>
@@ -329,11 +329,11 @@
 
               <!-- Status Button Group -->
               <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setGrievanceStatus(this, 'in-progress')"
+                <button onclick="transitionTicket(this, '2', 'grievance', 'in_progress')"
                   class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   🔧 In Progress
                 </button>
-                <button onclick="setGrievanceStatus(this, 'completed')"
+                <button onclick="transitionTicket(this, '1', 'grievance', 'resolved')"
                   class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   ✔ Resolved
                 </button>
@@ -379,11 +379,11 @@
               </div>
 
               <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setGrievanceStatus(this, 'in-progress')"
+                <button onclick="transitionTicket(this, '3', 'grievance', 'in_progress')"
                   class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   🔧 In Progress
                 </button>
-                <button onclick="setGrievanceStatus(this, 'completed')"
+                <button onclick="transitionTicket(this, '1', 'grievance', 'resolved')"
                   class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   ✔ Resolved
                 </button>
@@ -428,11 +428,11 @@
               </div>
 
               <div class="flex flex-wrap gap-2 mb-3">
-                <button onclick="setGrievanceStatus(this, 'in-progress')"
+                <button onclick="transitionTicket(this, '3', 'grievance', 'in_progress')"
                   class="status-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   🔧 In Progress
                 </button>
-                <button onclick="setGrievanceStatus(this, 'completed')"
+                <button onclick="transitionTicket(this, '1', 'grievance', 'resolved')"
                   class="status-btn flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
                   ✔ Resolved
                 </button>
@@ -557,6 +557,101 @@
       setTimeout(function() { toast.classList.add('hidden'); }, 2500);
     }
   </script>
+<script>
+  // --- Helper: get CSRF cookie ---
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      document.cookie.split(';').forEach(function (cookie) {
+        const trimmed = cookie.trim();
+        if (trimmed.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+        }
+      });
+    }
+    return cookieValue;
+  }
+
+  // --- Helper: get status badge HTML ---
+  function getStatusBadgeHTML(type, newStatus) {
+    if (type === 'appointment') {
+      const apptBadges = {
+        'confirmed':  '<span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">🔧 In Progress</span>',
+        'completed':  '<span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">✔ Completed</span>',
+        'cancelled':  '<span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">✕ Rejected</span>'
+      };
+      return apptBadges[newStatus] || '';
+    } else {
+      const grievBadges = {
+        'in_progress': '<span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">🔧 In Progress</span>',
+        'resolved':    '<span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">✔ Resolved</span>',
+        'rejected':    '<span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">✕ Rejected</span>'
+      };
+      return grievBadges[newStatus] || '';
+    }
+  }
+
+  // --- Main transition function ---
+  function transitionTicket(btn, ticketId, ticketType, newStatus) {
+    const card = btn.closest('.bg-white');
+    const authToken = sessionStorage.getItem('gramsmart_token') || '';
+
+    // Disable all buttons in this card while request is in flight
+    const allBtns = card.querySelectorAll('.status-btn');
+    allBtns.forEach(function (b) { b.disabled = true; b.style.opacity = '0.6'; });
+
+    fetch('/api/admin/tickets/transition/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Authorization': authToken ? 'Token ' + authToken : ''
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        ticket_id:  ticketId,
+        type:       ticketType,
+        new_status: newStatus
+      })
+    })
+    .then(function (response) {
+      return response.json().then(function (data) {
+        return { status: response.status, data: data };
+      });
+    })
+    .then(function (result) {
+      if (result.status === 200) {
+        // --- Success: update badge and fade card if terminal ---
+        const badgeEl = card.querySelector('.rounded-full.font-medium:last-of-type');
+        if (badgeEl) badgeEl.outerHTML = getStatusBadgeHTML(ticketType, newStatus);
+
+        const terminalStates = ['completed', 'cancelled', 'resolved', 'rejected'];
+        if (terminalStates.includes(newStatus)) {
+          card.style.opacity = '0.6';
+          allBtns.forEach(function (b) { b.disabled = true; });
+        } else {
+          allBtns.forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+        }
+
+        showToast('✔', 'Status updated to ' + newStatus.replace('_', ' '));
+
+      } else if (result.status === 400) {
+        // --- Invalid transition ---
+        allBtns.forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+        const errorMsg = result.data.error || result.data.detail || 'Invalid transition';
+        showToast('⚠️', errorMsg);
+
+      } else {
+        allBtns.forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+        showToast('❌', 'Failed to update status. Try again.');
+      }
+    })
+    .catch(function () {
+      allBtns.forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+      showToast('❌', 'Network error. Please check your connection.');
+    });
+  }
+</script>
   {% load static %}
   <script src="{% static 'staff/js/control_validations.js' %}"></script>
 </body>
