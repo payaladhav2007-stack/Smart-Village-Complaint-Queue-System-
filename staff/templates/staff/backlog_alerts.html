@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Backlog Alert System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .panel-scroll { overflow-y: auto; height: calc(100vh - 64px); }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      70% { transform: scale(1.1); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+    .live-dot::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: #dc2626;
+      animation: pulse-ring 1.5s ease-out infinite;
+    }
+    .live-dot { position: relative; }
+
+    /* Alert card severity animations */
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .alert-card { animation: slide-in 0.3s ease forwards; }
+
+    /* Critical alert flash */
+    @keyframes border-flash {
+      0%, 100% { border-color: #dc2626; }
+      50% { border-color: #fca5a5; }
+    }
+    .critical-flash { animation: border-flash 2s ease-in-out infinite; }
+
+    .escalate-btn { transition: all 0.15s ease; }
+    .escalate-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- STICKY TOP NAVBAR -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 flex items-center px-6 justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+        <span class="text-white font-black text-sm">!</span>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
+        <p class="text-xs text-gray-400">Operational Alert System</p>
+      </div>
+    </div>
+
+    <!-- Center: Alert Status -->
+    <div class="hidden md:flex items-center gap-3">
+      <span class="flex items-center gap-1.5 text-xs text-red-600 font-semibold">
+        <span class="w-2 h-2 rounded-full bg-red-500 live-dot inline-block"></span>
+        Live Alerts
+      </span>
+      <span class="text-xs bg-red-100 text-red-600 font-bold px-3 py-1 rounded-full" id="alert-count">
+        9 Active Alerts
+      </span>
+      <span class="text-xs text-gray-400" id="alert-date">—</span>
+    </div>
+
+    <!-- Right -->
+    <div class="flex items-center gap-3">
+      <a href="/staff/workload-charts/"
+        class="text-xs text-green-600 hover:text-green-800 font-medium border border-green-200 px-3 py-1 rounded-lg transition">
+        📊 Charts
+      </a>
+      <a href="/staff/workbench/"
+        class="text-xs text-green-600 hover:text-green-800 font-medium border border-green-200 px-3 py-1 rounded-lg transition">
+        ← Workbench
+      </a>
+      <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+        <span class="text-red-600 font-bold text-sm">GS</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="pt-16 panel-scroll">
+    <div class="max-w-6xl mx-auto px-4 py-6">
+
+      <!-- Page Header -->
+      <div class="flex items-start justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            🚨 Backlog Alert Dashboard
+            <span class="text-xs bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+          </h2>
+          <p class="text-xs text-gray-500 mt-0.5">Tickets exceeding standard processing thresholds — requires immediate action</p>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
+            <option>All Severities</option>
+            <option>Critical (7+ days)</option>
+            <option>High (4-6 days)</option>
+            <option>Medium (2-3 days)</option>
+          </select>
+          <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
+            <option>All Categories</option>
+            <option>Roads / Potholes</option>
+            <option>Water Supply</option>
+            <option>Electricity</option>
+            <option>Sanitation</option>
+          </select>
+          <button onclick="window.location.reload()"
+            class="bg-red-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg hover:bg-red-700 transition">
+            🔄 Refresh Alerts
+          </button>
+        </div>
+      </div>
+
+      <!-- ALERT THRESHOLD LEGEND -->
+      <div class="bg-white rounded-xl shadow-sm p-4 mb-5 flex flex-wrap gap-4 items-center">
+        <p class="text-xs font-semibold text-gray-600">Alert Thresholds:</p>
+        <span class="flex items-center gap-1.5 text-xs">
+          <span class="w-3 h-3 rounded-sm bg-red-600 inline-block"></span>
+          <strong class="text-red-600">Critical</strong> — Pending 7+ days
+        </span>
+        <span class="flex items-center gap-1.5 text-xs">
+          <span class="w-3 h-3 rounded-sm bg-orange-500 inline-block"></span>
+          <strong class="text-orange-500">High</strong> — Pending 4–6 days
+        </span>
+        <span class="flex items-center gap-1.5 text-xs">
+          <span class="w-3 h-3 rounded-sm bg-yellow-400 inline-block"></span>
+          <strong class="text-yellow-600">Medium</strong> — Pending 2–3 days
+        </span>
+        <span class="flex items-center gap-1.5 text-xs">
+          <span class="w-3 h-3 rounded-sm bg-blue-400 inline-block"></span>
+          <strong class="text-blue-600">Appointment</strong> — No-show / Overdue token
+        </span>
+      </div>
+
+      <!-- SUMMARY STRIP -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
+          <p class="text-2xl font-black text-red-600">3</p>
+          <p class="text-xs text-red-500 mt-0.5">Critical Alerts</p>
+          <p class="text-xs text-red-400">7+ days overdue</p>
+        </div>
+        <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 text-center">
+          <p class="text-2xl font-black text-orange-500">3</p>
+          <p class="text-xs text-orange-500 mt-0.5">High Alerts</p>
+          <p class="text-xs text-orange-400">4–6 days overdue</p>
+        </div>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
+          <p class="text-2xl font-black text-yellow-500">2</p>
+          <p class="text-xs text-yellow-600 mt-0.5">Medium Alerts</p>
+          <p class="text-xs text-yellow-400">2–3 days overdue</p>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
+          <p class="text-2xl font-black text-blue-500">1</p>
+          <p class="text-xs text-blue-500 mt-0.5">Appointment Alert</p>
+          <p class="text-xs text-blue-400">No-show / overdue</p>
+        </div>
+      </div>
+
+      <!-- ===== CRITICAL ALERTS ===== -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-3 h-3 rounded-full bg-red-600 animate-pulse inline-block"></span>
+          <h3 class="text-sm font-bold text-red-700 uppercase tracking-wide">Critical Alerts — 7+ Days Pending</h3>
+        </div>
+
+        <div class="space-y-3">
+
+          <!-- Critical Card 1 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-red-600 shadow-md p-4 critical-flash">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">🚧</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-black text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">🚨 CRITICAL</span>
+                    <span class="text-xs text-gray-400">GRV-001</span>
+                    <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
+                    <span class="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full font-bold">⏰ 9 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">Large pothole on Main Road — near bus stop</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 4 · Submitted by Ramesh Patil · 📞 9876543210</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 20 Jun 2026 · Last updated: 20 Jun 2026 · No action taken</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <!-- Escalation Buttons -->
+            <div class="border-t border-red-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-001', 'Sarpanch')"
+                class="escalate-btn bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to Sarpanch
+              </button>
+              <button onclick="markInProgress(this, 'GRV-001')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-001')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-001')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+          <!-- Critical Card 2 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-red-600 shadow-md p-4 critical-flash">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">⚡</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-black text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">🚨 CRITICAL</span>
+                    <span class="text-xs text-gray-400">GRV-003</span>
+                    <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full font-medium">Electricity</span>
+                    <span class="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full font-bold">⏰ 8 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">No electricity for 3 days — entire street affected</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 3 · Submitted by Sunita Deshmukh · 📞 9765432101</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 21 Jun 2026 · Last updated: 21 Jun 2026 · No action taken</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <div class="border-t border-red-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-003', 'Sarpanch')"
+                class="escalate-btn bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to Sarpanch
+              </button>
+              <button onclick="markInProgress(this, 'GRV-003')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-003')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-003')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+          <!-- Critical Card 3 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-red-600 shadow-md p-4 critical-flash">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">💧</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-black text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">🚨 CRITICAL</span>
+                    <span class="text-xs text-gray-400">GRV-007</span>
+                    <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Water Supply</span>
+                    <span class="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full font-bold">⏰ 7 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">Water supply disruption — Ward 5 colony</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 5 · Submitted by Kavita Naik · 📞 9210123456</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 22 Jun 2026 · Last updated: 22 Jun 2026 · No action taken</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <div class="border-t border-red-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-007', 'District Office')"
+                class="escalate-btn bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to District Office
+              </button>
+              <button onclick="markInProgress(this, 'GRV-007')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-007')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-007')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== HIGH ALERTS ===== -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-3 h-3 rounded-full bg-orange-500 inline-block"></span>
+          <h3 class="text-sm font-bold text-orange-600 uppercase tracking-wide">High Alerts — 4–6 Days Pending</h3>
+        </div>
+
+        <div class="space-y-3">
+
+          <!-- High Card 1 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-orange-500 shadow-sm p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">🧹</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">⚠️ HIGH</span>
+                    <span class="text-xs text-gray-400">GRV-002</span>
+                    <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium">Sanitation</span>
+                    <span class="text-xs bg-orange-100 text-orange-500 px-2 py-0.5 rounded-full font-bold">⏰ 6 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">Sewage overflow on Street 5 — health hazard</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 2 · Submitted by Manoj Kumar · 📞 9654321012</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 23 Jun 2026 · Last updated: 23 Jun 2026</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <div class="border-t border-orange-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-002', 'Gram Sevak')"
+                class="escalate-btn bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to Gram Sevak
+              </button>
+              <button onclick="markInProgress(this, 'GRV-002')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-002')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-002')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+          <!-- High Card 2 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-orange-500 shadow-sm p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">🚧</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">⚠️ HIGH</span>
+                    <span class="text-xs text-gray-400">GRV-005</span>
+                    <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
+                    <span class="text-xs bg-orange-100 text-orange-500 px-2 py-0.5 rounded-full font-bold">⏰ 5 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">Road cave-in near market area — vehicles at risk</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 1 · Submitted by Priya Sharma · 📞 9543210123</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 24 Jun 2026 · Last updated: 24 Jun 2026</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <div class="border-t border-orange-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-005', 'Gram Sevak')"
+                class="escalate-btn bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to Gram Sevak
+              </button>
+              <button onclick="markInProgress(this, 'GRV-005')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-005')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-005')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+          <!-- High Card 3 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-orange-500 shadow-sm p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">💧</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">⚠️ HIGH</span>
+                    <span class="text-xs text-gray-400">GRV-009</span>
+                    <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Water Supply</span>
+                    <span class="text-xs bg-orange-100 text-orange-500 px-2 py-0.5 rounded-full font-bold">⏰ 4 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">Water pipeline burst — street flooding</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 3 · Submitted by Anita Joshi · 📞 9432101234</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 25 Jun 2026 · Last updated: 25 Jun 2026</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <div class="border-t border-orange-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-009', 'Talati')"
+                class="escalate-btn bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to Talati
+              </button>
+              <button onclick="markInProgress(this, 'GRV-009')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-009')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-009')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== MEDIUM ALERTS ===== -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>
+          <h3 class="text-sm font-bold text-yellow-600 uppercase tracking-wide">Medium Alerts — 2–3 Days Pending</h3>
+        </div>
+
+        <div class="space-y-3">
+
+          <!-- Medium Card 1 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-yellow-400 shadow-sm p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">⚡</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">🔔 MEDIUM</span>
+                    <span class="text-xs text-gray-400">GRV-004</span>
+                    <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full font-medium">Electricity</span>
+                    <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full font-bold">⏰ 3 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">Street lights not working — near school gate</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 4 · Submitted by Vikram Rao · 📞 9321012345</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 26 Jun 2026 · Last updated: 26 Jun 2026</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <div class="border-t border-yellow-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-004', 'Gram Sevak')"
+                class="escalate-btn bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to Gram Sevak
+              </button>
+              <button onclick="markInProgress(this, 'GRV-004')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-004')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-004')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+          <!-- Medium Card 2 -->
+          <div class="alert-card bg-white rounded-xl border-l-4 border-yellow-400 shadow-sm p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span class="text-lg">🧹</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">🔔 MEDIUM</span>
+                    <span class="text-xs text-gray-400">GRV-006</span>
+                    <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium">Sanitation</span>
+                    <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full font-bold">⏰ 2 days overdue</span>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">Garbage pile growing near market — 3 days uncollected</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Ward 4 · Submitted by Anushka Kasar · 📞 9100123456</p>
+                  <p class="text-xs text-gray-400 mt-1">Submitted: 27 Jun 2026 · Last updated: 27 Jun 2026</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <p class="text-xs text-gray-400">Current Status</p>
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold">Pending</span>
+              </div>
+            </div>
+            <div class="border-t border-yellow-100 pt-3 flex flex-wrap gap-2">
+              <button onclick="escalate(this, 'GRV-006', 'Gram Sevak')"
+                class="escalate-btn bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                🔺 Escalate to Gram Sevak
+              </button>
+              <button onclick="markInProgress(this, 'GRV-006')"
+                class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                🔧 Mark In Progress
+              </button>
+              <button onclick="assignWorker(this, 'GRV-006')"
+                class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                👷 Assign Field Worker
+              </button>
+              <button onclick="addNote(this, 'GRV-006')"
+                class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+                💬 Add Note
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== APPOINTMENT ALERT ===== -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+          <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wide">Appointment Alerts — No Show / Overdue Tokens</h3>
+        </div>
+
+        <div class="alert-card bg-white rounded-xl border-l-4 border-blue-500 shadow-sm p-4">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span class="text-lg">📋</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                  <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">📅 APPOINTMENT</span>
+                  <span class="text-xs text-gray-400">Token #006</span>
+                  <span class="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full font-medium">Death Certificate</span>
+                  <span class="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full font-bold">❌ No Show</span>
+                </div>
+                <p class="text-sm font-bold text-gray-800">Vikram Rao — missed 11:30 AM appointment</p>
+                <p class="text-xs text-gray-500 mt-0.5">Ward 4 · 📞 9321012345 · Scheduled: 29 Jun 2026 at 11:30 AM</p>
+                <p class="text-xs text-gray-400 mt-1">Token expired — slot wasted · Purpose: Insurance claim</p>
+              </div>
+            </div>
+            <div class="text-right flex-shrink-0 ml-2">
+              <p class="text-xs text-gray-400">Token Status</p>
+              <span class="text-xs bg-red-100 text-red-500 px-2 py-1 rounded-full font-semibold">❌ No Show</span>
+            </div>
+          </div>
+          <div class="border-t border-blue-100 pt-3 flex flex-wrap gap-2">
+            <button onclick="reschedule(this, 'TKN-006')"
+              class="escalate-btn bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+              📅 Reschedule Token
+            </button>
+            <button onclick="releaseSlot(this, 'TKN-006')"
+              class="escalate-btn bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+              🔓 Release Slot
+            </button>
+            <button onclick="markNoShow(this, 'TKN-006')"
+              class="escalate-btn border border-gray-300 text-gray-600 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+              ✕ Confirm No Show
+            </button>
+            <button onclick="addNote(this, 'TKN-006')"
+              class="escalate-btn border border-gray-300 text-gray-500 hover:bg-gray-50 text-xs font-medium px-4 py-2 rounded-lg transition">
+              💬 Add Note
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+    <div class="text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg flex items-center gap-2" id="toast-inner">
+      <span id="toast-icon">✔</span>
+      <span id="toast-message">Action completed</span>
+    </div>
+  </div>
+
+  <script>
+    // Set date
+    document.getElementById('alert-date').textContent =
+      new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    function showToast(icon, message, color) {
+      var toast = document.getElementById('toast');
+      var inner = document.getElementById('toast-inner');
+      inner.className = 'text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 ' + color;
+      document.getElementById('toast-icon').textContent = icon;
+      document.getElementById('toast-message').textContent = message;
+      toast.classList.remove('hidden');
+      setTimeout(function() { toast.classList.add('hidden'); }, 3000);
+    }
+
+    function escalate(btn, id, target) {
+      var card = btn.closest('.alert-card');
+      card.style.opacity = '0.6';
+      btn.textContent = '✔ Escalated to ' + target;
+      btn.disabled = true;
+      btn.classList.remove('bg-red-600', 'bg-orange-500', 'bg-yellow-500');
+      btn.classList.add('bg-gray-400');
+      showToast('🔺', id + ' escalated to ' + target, 'bg-red-600');
+    }
+
+    function markInProgress(btn, id) {
+      var card = btn.closest('.alert-card');
+      var statusBadge = card.querySelector('.bg-yellow-100.text-yellow-700');
+      if (statusBadge) {
+        statusBadge.className = 'text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold';
+        statusBadge.textContent = '🔧 In Progress';
+      }
+      btn.textContent = '✔ Marked In Progress';
+      btn.disabled = true;
+      btn.classList.remove('bg-blue-600');
+      btn.classList.add('bg-gray-400');
+      showToast('🔧', id + ' marked as In Progress', 'bg-blue-600');
+    }
+
+    function assignWorker(btn, id) {
+      btn.textContent = '✔ Worker Assigned';
+      btn.disabled = true;
+      showToast('👷', 'Field worker assigned to ' + id, 'bg-green-600');
+    }
+
+    function addNote(btn, id) {
+      btn.textContent = '✔ Note Added';
+      btn.disabled = true;
+      showToast('💬', 'Note added to ' + id, 'bg-gray-700');
+    }
+
+    function reschedule(btn, id) {
+      btn.textContent = '✔ Rescheduled';
+      btn.disabled = true;
+      showToast('📅', id + ' rescheduled', 'bg-blue-600');
+    }
+
+    function releaseSlot(btn, id) {
+      btn.textContent = '✔ Slot Released';
+      btn.disabled = true;
+      showToast('🔓', 'Slot released for ' + id, 'bg-green-600');
+    }
+
+    function markNoShow(btn, id) {
+      btn.textContent = '✔ Confirmed No Show';
+      btn.disabled = true;
+      showToast('✕', id + ' confirmed as No Show', 'bg-gray-700');
+    }
+  </script>
+
+</body>
+</html>
