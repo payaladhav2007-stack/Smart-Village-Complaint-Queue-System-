@@ -6,7 +6,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Feedback(models.Model):
-
     # Polymorphic generic relation fields
     content_type = models.ForeignKey(
         ContentType,
@@ -42,6 +41,7 @@ class Feedback(models.Model):
                 name='feedback_generic_fk_idx'
             ),
         ]
+        unique_together = ['content_type', 'target_object_id', 'submitted_by']
 
     def __str__(self):
         return f"{self.submitted_by.username} rated {self.content_type} #{self.target_object_id} — {self.rating}★"
