@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Regional Analytics Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes count-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .metric-card { animation: count-up 0.4s ease forwards; }
+    .table-row:hover { background-color: #f0fdf4; }
+    .progress-bar {
+      height: 6px;
+      border-radius: 9999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.6s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- STICKY TOP NAVBAR -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 flex items-center px-6 justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+        <span class="text-white font-black text-sm">GS</span>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
+        <p class="text-xs text-gray-400">Regional Analytics Dashboard</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-gray-400 hidden sm:block" id="current-date"></span>
+      <span class="flex items-center gap-1.5 text-xs text-green-600 font-medium">
+        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
+        Live
+      </span>
+      <a href="/staff/workbench/" class="text-xs text-green-600 hover:text-green-800 font-medium transition">← Workbench</a>
+      <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+        <span class="text-green-700 font-bold text-sm">RL</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="pt-20 px-4 pb-10 max-w-7xl mx-auto">
+
+    <!-- Page Header -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Regional Performance Overview</h2>
+        <p class="text-sm text-gray-500 mt-0.5">All wards — GramSmart system health metrics</p>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
+          <option>This Month</option>
+          <option>Last Month</option>
+          <option>Last 3 Months</option>
+          <option>This Year</option>
+        </select>
+        <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
+          <option>All Wards</option>
+          <option>Ward 1</option>
+          <option>Ward 2</option>
+          <option>Ward 3</option>
+          <option>Ward 4</option>
+          <option>Ward 5</option>
+        </select>
+        <button class="bg-green-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg hover:bg-green-700 transition">
+          Export Report
+        </button>
+      </div>
+    </div>
+
+    <!-- TOP METRICS GRID -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+      <!-- Total Complaints -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-blue-500">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">📋</span>
+          <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">Total</span>
+        </div>
+        <p class="text-3xl font-black text-gray-800">142</p>
+        <p class="text-xs text-gray-500 mt-1">Total Complaints</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↑ 12% from last month</p>
+      </div>
+
+      <!-- Resolved -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-green-500">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">✅</span>
+          <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">Resolved</span>
+        </div>
+        <p class="text-3xl font-black text-green-600">98</p>
+        <p class="text-xs text-gray-500 mt-1">Complaints Resolved</p>
+        <p class="text-xs text-green-600 font-medium mt-2">69% resolution rate</p>
+      </div>
+
+      <!-- Pending -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-yellow-400">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">⏳</span>
+          <span class="text-xs bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">Pending</span>
+        </div>
+        <p class="text-3xl font-black text-yellow-500">32</p>
+        <p class="text-xs text-gray-500 mt-1">Complaints Pending</p>
+        <p class="text-xs text-red-500 font-medium mt-2">↑ 5 new today</p>
+      </div>
+
+      <!-- Avg Resolution Time -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-purple-500">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">⚡</span>
+          <span class="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">Avg Time</span>
+        </div>
+        <p class="text-3xl font-black text-purple-600">2.4d</p>
+        <p class="text-xs text-gray-500 mt-1">Avg Resolution Time</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↓ 0.3d faster this month</p>
+      </div>
+
+    </div>
+
+    <!-- SECOND METRICS ROW -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+      <!-- Total Appointments -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-teal-500">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">📅</span>
+          <span class="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full font-medium">Appointments</span>
+        </div>
+        <p class="text-3xl font-black text-gray-800">215</p>
+        <p class="text-xs text-gray-500 mt-1">Total Appointments</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↑ 18% from last month</p>
+      </div>
+
+      <!-- Completed Appointments -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-green-400">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">🎟️</span>
+          <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">Completed</span>
+        </div>
+        <p class="text-3xl font-black text-green-600">187</p>
+        <p class="text-xs text-gray-500 mt-1">Appointments Completed</p>
+        <p class="text-xs text-green-600 font-medium mt-2">87% completion rate</p>
+      </div>
+
+      <!-- Citizen Feedback Score -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-amber-400">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">⭐</span>
+          <span class="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-medium">Rating</span>
+        </div>
+        <p class="text-3xl font-black text-amber-500">4.2</p>
+        <p class="text-xs text-gray-500 mt-1">Avg Citizen Rating</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↑ 0.3 from last month</p>
+      </div>
+
+      <!-- Active Wards -->
+      <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-indigo-500">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-2xl">🏘️</span>
+          <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">Wards</span>
+        </div>
+        <p class="text-3xl font-black text-indigo-600">5</p>
+        <p class="text-xs text-gray-500 mt-1">Active Wards</p>
+        <p class="text-xs text-green-600 font-medium mt-2">All wards reporting</p>
+      </div>
+
+    </div>
+
+    <!-- MAIN GRID: Charts + Backlog -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+
+      <!-- Complaints by Category Chart -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold text-gray-800">Complaints by Category</h3>
+          <span class="text-xs text-gray-400">This Month</span>
+        </div>
+        <canvas id="categoryChart" height="120"></canvas>
+      </div>
+
+      <!-- Aggregate Backlog Cards -->
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold text-gray-800">Backlog Summary</h3>
+          <span class="text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-medium">44 Open</span>
+        </div>
+        <div class="space-y-4">
+
+          <!-- Roads -->
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-xs font-medium text-gray-700">🚧 Roads / Potholes</span>
+              <span class="text-xs font-bold text-red-500">14 open</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill bg-red-400" style="width: 68%"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 3.2 days</p>
+          </div>
+
+          <!-- Water -->
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-xs font-medium text-gray-700">💧 Water Supply</span>
+              <span class="text-xs font-bold text-yellow-500">9 open</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill bg-yellow-400" style="width: 45%"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 2.1 days</p>
+          </div>
+
+          <!-- Electricity -->
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-xs font-medium text-gray-700">💡 Electricity</span>
+              <span class="text-xs font-bold text-yellow-500">11 open</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill bg-yellow-500" style="width: 55%"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 1.8 days</p>
+          </div>
+
+          <!-- Sanitation -->
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-xs font-medium text-gray-700">🗑️ Sanitation</span>
+              <span class="text-xs font-bold text-green-500">10 open</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill bg-green-400" style="width: 50%"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 1.5 days</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- WARD PERFORMANCE TABLE -->
+    <div class="bg-white rounded-2xl shadow-sm p-5 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-bold text-gray-800">Ward-wise Performance Table</h3>
+        <span class="text-xs text-gray-400">Sorted by Resolution Rate</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100">
+              <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Ward</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Total</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Resolved</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Pending</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Avg Time</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Rating</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Resolution %</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+
+            <!-- Ward 2 - Best -->
+            <tr class="table-row transition">
+              <td class="py-3 pr-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center text-xs font-bold text-green-700">W2</div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Ward 2</p>
+                    <p class="text-xs text-gray-400">North Zone</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">34</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-green-600">28</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-yellow-500">6</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">1.8d</td>
+              <td class="text-center py-3 px-4">
+                <span class="text-amber-500 font-bold text-sm">⭐ 4.6</span>
+              </td>
+              <td class="text-center py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="progress-bar flex-1">
+                    <div class="progress-fill bg-green-500" style="width: 82%"></div>
+                  </div>
+                  <span class="text-xs font-bold text-green-600">82%</span>
+                </div>
+              </td>
+              <td class="text-center py-3">
+                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-semibold">Excellent</span>
+              </td>
+            </tr>
+
+            <!-- Ward 1 -->
+            <tr class="table-row transition">
+              <td class="py-3 pr-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center text-xs font-bold text-green-700">W1</div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Ward 1</p>
+                    <p class="text-xs text-gray-400">Central Zone</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">28</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-green-600">21</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-yellow-500">7</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">2.1d</td>
+              <td class="text-center py-3 px-4">
+                <span class="text-amber-500 font-bold text-sm">⭐ 4.3</span>
+              </td>
+              <td class="text-center py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="progress-bar flex-1">
+                    <div class="progress-fill bg-green-400" style="width: 75%"></div>
+                  </div>
+                  <span class="text-xs font-bold text-green-600">75%</span>
+                </div>
+              </td>
+              <td class="text-center py-3">
+                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-semibold">Good</span>
+              </td>
+            </tr>
+
+            <!-- Ward 4 -->
+            <tr class="table-row transition">
+              <td class="py-3 pr-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 bg-yellow-100 rounded-lg flex items-center justify-center text-xs font-bold text-yellow-700">W4</div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Ward 4</p>
+                    <p class="text-xs text-gray-400">East Zone</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">31</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-green-600">22</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-yellow-500">9</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">2.4d</td>
+              <td class="text-center py-3 px-4">
+                <span class="text-amber-500 font-bold text-sm">⭐ 4.1</span>
+              </td>
+              <td class="text-center py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="progress-bar flex-1">
+                    <div class="progress-fill bg-yellow-400" style="width: 71%"></div>
+                  </div>
+                  <span class="text-xs font-bold text-yellow-600">71%</span>
+                </div>
+              </td>
+              <td class="text-center py-3">
+                <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-semibold">Average</span>
+              </td>
+            </tr>
+
+            <!-- Ward 3 -->
+            <tr class="table-row transition">
+              <td class="py-3 pr-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 bg-yellow-100 rounded-lg flex items-center justify-center text-xs font-bold text-yellow-700">W3</div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Ward 3</p>
+                    <p class="text-xs text-gray-400">West Zone</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">27</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-green-600">18</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-yellow-500">9</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">2.8d</td>
+              <td class="text-center py-3 px-4">
+                <span class="text-amber-500 font-bold text-sm">⭐ 3.9</span>
+              </td>
+              <td class="text-center py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="progress-bar flex-1">
+                    <div class="progress-fill bg-yellow-500" style="width: 67%"></div>
+                  </div>
+                  <span class="text-xs font-bold text-yellow-600">67%</span>
+                </div>
+              </td>
+              <td class="text-center py-3">
+                <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-semibold">Average</span>
+              </td>
+            </tr>
+
+            <!-- Ward 5 - Needs Attention -->
+            <tr class="table-row transition">
+              <td class="py-3 pr-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center text-xs font-bold text-red-600">W5</div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Ward 5</p>
+                    <p class="text-xs text-gray-400">South Zone</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-gray-700">22</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-green-600">9</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-red-500">13</td>
+              <td class="text-center py-3 px-4 text-sm font-semibold text-red-500">4.1d</td>
+              <td class="text-center py-3 px-4">
+                <span class="text-amber-500 font-bold text-sm">⭐ 3.2</span>
+              </td>
+              <td class="text-center py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="progress-bar flex-1">
+                    <div class="progress-fill bg-red-400" style="width: 41%"></div>
+                  </div>
+                  <span class="text-xs font-bold text-red-500">41%</span>
+                </div>
+              </td>
+              <td class="text-center py-3">
+                <span class="text-xs bg-red-100 text-red-500 px-2 py-1 rounded-full font-semibold">Needs Attention</span>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOTTOM GRID: Resolution Trend + Top Complaints -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+      <!-- Resolution Trend Chart -->
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold text-gray-800">Monthly Resolution Trend</h3>
+          <span class="text-xs text-gray-400">Last 6 months</span>
+        </div>
+        <canvas id="trendChart" height="150"></canvas>
+      </div>
+
+      <!-- Top Complaint Categories -->
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold text-gray-800">Top Complaint Categories</h3>
+          <span class="text-xs text-gray-400">This Month</span>
+        </div>
+        <div class="space-y-3">
+
+          <div class="flex items-center gap-3">
+            <span class="text-base w-6">🚧</span>
+            <div class="flex-1">
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-medium text-gray-700">Roads / Potholes</span>
+                <span class="text-xs font-bold text-gray-600">42 (30%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-red-400" style="width: 30%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-base w-6">💡</span>
+            <div class="flex-1">
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-medium text-gray-700">Electricity</span>
+                <span class="text-xs font-bold text-gray-600">38 (27%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-yellow-400" style="width: 27%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-base w-6">💧</span>
+            <div class="flex-1">
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-medium text-gray-700">Water Supply</span>
+                <span class="text-xs font-bold text-gray-600">35 (25%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-blue-400" style="width: 25%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-base w-6">🗑️</span>
+            <div class="flex-1">
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-medium text-gray-700">Sanitation</span>
+                <span class="text-xs font-bold text-gray-600">27 (18%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-green-400" style="width: 18%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Feedback Score Summary -->
+        <div class="mt-5 border-t pt-4">
+          <p class="text-xs font-semibold text-gray-700 mb-3">Citizen Satisfaction Scores</p>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="text-center bg-green-50 rounded-xl p-3">
+              <p class="text-lg font-black text-green-600">4.2</p>
+              <p class="text-xs text-gray-400">Overall</p>
+            </div>
+            <div class="text-center bg-blue-50 rounded-xl p-3">
+              <p class="text-lg font-black text-blue-600">4.5</p>
+              <p class="text-xs text-gray-400">Speed</p>
+            </div>
+            <div class="text-center bg-amber-50 rounded-xl p-3">
+              <p class="text-lg font-black text-amber-600">4.0</p>
+              <p class="text-xs text-gray-400">Staff</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- CHART.JS SCRIPTS -->
+  <script>
+    // Auto date
+    document.getElementById('current-date').textContent =
+      new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+
+    // Category Bar Chart
+    var ctx1 = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Roads', 'Electricity', 'Water Supply', 'Sanitation'],
+        datasets: [
+          {
+            label: 'Resolved',
+            data: [28, 26, 24, 20],
+            backgroundColor: '#4ade80',
+            borderRadius: 6
+          },
+          {
+            label: 'Pending',
+            data: [14, 12, 11, 7],
+            backgroundColor: '#fbbf24',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+        scales: {
+          x: { stacked: false, grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: '#f3f4f6' } }
+        }
+      }
+    });
+
+    // Trend Line Chart
+    var ctx2 = document.getElementById('trendChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [
+          {
+            label: 'Resolved',
+            data: [12, 18, 22, 19, 28, 32],
+            borderColor: '#16a34a',
+            backgroundColor: 'rgba(22, 163, 74, 0.08)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#16a34a',
+            pointRadius: 4
+          },
+          {
+            label: 'New Complaints',
+            data: [15, 20, 25, 22, 30, 35],
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.08)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#f59e0b',
+            pointRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: '#f3f4f6' } }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
