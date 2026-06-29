@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Submit Feedback</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Star Rating Animation */
+    .star-btn {
+      transition: transform 0.15s ease, color 0.15s ease;
+      cursor: pointer;
+      font-size: 2.5rem;
+      line-height: 1;
+      background: none;
+      border: none;
+      padding: 4px;
+      color: #d1d5db;
+    }
+    .star-btn:hover,
+    .star-btn.active {
+      color: #f59e0b;
+      transform: scale(1.2);
+    }
+    .star-btn.active {
+      filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+    }
+    /* Pulse animation on submit */
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .pop { animation: pop 0.3s ease; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-gray-100 min-h-screen flex items-center justify-center px-4 py-10">
+
+  <div class="bg-white w-full max-w-md rounded-3xl shadow-xl p-6 sm:p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <span class="text-3xl">⭐</span>
+      </div>
+      <h1 class="text-xl font-bold text-gray-800">Share Your Feedback</h1>
+      <p class="text-sm text-gray-500 mt-1">Help us improve GramSmart services</p>
+    </div>
+
+    <!-- Service Info Card -->
+    <div class="bg-green-50 border border-green-100 rounded-2xl px-4 py-3 mb-6 flex items-center gap-3">
+      <div class="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+        <span class="text-white text-lg">📋</span>
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">Service Completed</p>
+        <p class="text-sm font-bold text-gray-800" id="service-label">Income Certificate</p>
+        <p class="text-xs text-green-600 font-medium">Token #042 — Jun 25, 2026</p>
+      </div>
+    </div>
+
+    <!-- Feedback Form -->
+    <form method="POST" id="feedback-form" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- 5-Star Rating Matrix -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1 text-center">
+          How would you rate this service? <span class="text-red-500">*</span>
+        </label>
+        <p class="text-xs text-gray-400 text-center mb-4">Tap a star to rate</p>
+
+        <!-- Star Buttons -->
+        <div class="flex justify-center gap-1 mb-3" id="star-container">
+          <button type="button" class="star-btn" data-value="1" onclick="setRating(1)">★</button>
+          <button type="button" class="star-btn" data-value="2" onclick="setRating(2)">★</button>
+          <button type="button" class="star-btn" data-value="3" onclick="setRating(3)">★</button>
+          <button type="button" class="star-btn" data-value="4" onclick="setRating(4)">★</button>
+          <button type="button" class="star-btn" data-value="5" onclick="setRating(5)">★</button>
+        </div>
+
+        <!-- Rating Label -->
+        <div class="text-center h-6">
+          <span id="rating-label" class="text-sm font-semibold text-amber-500"></span>
+        </div>
+
+        <!-- Hidden rating input -->
+        <input type="hidden" name="rating" id="rating-input" value="" />
+      </div>
+
+      <!-- Category Rating Section -->
+      <div class="border-t pt-5">
+        <p class="text-sm font-semibold text-gray-700 mb-4">Rate specific aspects:</p>
+        <div class="space-y-3">
+
+          <!-- Speed -->
+          <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">⚡</span>
+              <span class="text-sm font-medium text-gray-700">Speed of Service</span>
+            </div>
+            <div class="flex gap-1" id="speed-stars">
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="speed" data-value="1" onclick="setGroupRating('speed', 1)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="speed" data-value="2" onclick="setGroupRating('speed', 2)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="speed" data-value="3" onclick="setGroupRating('speed', 3)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="speed" data-value="4" onclick="setGroupRating('speed', 4)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="speed" data-value="5" onclick="setGroupRating('speed', 5)">★</button>
+            </div>
+          </div>
+
+          <!-- Staff Behaviour -->
+          <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">👤</span>
+              <span class="text-sm font-medium text-gray-700">Staff Behaviour</span>
+            </div>
+            <div class="flex gap-1" id="staff-stars">
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="staff" data-value="1" onclick="setGroupRating('staff', 1)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="staff" data-value="2" onclick="setGroupRating('staff', 2)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="staff" data-value="3" onclick="setGroupRating('staff', 3)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="staff" data-value="4" onclick="setGroupRating('staff', 4)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="staff" data-value="5" onclick="setGroupRating('staff', 5)">★</button>
+            </div>
+          </div>
+
+          <!-- Ease of Process -->
+          <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">📱</span>
+              <span class="text-sm font-medium text-gray-700">Ease of Process</span>
+            </div>
+            <div class="flex gap-1" id="ease-stars">
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="ease" data-value="1" onclick="setGroupRating('ease', 1)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="ease" data-value="2" onclick="setGroupRating('ease', 2)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="ease" data-value="3" onclick="setGroupRating('ease', 3)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="ease" data-value="4" onclick="setGroupRating('ease', 4)">★</button>
+              <button type="button" class="text-gray-300 text-xl hover:text-amber-400 transition" data-group="ease" data-value="5" onclick="setGroupRating('ease', 5)">★</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Tags -->
+      <div class="border-t pt-5">
+        <p class="text-sm font-semibold text-gray-700 mb-3">Quick tags (optional):</p>
+        <div class="flex flex-wrap gap-2" id="tag-container">
+          <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-green-400 hover:text-green-600 transition">
+            👍 Helpful Staff
+          </button>
+          <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-green-400 hover:text-green-600 transition">
+            ⚡ Fast Service
+          </button>
+          <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-green-400 hover:text-green-600 transition">
+            😊 Friendly
+          </button>
+          <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-green-400 hover:text-green-600 transition">
+            📋 Well Organized
+          </button>
+          <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-green-400 hover:text-green-600 transition">
+            🐢 Too Slow
+          </button>
+          <button type="button" onclick="toggleTag(this)" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-green-400 hover:text-green-600 transition">
+            😐 Needs Improvement
+          </button>
+        </div>
+        <input type="hidden" name="tags" id="tags-input" value="" />
+      </div>
+
+      <!-- Qualitative Comment Block -->
+      <div class="border-t pt-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          Additional Comments (Optional)
+        </label>
+        <textarea
+          name="comment"
+          rows="4"
+          maxlength="500"
+          placeholder="Tell us about your experience — what went well or what could be improved..."
+          oninput="updateCharCount(this)"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none text-gray-700 placeholder-gray-300"
+        ></textarea>
+        <div class="flex justify-between mt-1">
+          <p class="text-xs text-gray-400">Be specific — your feedback helps improve village services</p>
+          <p class="text-xs text-gray-400"><span id="char-count">0</span>/500</p>
+        </div>
+      </div>
+
+      <!-- Anonymous Toggle -->
+      <div class="bg-gray-50 rounded-xl px-4 py-3 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-700">Submit Anonymously</p>
+          <p class="text-xs text-gray-400">Your name will not be shown with this feedback</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" name="is_anonymous" class="sr-only peer" />
+          <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-green-500 rounded-full peer peer-checked:bg-green-600 transition"></div>
+          <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition peer-checked:translate-x-5"></div>
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-2">
+        <button
+          type="submit"
+          id="submit-btn"
+          onclick="validateAndSubmit(event)"
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-2xl text-sm transition duration-200 shadow-md"
+        >
+          Submit Feedback ⭐
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Success Message (hidden initially) -->
+    <div id="success-panel" class="hidden text-center py-6">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-4xl">🎉</span>
+      </div>
+      <h2 class="text-lg font-bold text-gray-800 mb-2">Thank You!</h2>
+      <p class="text-sm text-gray-500 mb-4">Your feedback has been submitted successfully.</p>
+      <a href="/appointments/queue/" class="inline-block bg-green-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-green-700 transition">
+        Back to Dashboard
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-xs text-gray-400 mt-6">
+      GramSmart — Unified Rural Governance Platform
+    </p>
+
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    var currentRating = 0;
+    var selectedTags = [];
+    var groupRatings = { speed: 0, staff: 0, ease: 0 };
+
+    var ratingLabels = {
+      1: '😞 Poor',
+      2: '😐 Fair',
+      3: '🙂 Good',
+      4: '😊 Very Good',
+      5: '🤩 Excellent!'
+    };
+
+    // Main 5-star rating
+    function setRating(value) {
+      currentRating = value;
+      document.getElementById('rating-input').value = value;
+      document.getElementById('rating-label').textContent = ratingLabels[value];
+
+      var stars = document.querySelectorAll('#star-container .star-btn');
+      stars.forEach(function(star) {
+        var starVal = parseInt(star.getAttribute('data-value'));
+        if (starVal <= value) {
+          star.classList.add('active');
+          star.style.color = '#f59e0b';
+        } else {
+          star.classList.remove('active');
+          star.style.color = '#d1d5db';
+        }
+      });
+
+      // Pop animation on submit button
+      var btn = document.getElementById('submit-btn');
+      btn.classList.add('pop');
+      setTimeout(function() { btn.classList.remove('pop'); }, 300);
+    }
+
+    // Group star ratings (Speed, Staff, Ease)
+    function setGroupRating(group, value) {
+      groupRatings[group] = value;
+      var stars = document.querySelectorAll('[data-group="' + group + '"]');
+      stars.forEach(function(star) {
+        var starVal = parseInt(star.getAttribute('data-value'));
+        if (starVal <= value) {
+          star.style.color = '#f59e0b';
+        } else {
+          star.style.color = '#d1d5db';
+        }
+      });
+    }
+
+    // Quick tag toggle
+    function toggleTag(btn) {
+      var tagText = btn.textContent.trim();
+      if (btn.classList.contains('selected')) {
+        btn.classList.remove('selected', 'border-green-500', 'text-green-600', 'bg-green-50');
+        btn.classList.add('border-gray-200', 'text-gray-600');
+        selectedTags = selectedTags.filter(function(t) { return t !== tagText; });
+      } else {
+        btn.classList.add('selected', 'border-green-500', 'text-green-600', 'bg-green-50');
+        btn.classList.remove('border-gray-200', 'text-gray-600');
+        selectedTags.push(tagText);
+      }
+      document.getElementById('tags-input').value = selectedTags.join(',');
+    }
+
+    // Character counter
+    function updateCharCount(textarea) {
+      document.getElementById('char-count').textContent = textarea.value.length;
+    }
+
+    // Validate and submit
+    function validateAndSubmit(event) {
+      event.preventDefault();
+      if (currentRating === 0) {
+        alert('Please select a star rating before submitting.');
+        return;
+      }
+      // Hide form and show success
+      document.getElementById('feedback-form').classList.add('hidden');
+      document.getElementById('success-panel').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import AnalyticsSummaryView
+from .views import regional_dashboard
 
 urlpatterns = [
-    path('summary/', AnalyticsSummaryView.as_view(), name='analytics_summary'),
+    path('dashboard/', regional_dashboard, name='regional_dashboard'),
 ]
