@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/admin/workbench/', include('workbench.urls')),
     path('api/admin/tickets/transition/', TicketTransitionView.as_view(), name='ticket-transition-exact'),
     path('staff/', include('staff.urls')),
+    path('api/analytics/', include('analytics.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
