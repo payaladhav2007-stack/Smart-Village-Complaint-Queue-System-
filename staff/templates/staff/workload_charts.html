@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Workload Distribution Charts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .panel-scroll { overflow-y: auto; height: calc(100vh - 64px); }
+    .progress-bar { height: 8px; border-radius: 9999px; background: #e5e7eb; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 9999px; transition: width 0.8s ease; }
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .chart-card { animation: slide-in 0.4s ease forwards; }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      70% { transform: scale(1.1); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+    .live-dot::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: #16a34a;
+      animation: pulse-ring 1.5s ease-out infinite;
+    }
+    .live-dot { position: relative; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- STICKY TOP NAVBAR -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 flex items-center px-6 justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+        <span class="text-white font-black text-sm">GS</span>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
+        <p class="text-xs text-gray-400">Workload Distribution Charts</p>
+      </div>
+    </div>
+
+    <!-- Center -->
+    <div class="hidden md:flex items-center gap-3">
+      <span class="flex items-center gap-1.5 text-xs text-green-600 font-semibold">
+        <span class="w-2 h-2 rounded-full bg-green-500 live-dot inline-block"></span>
+        Live Metrics
+      </span>
+      <span class="text-xs text-gray-400" id="chart-date">—</span>
+    </div>
+
+    <!-- Right -->
+    <div class="flex items-center gap-3">
+      <a href="/analytics/dashboard/"
+        class="text-xs text-green-600 hover:text-green-800 font-medium border border-green-200 px-3 py-1 rounded-lg transition">
+        📊 Full Analytics
+      </a>
+      <a href="/staff/workbench/"
+        class="text-xs text-green-600 hover:text-green-800 font-medium border border-green-200 px-3 py-1 rounded-lg transition">
+        ← Workbench
+      </a>
+      <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+        <span class="text-green-700 font-bold text-sm">GS</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="pt-16 panel-scroll">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">Workload Distribution Overview</h2>
+          <p class="text-xs text-gray-500 mt-0.5">Pending vs Resolved ratios per operational sector</p>
+        </div>
+        <div class="flex gap-2">
+          <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
+            <option>This Month</option>
+            <option>Last Month</option>
+            <option>Last 3 Months</option>
+          </select>
+          <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
+            <option>All Wards</option>
+            <option>Ward 1</option>
+            <option>Ward 2</option>
+            <option>Ward 3</option>
+            <option>Ward 4</option>
+            <option>Ward 5</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- QUICK METRIC PILLS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-yellow-400 chart-card">
+          <p class="text-2xl font-black text-yellow-500">32</p>
+          <p class="text-xs text-gray-500 mt-0.5">Total Pending</p>
+          <div class="progress-bar mt-2">
+            <div class="progress-fill bg-yellow-400" style="width: 23%"></div>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">23% of total workload</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500 chart-card">
+          <p class="text-2xl font-black text-blue-500">12</p>
+          <p class="text-xs text-gray-500 mt-0.5">In Progress</p>
+          <div class="progress-bar mt-2">
+            <div class="progress-fill bg-blue-400" style="width: 8%"></div>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">8% of total workload</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-green-500 chart-card">
+          <p class="text-2xl font-black text-green-600">98</p>
+          <p class="text-xs text-gray-500 mt-0.5">Resolved</p>
+          <div class="progress-bar mt-2">
+            <div class="progress-fill bg-green-500" style="width: 69%"></div>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">69% resolution rate</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-red-400 chart-card">
+          <p class="text-2xl font-black text-red-500">8</p>
+          <p class="text-xs text-gray-500 mt-0.5">Rejected</p>
+          <div class="progress-bar mt-2">
+            <div class="progress-fill bg-red-400" style="width: 6%"></div>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">6% of total workload</p>
+        </div>
+      </div>
+
+      <!-- ROW 1: Bar Chart + Donut Chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+
+        <!-- Pending vs Resolved Bar Chart -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-5 chart-card">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-gray-800">Pending vs Resolved by Sector</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Grouped by operational category</p>
+            </div>
+            <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">This Month</span>
+          </div>
+          <canvas id="pendingResolvedChart" height="130"></canvas>
+        </div>
+
+        <!-- Workload Donut Chart -->
+        <div class="bg-white rounded-2xl shadow-sm p-5 chart-card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-800">Overall Distribution</h3>
+            <span class="text-xs text-gray-400">All Sectors</span>
+          </div>
+          <canvas id="distributionDonut" height="160"></canvas>
+          <!-- Donut Legend -->
+          <div class="mt-4 space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-green-500 inline-block"></span> Resolved</span>
+              <span class="font-semibold text-gray-700">98 (69%)</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-yellow-400 inline-block"></span> Pending</span>
+              <span class="font-semibold text-gray-700">32 (23%)</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-400 inline-block"></span> In Progress</span>
+              <span class="font-semibold text-gray-700">12 (8%)</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-red-400 inline-block"></span> Rejected</span>
+              <span class="font-semibold text-gray-700">8 (6%)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROW 2: Per Sector CSS Progress Bars -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+
+        <!-- Sector Performance Bars -->
+        <div class="bg-white rounded-2xl shadow-sm p-5 chart-card">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-sm font-bold text-gray-800">Sector Resolution Ratios</h3>
+            <span class="text-xs text-gray-400">Pending vs Resolved</span>
+          </div>
+          <div class="space-y-5">
+
+            <!-- Roads -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-semibold text-gray-700">🚧 Roads / Potholes</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-green-600 font-bold">28 resolved</span>
+                  <span class="text-xs text-gray-400">/</span>
+                  <span class="text-xs text-yellow-500 font-bold">14 pending</span>
+                </div>
+              </div>
+              <div class="flex gap-1 h-3 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full transition-all duration-700" style="width: 67%"></div>
+                <div class="bg-yellow-400 transition-all duration-700" style="width: 33%"></div>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="text-xs text-green-600">67% resolved</span>
+                <span class="text-xs text-yellow-500">33% pending</span>
+              </div>
+            </div>
+
+            <!-- Electricity -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-semibold text-gray-700">⚡ Electricity</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-green-600 font-bold">26 resolved</span>
+                  <span class="text-xs text-gray-400">/</span>
+                  <span class="text-xs text-yellow-500 font-bold">12 pending</span>
+                </div>
+              </div>
+              <div class="flex gap-1 h-3 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full transition-all duration-700" style="width: 68%"></div>
+                <div class="bg-yellow-400 transition-all duration-700" style="width: 32%"></div>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="text-xs text-green-600">68% resolved</span>
+                <span class="text-xs text-yellow-500">32% pending</span>
+              </div>
+            </div>
+
+            <!-- Water Supply -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-semibold text-gray-700">💧 Water Supply</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-green-600 font-bold">24 resolved</span>
+                  <span class="text-xs text-gray-400">/</span>
+                  <span class="text-xs text-yellow-500 font-bold">11 pending</span>
+                </div>
+              </div>
+              <div class="flex gap-1 h-3 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full transition-all duration-700" style="width: 69%"></div>
+                <div class="bg-yellow-400 transition-all duration-700" style="width: 31%"></div>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="text-xs text-green-600">69% resolved</span>
+                <span class="text-xs text-yellow-500">31% pending</span>
+              </div>
+            </div>
+
+            <!-- Sanitation -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-semibold text-gray-700">🧹 Sanitation</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-green-600 font-bold">20 resolved</span>
+                  <span class="text-xs text-gray-400">/</span>
+                  <span class="text-xs text-green-600 font-bold">7 pending</span>
+                </div>
+              </div>
+              <div class="flex gap-1 h-3 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full transition-all duration-700" style="width: 74%"></div>
+                <div class="bg-green-300 transition-all duration-700" style="width: 26%"></div>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="text-xs text-green-600">74% resolved</span>
+                <span class="text-xs text-green-500">26% pending</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Appointment Status Distribution -->
+        <div class="bg-white rounded-2xl shadow-sm p-5 chart-card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-800">Appointment Workload</h3>
+            <span class="text-xs text-gray-400">By Status</span>
+          </div>
+          <canvas id="appointmentChart" height="160"></canvas>
+
+          <!-- Appointment Sector Bars -->
+          <div class="mt-5 border-t pt-4 space-y-3">
+            <p class="text-xs font-semibold text-gray-700 mb-2">By Certificate Type</p>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs text-gray-600">Income Certificate</span>
+                <span class="text-xs font-bold text-gray-700">52 (24%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-orange-400" style="width: 24%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs text-gray-600">Domicile Certificate</span>
+                <span class="text-xs font-bold text-gray-700">45 (21%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-blue-400" style="width: 21%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs text-gray-600">Caste Certificate</span>
+                <span class="text-xs font-bold text-gray-700">41 (19%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-purple-400" style="width: 19%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs text-gray-600">Birth Certificate</span>
+                <span class="text-xs font-bold text-gray-700">38 (18%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-pink-400" style="width: 18%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs text-gray-600">Other Certificates</span>
+                <span class="text-xs font-bold text-gray-700">39 (18%)</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-gray-400" style="width: 18%"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROW 3: Trend Line Chart + Ward Load Bars -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+
+        <!-- Weekly Load Trend -->
+        <div class="bg-white rounded-2xl shadow-sm p-5 chart-card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-800">Weekly Workload Trend</h3>
+            <span class="text-xs text-gray-400">Last 7 days</span>
+          </div>
+          <canvas id="weeklyTrendChart" height="150"></canvas>
+        </div>
+
+        <!-- Ward Workload Distribution Bars -->
+        <div class="bg-white rounded-2xl shadow-sm p-5 chart-card">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-sm font-bold text-gray-800">Ward Workload Distribution</h3>
+            <span class="text-xs text-gray-400">Active load per ward</span>
+          </div>
+          <div class="space-y-4">
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-semibold text-gray-700">Ward 1 — Central Zone</span>
+                <span class="text-xs font-bold text-gray-600">28 tickets · 7 pending</span>
+              </div>
+              <div class="flex gap-1 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full" style="width: 75%"></div>
+                <div class="bg-yellow-400" style="width: 25%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-semibold text-gray-700">Ward 2 — North Zone</span>
+                <span class="text-xs font-bold text-gray-600">34 tickets · 6 pending</span>
+              </div>
+              <div class="flex gap-1 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full" style="width: 82%"></div>
+                <div class="bg-yellow-400" style="width: 18%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-semibold text-gray-700">Ward 3 — West Zone</span>
+                <span class="text-xs font-bold text-gray-600">27 tickets · 9 pending</span>
+              </div>
+              <div class="flex gap-1 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full" style="width: 67%"></div>
+                <div class="bg-yellow-400" style="width: 33%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-semibold text-gray-700">Ward 4 — East Zone</span>
+                <span class="text-xs font-bold text-gray-600">31 tickets · 9 pending</span>
+              </div>
+              <div class="flex gap-1 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full" style="width: 71%"></div>
+                <div class="bg-yellow-400" style="width: 29%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-xs font-semibold text-gray-700">Ward 5 — South Zone</span>
+                <span class="text-xs font-bold text-red-500">22 tickets · 13 pending ⚠️</span>
+              </div>
+              <div class="flex gap-1 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-green-500 rounded-l-full" style="width: 41%"></div>
+                <div class="bg-red-400" style="width: 59%"></div>
+              </div>
+              <p class="text-xs text-red-500 mt-1 font-medium">⚠️ High backlog — needs attention</p>
+            </div>
+
+          </div>
+
+          <!-- Legend -->
+          <div class="flex items-center gap-4 mt-4 pt-3 border-t text-xs text-gray-500">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-green-500 inline-block"></span> Resolved</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-yellow-400 inline-block"></span> Pending</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-red-400 inline-block"></span> High Backlog</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Date
+    document.getElementById('chart-date').textContent =
+      new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    // 1. Pending vs Resolved Bar Chart
+    new Chart(document.getElementById('pendingResolvedChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['Roads', 'Electricity', 'Water Supply', 'Sanitation'],
+        datasets: [
+          { label: 'Resolved', data: [28, 26, 24, 20], backgroundColor: '#4ade80', borderRadius: 6 },
+          { label: 'Pending', data: [14, 12, 11, 7], backgroundColor: '#fbbf24', borderRadius: 6 },
+          { label: 'In Progress', data: [4, 3, 3, 2], backgroundColor: '#60a5fa', borderRadius: 6 }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { font: { size: 10 }, boxWidth: 12 } } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: '#f3f4f6' } }
+        }
+      }
+    });
+
+    // 2. Overall Distribution Donut
+    new Chart(document.getElementById('distributionDonut').getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Resolved', 'Pending', 'In Progress', 'Rejected'],
+        datasets: [{
+          data: [98, 32, 12, 8],
+          backgroundColor: ['#4ade80', '#fbbf24', '#60a5fa', '#f87171'],
+          borderWidth: 0,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '65%',
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // 3. Appointment Status Doughnut
+    new Chart(document.getElementById('appointmentChart').getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed', 'Pending', 'Confirmed', 'Cancelled'],
+        datasets: [{
+          data: [187, 15, 8, 5],
+          backgroundColor: ['#4ade80', '#fbbf24', '#60a5fa', '#f87171'],
+          borderWidth: 0,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '60%',
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } }
+        }
+      }
+    });
+
+    // 4. Weekly Trend Line Chart
+    new Chart(document.getElementById('weeklyTrendChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [
+          {
+            label: 'New Complaints',
+            data: [8, 12, 6, 15, 9, 4, 3],
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245,158,11,0.08)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#f59e0b',
+            pointRadius: 4
+          },
+          {
+            label: 'Resolved',
+            data: [5, 10, 8, 12, 11, 6, 2],
+            borderColor: '#16a34a',
+            backgroundColor: 'rgba(22,163,74,0.08)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#16a34a',
+            pointRadius: 4
+          },
+          {
+            label: 'Appointments',
+            data: [10, 14, 12, 18, 13, 8, 5],
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99,102,241,0.08)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#6366f1',
+            pointRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { font: { size: 10 }, boxWidth: 12 } } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: '#f3f4f6' } }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -11,3 +11,6 @@ def token_tracking_console(request):
 
 def control_panel(request):
     return render(request, 'staff/control_panel.html')
+
+def workload_charts(request):
+    return render(request, 'staff/workload_charts.html')
