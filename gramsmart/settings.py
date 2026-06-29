@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     'grievances',  # ADD THIS
     'appointments',  # ADD THIS
     'workbench',  # ADD THIS
-    'staff',]
+    'staff',
+    'feedback',  # ADD THIS
+]
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # ADD - must be at top
     'django.middleware.security.SecurityMiddleware',
