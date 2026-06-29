@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'workbench',  # ADD THIS
     'staff',
     'feedback',  # ADD THIS
+    'analytics',  # ADD THIS
 ]
 
 MIDDLEWARE = [
