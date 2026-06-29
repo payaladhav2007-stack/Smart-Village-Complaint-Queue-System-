@@ -14,3 +14,6 @@ def control_panel(request):
 
 def workload_charts(request):
     return render(request, 'staff/workload_charts.html')
+
+def backlog_alerts(request):
+    return render(request, 'staff/backlog_alerts.html')
