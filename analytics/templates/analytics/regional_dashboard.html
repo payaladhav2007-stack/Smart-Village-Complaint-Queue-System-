@@ -91,7 +91,7 @@
           <span class="text-2xl">📋</span>
           <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">Total</span>
         </div>
-        <p class="text-3xl font-black text-gray-800">142</p>
+        <p class="text-3xl font-black text-gray-800" id="kpi-total-complaints">142</p>
         <p class="text-xs text-gray-500 mt-1">Total Complaints</p>
         <p class="text-xs text-green-600 font-medium mt-2">↑ 12% from last month</p>
       </div>
@@ -102,7 +102,7 @@
           <span class="text-2xl">✅</span>
           <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">Resolved</span>
         </div>
-        <p class="text-3xl font-black text-green-600">98</p>
+        <p class="text-3xl font-black text-green-600" id="kpi-resolved">98</p>
         <p class="text-xs text-gray-500 mt-1">Complaints Resolved</p>
         <p class="text-xs text-green-600 font-medium mt-2">69% resolution rate</p>
       </div>
@@ -113,7 +113,7 @@
           <span class="text-2xl">⏳</span>
           <span class="text-xs bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">Pending</span>
         </div>
-        <p class="text-3xl font-black text-yellow-500">32</p>
+        <p class="text-3xl font-black text-yellow-500" id="kpi-pending">32</p>
         <p class="text-xs text-gray-500 mt-1">Complaints Pending</p>
         <p class="text-xs text-red-500 font-medium mt-2">↑ 5 new today</p>
       </div>
@@ -124,7 +124,7 @@
           <span class="text-2xl">⚡</span>
           <span class="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">Avg Time</span>
         </div>
-        <p class="text-3xl font-black text-purple-600">2.4d</p>
+        <p class="text-3xl font-black text-purple-600" id="kpi-avg-time">2.4d</p>
         <p class="text-xs text-gray-500 mt-1">Avg Resolution Time</p>
         <p class="text-xs text-green-600 font-medium mt-2">↓ 0.3d faster this month</p>
       </div>
@@ -535,6 +535,68 @@
   </div>
 
   <!-- CHART.JS SCRIPTS -->
+<script>
+  // --- Helper: get CSRF cookie ---
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      document.cookie.split(';').forEach(function (cookie) {
+        const trimmed = cookie.trim();
+        if (trimmed.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+        }
+      });
+    }
+    return cookieValue;
+  }
+
+  // --- Fetch live analytics summary from API ---
+  function fetchAnalyticsSummary() {
+    const token = sessionStorage.getItem('gramsmart_token') || '';
+
+    fetch('/api/analytics/summary/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Authorization': token ? 'Token ' + token : ''
+      },
+      credentials: 'same-origin'
+    })
+    .then(function (response) { return response.json(); })
+    .then(function (data) {
+      // --- Inject top metric numbers ---
+      const totalEl = document.getElementById('kpi-total-complaints');
+      if (totalEl && data.total_complaints !== undefined) totalEl.textContent = data.total_complaints;
+
+      const resolvedEl = document.getElementById('kpi-resolved');
+      if (resolvedEl && data.resolved_complaints !== undefined) resolvedEl.textContent = data.resolved_complaints;
+
+      const pendingEl = document.getElementById('kpi-pending');
+      if (pendingEl && data.pending_complaints !== undefined) pendingEl.textContent = data.pending_complaints;
+
+      const avgTimeEl = document.getElementById('kpi-avg-time');
+      if (avgTimeEl && data.avg_resolution_days !== undefined) avgTimeEl.textContent = data.avg_resolution_days + 'd';
+
+      // --- Update backlog progress bars if backend sends per-category backlog array ---
+      if (Array.isArray(data.backlog_by_category)) {
+        data.backlog_by_category.forEach(function (item) {
+          console.log('Backlog:', item.category, item.open_count, item.avg_wait_days);
+        });
+      }
+    })
+    .catch(function () {
+      console.warn('GS-512: Failed to fetch analytics summary. Showing static fallback values.');
+    });
+  }
+
+  // --- Run on page load ---
+  window.addEventListener('load', function () {
+    fetchAnalyticsSummary();
+    // Auto-refresh every 60 seconds
+    setInterval(fetchAnalyticsSummary, 60000);
+  });
+</script>
   <script>
     // Auto date
     document.getElementById('current-date').textContent =
