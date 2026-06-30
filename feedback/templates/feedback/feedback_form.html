@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -311,10 +312,70 @@
         alert('Please select a star rating before submitting.');
         return;
       }
-      // Hide form and show success
-      document.getElementById('feedback-form').classList.add('hidden');
-      document.getElementById('success-panel').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      var submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      var commentVal = document.querySelector('textarea[name="comment"]').value.trim();
+      var isAnonymous = document.querySelector('input[name="is_anonymous"]').checked;
+      var token = sessionStorage.getItem('gramsmart_token') || '';
+
+      var payload = {
+        rating: currentRating,
+        category_ratings: { speed: groupRatings.speed, staff: groupRatings.staff, ease: groupRatings.ease },
+        tags: selectedTags,
+        comment: commentVal,
+        is_anonymous: isAnonymous
+      };
+
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          document.cookie.split(';').forEach(function (cookie) {
+            var trimmed = cookie.trim();
+            if (trimmed.startsWith(name + '=')) {
+              cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+            }
+          });
+        }
+        return cookieValue;
+      }
+
+      fetch('/api/feedback/submit/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Authorization': token ? 'Token ' + token : ''
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload)
+      })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          return { status: response.status, data: data };
+        });
+      })
+      .then(function (result) {
+        if (result.status === 201) {
+          document.getElementById('feedback-form').classList.add('hidden');
+          document.getElementById('success-panel').classList.remove('hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (window.opener && typeof window.opener.fetchLiveQueueData === 'function') {
+            window.opener.fetchLiveQueueData();
+          }
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Feedback ⭐';
+          var errorMsg = result.data.detail || result.data.non_field_errors || 'Submission failed. Please try again.';
+          alert(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg);
+        }
+      })
+      .catch(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Feedback ⭐';
+        alert('Network error. Please check your connection and try again.');
+      });
     }
   </script>
 
