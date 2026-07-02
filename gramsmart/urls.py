@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
 from workbench.views import TicketTransitionView
+from feedback.views import SubmitFeedbackView
 
 def health_check(request):
     return JsonResponse({"status": "GramSmart server is running"})
@@ -20,6 +21,7 @@ urlpatterns = [
     path('api/admin/tickets/transition/', TicketTransitionView.as_view(), name='ticket-transition-exact'),
     path('staff/', include('staff.urls')),
     path('api/analytics/', include('analytics.urls')),
-    path('api/feedback/', include('feedback.urls')),                         path('feedback/', include('feedback.urls')),
-path('analytics/', include('analytics.urls')),] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
+    path('api/feedback/submit/', SubmitFeedbackView.as_view(), name='feedback_submit_direct'),
+    path('feedback/', include('feedback.urls')),
+    path('api/feedback/', include('feedback.urls')),
+    path('analytics/', include('analytics.urls')),] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
