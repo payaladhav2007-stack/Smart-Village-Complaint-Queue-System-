@@ -566,17 +566,19 @@
     .then(function (response) { return response.json(); })
     .then(function (data) {
       // --- Inject top metric numbers ---
-      const totalEl = document.getElementById('kpi-total-complaints');
-      if (totalEl && data.total_complaints !== undefined) totalEl.textContent = data.total_complaints;
-
-      const resolvedEl = document.getElementById('kpi-resolved');
-      if (resolvedEl && data.resolved_complaints !== undefined) resolvedEl.textContent = data.resolved_complaints;
-
-      const pendingEl = document.getElementById('kpi-pending');
-      if (pendingEl && data.pending_complaints !== undefined) pendingEl.textContent = data.pending_complaints;
-
-      const avgTimeEl = document.getElementById('kpi-avg-time');
-      if (avgTimeEl && data.avg_resolution_days !== undefined) avgTimeEl.textContent = data.avg_resolution_days + 'd';
+      const kpis = data.analytics_summary && data.analytics_summary.grievance_kpis;
+      if (kpis) {
+          const totalEl = document.getElementById('kpi-total-complaints');
+          if (totalEl) totalEl.textContent = kpis.total_complaints;
+          const resolvedEl = document.getElementById('kpi-resolved');
+          if (resolvedEl) resolvedEl.textContent = kpis.resolved;
+          const pendingEl = document.getElementById('kpi-pending');
+          if (pendingEl) pendingEl.textContent = kpis.pending;
+          const avgTimeEl = document.getElementById('kpi-avg-time');
+          if (avgTimeEl && kpis.avg_resolution_time_hours !== null) {
+              avgTimeEl.textContent = (kpis.avg_resolution_time_hours / 24).toFixed(1) + 'd';
+          }
+      }
 
       // --- Update backlog progress bars if backend sends per-category backlog array ---
       if (Array.isArray(data.backlog_by_category)) {
