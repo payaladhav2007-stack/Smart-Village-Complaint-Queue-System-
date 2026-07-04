@@ -35,11 +35,14 @@ class ListComplaintsView(ListAPIView):
         else:
             queryset = Complaint.objects.filter(user=user)
 
-        category = self.request.query_params.get('category')
+        main_category = self.request.query_params.get('main_category')
+        sub_category = self.request.query_params.get('sub_category')
         status_param = self.request.query_params.get('status')
 
-        if category:
-            queryset = queryset.filter(category=category)
+        if main_category:
+            queryset = queryset.filter(main_category=main_category)
+        if sub_category:
+            queryset = queryset.filter(sub_category=sub_category)
         if status_param:
             queryset = queryset.filter(status=status_param)
 
