@@ -25,7 +25,9 @@ class WorkbenchSummaryView(APIView):
         complaints_data = [
             {
                 'id': c.id,
-                'category': c.category,
+                'main_category': c.main_category,
+                'sub_category': c.sub_category,
+                'complaint_subject': c.complaint_subject,
                 'description': c.description[:100],
                 'status': c.status,
                 'latitude': str(c.latitude) if c.latitude else None,
@@ -76,12 +78,26 @@ class WorkbenchSummaryView(APIView):
 
         total_todays_appointments = upcoming_appointments.count()
 
+        # --- Category Breakdown ---
+        category_breakdown = {
+            'government': Complaint.objects.filter(
+                status='pending', main_category='government'
+            ).count(),
+            'personal': Complaint.objects.filter(
+                status='pending', main_category='personal'
+            ).count(),
+            'other': Complaint.objects.filter(
+                status='pending', main_category='other'
+            ).count(),
+        }
+
         return Response({
             'workbench_summary': {
                 'metrics': {
                     'pending_complaints': total_pending_complaints,
                     'in_progress_complaints': total_in_progress_complaints,
                     'todays_appointments': total_todays_appointments,
+                    'category_breakdown': category_breakdown,
                 },
                 'pending_infrastructure_complaints': complaints_data,
                 'upcoming_token_slots': appointments_data,
