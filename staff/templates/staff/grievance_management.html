@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,9 +8,11 @@
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
   />
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    crossorigin=""
   ></script>
   <style>
     #modal-map { height: 200px; width: 100%; border-radius: 10px; z-index: 0; }
@@ -25,6 +26,7 @@
       justify-content: center;
     }
     .modal-overlay.active { display: flex; }
+    .gs-grievance-row { transition: all 0.2s ease; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -57,7 +59,6 @@
         <h2 class="text-xl font-bold text-gray-800">Infrastructure Complaints</h2>
         <p class="text-sm text-gray-500 mt-0.5">Manage and track all incoming public grievances</p>
       </div>
-      <!-- Summary Badges -->
       <div class="flex gap-2 flex-wrap">
         <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-full">🔴 3 High</span>
         <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-3 py-1.5 rounded-full">🟡 3 Medium</span>
@@ -66,42 +67,80 @@
       </div>
     </div>
 
-    <!-- Filter Bar -->
-    <div class="bg-white rounded-xl shadow-sm p-4 mb-5 flex flex-col sm:flex-row gap-3">
-      <input
-        type="text"
-        id="gs-search"
-        placeholder="🔍 Search complaints..."
-        class="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-      />
-      <select id="gs-category" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
-        <option>All Categories</option>
-        <option>Roads / Potholes</option>
-        <option>Water Supply</option>
-        <option>Electricity</option>
-        <option>Sanitation</option>
-      </select>
-      <select id="gs-priority" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
-        <option>All Priorities</option>
-        <option>High</option>
-        <option>Medium</option>
-        <option>Low</option>
-      </select>
-      <select id="gs-status" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
-        <option>All Status</option>
-        <option>Open</option>
-        <option>In Progress</option>
-        <option>Resolved</option>
-      </select>
+    <!-- UPDATED FILTER BAR -->
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-5 space-y-3">
+
+      <!-- Row 1: Search + Status -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          id="gs-search"
+          placeholder="🔍 Search complaints, subjects..."
+          class="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        <select id="gs-status" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+          <option value="">All Status</option>
+          <option value="open">Open</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+        </select>
+        <select id="gs-priority" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
+          <option value="">All Priorities</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <!-- Row 2: NEW Category Filters -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="flex-1">
+          <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Main Category</label>
+          <select id="gs-main-category" onchange="updateSubCategoryFilter()" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="">All Categories</option>
+            <option value="government">🏛️ Government Services</option>
+            <option value="personal">👤 Personal Issues</option>
+            <option value="other">📝 Other</option>
+          </select>
+        </div>
+        <div class="flex-1">
+          <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Sub Category</label>
+          <select id="gs-sub-category" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="">All Sub-Categories</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="clearFilters()" class="px-4 py-2 text-xs font-semibold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Filter Tags -->
+      <div id="active-filter-tags" class="hidden flex flex-wrap gap-2 pt-1 border-t border-gray-100">
+        <span class="text-xs text-gray-400 font-medium">Active filters:</span>
+      </div>
+
     </div>
 
-    <!-- Grievance List Grid -->
-    <div class="space-y-3">
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden bg-white rounded-xl p-8 text-center mb-3">
+      <p class="text-2xl mb-2">🔍</p>
+      <p class="text-sm font-semibold text-gray-600">No complaints match your filters</p>
+      <p class="text-xs text-gray-400 mt-1">Try adjusting or clearing the filters</p>
+    </div>
 
-      <!-- Row 1 - High Priority -->
+    <!-- GRIEVANCE LIST GRID -->
+    <div class="space-y-3" id="grievance-list">
+
+      <!-- GRV-001 -->
       <div
-        onclick="openModal('GRV-001', 'Large pothole on Main Road', 'Roads / Potholes', 'High', '2 hours ago', 'Jun 25, 2026', 'Ramesh Patil', '9876543210', 'Ward 4, Near Bus Stop, Main Road — Large pothole causing accidents daily. Vehicles are getting damaged. Urgent repair needed.', 21.1458, 79.0882, true, 'roads')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md cursor-pointer"
+        data-main-category="government"
+        data-sub-category="roads"
+        data-priority="high"
+        data-status="open"
+        onclick="openModal('GRV-001','Large pothole on Main Road','government','roads','Roads & Potholes','','High','2 hours ago','Jun 25, 2026','Ramesh Patil','9876543210','Ward 4, Near Bus Stop — Large pothole causing accidents daily.',21.1458,79.0882,true)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -110,11 +149,15 @@
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-001</span>
                 <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
-                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <!-- Category Hierarchy -->
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">🚧 Roads & Potholes</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Large pothole on Main Road</h3>
+              <!-- Subject Line -->
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Roads & Potholes — Auto</p>
               <p class="text-xs text-gray-500 mt-0.5">Ward 4, Near Bus Stop — Ramesh Patil • 2 hours ago</p>
             </div>
           </div>
@@ -125,10 +168,14 @@
         </div>
       </div>
 
-      <!-- Row 2 - High Priority -->
+      <!-- GRV-002 -->
       <div
-        onclick="openModal('GRV-002', 'Sewage overflow on Street 5', 'Sanitation / Garbage', 'High', '4 hours ago', 'Jun 25, 2026', 'Sunita Deshmukh', '9765432101', 'Sewage water overflowing on Street 5 near the primary school. Very unhygienic situation affecting students and residents.', 21.1490, 79.0910, true, 'sanitation')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md cursor-pointer"
+        data-main-category="government"
+        data-sub-category="sanitation"
+        data-priority="high"
+        data-status="open"
+        onclick="openModal('GRV-002','Sewage overflow on Street 5','government','sanitation','Sanitation & Garbage','','High','4 hours ago','Jun 25, 2026','Sunita Deshmukh','9765432101','Near Primary School — Sewage water overflowing, very unhygienic.',21.1490,79.0910,true)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -137,11 +184,13 @@
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-002</span>
                 <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
-                <span class="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">Sanitation</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">🗑️ Sanitation & Garbage</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Sewage overflow on Street 5</h3>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Sanitation & Garbage — Auto</p>
               <p class="text-xs text-gray-500 mt-0.5">Near Primary School — Sunita Deshmukh • 4 hours ago</p>
             </div>
           </div>
@@ -152,22 +201,29 @@
         </div>
       </div>
 
-      <!-- Row 3 - High Priority -->
+      <!-- GRV-003 Personal Issue -->
       <div
-        onclick="openModal('GRV-003', 'No electricity for 3 days', 'Electricity', 'High', '6 hours ago', 'Jun 25, 2026', 'Manoj Kumar', '9654321012', 'Entire lane 7 has had no electricity for 3 days. Transformer issue reported to electric board but no action taken yet.', 21.1420, 79.0850, false, 'electricity')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-4 hover:shadow-md cursor-pointer"
+        data-main-category="personal"
+        data-sub-category="noise"
+        data-priority="high"
+        data-status="in_progress"
+        onclick="openModal('GRV-003','Loud construction noise at night','personal','noise','Noise Complaint','Loud construction work every night past midnight disturbing sleep','High','6 hours ago','Jun 25, 2026','Manoj Kumar','9654321012','Lane 7, Ward 4 — Construction past midnight.',21.1420,79.0850,false)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-lg flex-shrink-0">💡</div>
+            <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-lg flex-shrink-0">🔊</div>
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-003</span>
                 <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
-                <span class="bg-yellow-100 text-yellow-600 text-xs px-2 py-0.5 rounded-full font-medium">Electricity</span>
+                <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">👤 Personal</span>
+                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">🔊 Noise Complaint</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
               </div>
-              <h3 class="text-sm font-bold text-gray-800">No electricity for 3 days</h3>
+              <h3 class="text-sm font-bold text-gray-800">Loud construction noise at night</h3>
+              <!-- Manual Subject -->
+              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 Subject: Loud construction work every night past midnight disturbing sleep</p>
               <p class="text-xs text-gray-500 mt-0.5">Lane 7, Ward 4 — Manoj Kumar • 6 hours ago</p>
             </div>
           </div>
@@ -178,10 +234,14 @@
         </div>
       </div>
 
-      <!-- Row 4 - Medium -->
+      <!-- GRV-004 -->
       <div
-        onclick="openModal('GRV-004', 'Water pipeline leakage', 'Water Supply', 'Medium', '1 day ago', 'Jun 24, 2026', 'Priya Sharma', '9543210123', 'Water pipeline leaking on Street 12. Water wasting for 2 days. Road also getting damaged due to continuous water flow.', 21.1470, 79.0900, true, 'water')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointe
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md cursor-pointer"
+        data-main-category="government"
+        data-sub-category="water"
+        data-priority="medium"
+        data-status="open"
+        onclick="openModal('GRV-004','Water pipeline leakage','government','water','Water Supply & Pipeline','','Medium','1 day ago','Jun 24, 2026','Priya Sharma','9543210123','Street 12 — Water pipeline leaking for 2 days.',21.1470,79.0900,true)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -190,11 +250,13 @@
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-004</span>
                 <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
-                <span class="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">Water Supply</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">💧 Water Supply & Pipeline</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Water pipeline leakage</h3>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Water Supply & Pipeline — Auto</p>
               <p class="text-xs text-gray-500 mt-0.5">Street 12, Ward 4 — Priya Sharma • 1 day ago</p>
             </div>
           </div>
@@ -205,23 +267,29 @@
         </div>
       </div>
 
-      <!-- Row 5 - Medium -->
+      <!-- GRV-005 Personal -->
       <div
-        onclick="openModal('GRV-005', 'Street lights not working', 'Electricity', 'Medium', '1 day ago', 'Jun 24, 2026', 'Anita Joshi', '9432101234', 'Street lights near school gate not working for 5 days. Very unsafe at night for students and residents walking home.', 21.1435, 79.0865, false, 'electricity')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointe
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md cursor-pointer"
+        data-main-category="personal"
+        data-sub-category="property_dispute"
+        data-priority="medium"
+        data-status="open"
+        onclick="openModal('GRV-005','Property boundary dispute','personal','property_dispute','Property Dispute','Neighbour illegally constructed wall on my property boundary','Medium','1 day ago','Jun 24, 2026','Anita Joshi','9432101234','Ward 4 — Boundary wall dispute.',21.1435,79.0865,false)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-lg flex-shrink-0">🌙</div>
+            <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-lg flex-shrink-0">🏠</div>
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-005</span>
                 <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
-                <span class="bg-yellow-100 text-yellow-600 text-xs px-2 py-0.5 rounded-full font-medium">Electricity</span>
+                <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">👤 Personal</span>
+                <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">🏠 Property Dispute</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
               </div>
-              <h3 class="text-sm font-bold text-gray-800">Street lights not working</h3>
-              <p class="text-xs text-gray-500 mt-0.5">Near School Gate — Anita Joshi • 1 day ago</p>
+              <h3 class="text-sm font-bold text-gray-800">Property boundary dispute</h3>
+              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 Subject: Neighbour illegally constructed wall on my property boundary</p>
+              <p class="text-xs text-gray-500 mt-0.5">Ward 4 — Anita Joshi • 1 day ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
@@ -231,24 +299,29 @@
         </div>
       </div>
 
-      <!-- Row 6 - Medium -->
+      <!-- GRV-006 Other -->
       <div
-        onclick="openModal('GRV-006', 'Garbage pile near market', 'Sanitation / Garbage', 'Medium', '2 days ago', 'Jun 23, 2026', 'Vikram Nair', '9321012345', 'Garbage not collected for 4 days near the main market area. Very bad smell affecting shopkeepers and customers.', 21.1500, 79.0920, true, 'sanitation')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md transition cursor-pointe
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-yellow-400 p-4 hover:shadow-md cursor-pointer"
+        data-main-category="other"
+        data-sub-category=""
+        data-priority="medium"
+        data-status="in_progress"
+        onclick="openModal('GRV-006','Stray dog attacked child','other','','Other','Stray dog attacked child near park on 27th June','Medium','2 days ago','Jun 23, 2026','Vikram Nair','9321012345','Near park — stray dog attack.',21.1500,79.0920,true)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-lg flex-shrink-0">🗑️</div>
+            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-lg flex-shrink-0">📝</div>
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-006</span>
                 <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
-                <span class="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">Sanitation</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">📝 Other</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
               </div>
-              <h3 class="text-sm font-bold text-gray-800">Garbage pile near market</h3>
-              <p class="text-xs text-gray-500 mt-0.5">Main Market Area — Vikram Nair • 2 days ago</p>
+              <h3 class="text-sm font-bold text-gray-800">Stray dog attacked child</h3>
+              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 Subject: Stray dog attacked child near park on 27th June</p>
+              <p class="text-xs text-gray-500 mt-0.5">Near Park — Vikram Nair • 2 days ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
@@ -258,23 +331,29 @@
         </div>
       </div>
 
-      <!-- Row 7 - Low -->
+      <!-- GRV-007 -->
       <div
-        onclick="openModal('GRV-007', 'Broken footpath tiles', 'Roads / Potholes', 'Low', '3 days ago', 'Jun 22, 2026', 'Kavita Rao', '9210123456', 'Footpath tiles broken near the community hall. Minor inconvenience but could cause tripping hazard for elderly citizens.', 21.1445, 79.0875, false, 'roads')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-gray-300 p-4 hover:shadow-md transition cursor-pointer"
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-gray-300 p-4 hover:shadow-md cursor-pointer"
+        data-main-category="government"
+        data-sub-category="electricity"
+        data-priority="low"
+        data-status="open"
+        onclick="openModal('GRV-007','Street lights not working','government','electricity','Electricity & Street Lights','','Low','3 days ago','Jun 22, 2026','Kavita Rao','9210123456','Near School Gate — lights not working.',21.1445,79.0875,false)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-lg flex-shrink-0">🚶</div>
+            <div class="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-lg flex-shrink-0">💡</div>
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-007</span>
                 <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">⚪ Low</span>
-                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs px-2 py-0.5 rounded-full font-medium">💡 Electricity & Street Lights</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
               </div>
-              <h3 class="text-sm font-bold text-gray-800">Broken footpath tiles</h3>
-              <p class="text-xs text-gray-500 mt-0.5">Near Community Hall — Kavita Rao • 3 days ago</p>
+              <h3 class="text-sm font-bold text-gray-800">Street lights not working</h3>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Electricity & Street Lights — Auto</p>
+              <p class="text-xs text-gray-500 mt-0.5">Near School Gate — Kavita Rao • 3 days ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
@@ -284,10 +363,14 @@
         </div>
       </div>
 
-      <!-- Row 8 - Resolved -->
+      <!-- GRV-008 Resolved -->
       <div
-        onclick="openModal('GRV-008', 'Road repair completed', 'Roads / Potholes', 'Resolved', '5 days ago', 'Jun 20, 2026', 'Suresh Mehta', '9109876543', 'Road repair near market completed by field team. Pothole filled and surface leveled properly.', 21.1455, 79.0888, false, 'roads')"
-        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-green-400 p-4 hover:shadow-md transition cursor-pointer
+        class="gs-grievance-row bg-white rounded-xl shadow-sm border-l-4 border-green-400 p-4 hover:shadow-md cursor-pointer opacity-70"
+        data-main-category="government"
+        data-sub-category="roads"
+        data-priority="resolved"
+        data-status="resolved"
+        onclick="openModal('GRV-008','Road repair completed','government','roads','Roads & Potholes','','Resolved','5 days ago','Jun 20, 2026','Suresh Mehta','9109876543','Market Area — road repair done.',21.1455,79.0888,false)"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-start gap-3">
@@ -296,10 +379,12 @@
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-008</span>
                 <span class="bg-green-100 text-green-600 text-xs font-bold px-2 py-0.5 rounded-full">✅ Resolved</span>
-                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">Roads / Potholes</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">🚧 Roads & Potholes</span>
                 <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
               </div>
               <h3 class="text-sm font-semibold text-gray-500">Road repair completed</h3>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Roads & Potholes — Auto</p>
               <p class="text-xs text-gray-400 mt-0.5">Market Area — Suresh Mehta • 5 days ago</p>
             </div>
           </div>
@@ -313,7 +398,7 @@
     </div>
   </div>
 
-  <!-- ===== DETAIL MODAL ===== -->
+  <!-- DETAIL MODAL -->
   <div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-screen overflow-y-auto" id="modal-box">
 
@@ -329,11 +414,39 @@
       <!-- Modal Body -->
       <div class="p-5 space-y-4">
 
-        <!-- Status & Priority Badges -->
+        <!-- Priority & Status -->
         <div class="flex items-center gap-2 flex-wrap">
-          <span id="modal-priority" class="text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-600">High</span>
-          <span id="modal-category" class="text-xs font-medium px-3 py-1 rounded-full bg-orange-100 text-orange-600">Category</span>
-          <span id="modal-status-badge" class="text-xs font-medium px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">Open</span>
+          <span id="modal-priority" class="text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-600"></span>
+          <span id="modal-status-badge" class="text-xs font-medium px-3 py-1 rounded-full bg-yellow-100 text-yellow-700"></span>
+        </div>
+
+        <!-- UPDATED: Full Category Hierarchy Panel -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">📂 Category Hierarchy</p>
+          <div class="space-y-2">
+
+            <!-- Main Category -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-gray-500 w-24">Main:</span>
+              <span id="modal-main-category-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-700"></span>
+            </div>
+
+            <!-- Sub Category -->
+            <div class="flex items-center gap-2" id="modal-sub-row">
+              <span class="text-xs font-semibold text-gray-500 w-24">Sub-Category:</span>
+              <span id="modal-sub-category-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700"></span>
+            </div>
+
+            <!-- Complaint Subject -->
+            <div class="flex items-start gap-2">
+              <span class="text-xs font-semibold text-gray-500 w-24 mt-0.5">Subject:</span>
+              <div class="flex-1">
+                <p id="modal-subject" class="text-xs font-medium text-gray-800 bg-white rounded-lg px-3 py-2 border border-gray-100"></p>
+                <p id="modal-subject-type" class="text-xs text-gray-400 mt-1"></p>
+              </div>
+            </div>
+
+          </div>
         </div>
 
         <!-- Citizen Info -->
@@ -365,26 +478,23 @@
           <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4" id="modal-description">—</p>
         </div>
 
-        <!-- Media Attachment Block -->
+        <!-- Media Block -->
         <div id="modal-media-block">
           <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 Media Attachments</p>
           <div class="grid grid-cols-3 gap-2">
             <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-2xl cursor-pointer hover:bg-gray-200 transition">🖼️</div>
             <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-2xl cursor-pointer hover:bg-gray-200 transition">🖼️</div>
-            <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-gray-400 text-xs font-medium cursor-pointer hover:bg-gray-200 transition">+ Add</div>
+            <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-gray-400 text-xs font-medium">+ Add</div>
           </div>
-          <p class="text-xs text-gray-400 mt-2">2 photos attached by citizen</p>
         </div>
-
-        <!-- No Media Block -->
         <div id="modal-no-media-block" class="hidden">
           <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 Media Attachments</p>
           <div class="bg-gray-50 rounded-xl p-4 text-center">
-            <p class="text-sm text-gray-400">No media attached for this complaint</p>
+            <p class="text-sm text-gray-400">No media attached</p>
           </div>
         </div>
 
-        <!-- Geospatial Location Block -->
+        <!-- Map -->
         <div>
           <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📍 Complaint Location</p>
           <div id="modal-map"></div>
@@ -401,40 +511,130 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="border-t pt-4 space-y-2">
+        <div class="border-t pt-4">
           <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Actions</p>
           <div class="grid grid-cols-2 gap-2">
-            <button class="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">
-              ✓ Mark Resolved
-            </button>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">
-              👷 Assign Field Worker
-            </button>
-            <button class="border border-yellow-400 text-yellow-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-yellow-50 transition">
-              ⚡ Escalate Priority
-            </button>
-            <button class="border border-gray-200 text-gray-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition">
-              💬 Add Note
-            </button>
+            <button class="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">✓ Mark Resolved</button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">👷 Assign Field Worker</button>
+            <button class="border border-yellow-400 text-yellow-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-yellow-50 transition">⚡ Escalate Priority</button>
+            <button class="border border-gray-200 text-gray-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition">💬 Add Note</button>
           </div>
         </div>
 
       </div>
     </div>
   </div>
-<div id="gs-empty-state" style="display:none;" class="text-center py-12">
-        <p class="text-gray-400 text-sm font-medium">No complaints match your current filters.</p>
-        <p class="text-gray-300 text-xs mt-1">Try adjusting the search or filter options above.</p>
-      </div>
 
   <!-- JAVASCRIPT -->
   <script>
     var modalMap = null;
     var modalMarker = null;
 
-    function openModal(id, title, category, priority, timeAgo, date, name, phone, description, lat, lng, hasMedia, type) {
+    // Sub-category options per main category
+    var subCategories = {
+      government: [
+        { value: 'roads', label: '🚧 Roads & Potholes' },
+        { value: 'water', label: '💧 Water Supply & Pipeline' },
+        { value: 'electricity', label: '💡 Electricity & Street Lights' },
+        { value: 'sanitation', label: '🗑️ Sanitation & Garbage' },
+        { value: 'property_damage', label: '🏚️ Public Property Damage' },
+        { value: 'drainage', label: '🌊 Drainage & Flooding' },
+        { value: 'tree', label: '🌳 Tree Fallen / Obstruction' },
+        { value: 'stray_animals', label: '🐕 Stray Animal Issues' },
+        { value: 'internet', label: '📶 Internet & Connectivity' },
+        { value: 'health', label: '🏥 Public Health & Sanitation' },
+        { value: 'education', label: '🏫 School & Education Infrastructure' },
+        { value: 'transport', label: '🚌 Public Transport Issues' },
+      ],
+      personal: [
+        { value: 'family_dispute', label: '👨‍👩‍👧 Family Dispute' },
+        { value: 'property_dispute', label: '🏠 Property Dispute' },
+        { value: 'neighbour_water', label: '💧 Neighbour Water Issue' },
+        { value: 'noise', label: '🔊 Noise Complaint' },
+        { value: 'housing', label: '🏘️ Housing & Shelter' },
+        { value: 'employment', label: '💼 Employment Issue' },
+        { value: 'document_delay', label: '📄 Document & Certificate Delay' },
+        { value: 'financial_fraud', label: '💰 Financial Fraud' },
+      ],
+      other: []
+    };
 
-      // Populate modal fields
+    // Update sub-category filter dropdown
+    function updateSubCategoryFilter() {
+      var mainCat = document.getElementById('gs-main-category').value;
+      var subSelect = document.getElementById('gs-sub-category');
+      subSelect.innerHTML = '<option value="">All Sub-Categories</option>';
+      if (mainCat && subCategories[mainCat]) {
+        subCategories[mainCat].forEach(function(sub) {
+          var opt = document.createElement('option');
+          opt.value = sub.value;
+          opt.textContent = sub.label;
+          subSelect.appendChild(opt);
+        });
+      }
+      filterRows();
+    }
+
+    // Live filter function
+    function filterRows() {
+      var search = document.getElementById('gs-search').value.toLowerCase();
+      var status = document.getElementById('gs-status').value;
+      var priority = document.getElementById('gs-priority').value;
+      var mainCat = document.getElementById('gs-main-category').value;
+      var subCat = document.getElementById('gs-sub-category').value;
+
+      var rows = document.querySelectorAll('.gs-grievance-row');
+      var visibleCount = 0;
+
+      rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        var rowMain = row.getAttribute('data-main-category');
+        var rowSub = row.getAttribute('data-sub-category');
+        var rowPriority = row.getAttribute('data-priority');
+        var rowStatus = row.getAttribute('data-status');
+
+        var matchSearch = !search || text.includes(search);
+        var matchStatus = !status || rowStatus === status;
+        var matchPriority = !priority || rowPriority === priority;
+        var matchMain = !mainCat || rowMain === mainCat;
+        var matchSub = !subCat || rowSub === subCat;
+
+        if (matchSearch && matchStatus && matchPriority && matchMain && matchSub) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('empty-state').classList.toggle('hidden', visibleCount > 0);
+    }
+
+    // Clear all filters
+    function clearFilters() {
+      document.getElementById('gs-search').value = '';
+      document.getElementById('gs-status').value = '';
+      document.getElementById('gs-priority').value = '';
+      document.getElementById('gs-main-category').value = '';
+      document.getElementById('gs-sub-category').innerHTML = '<option value="">All Sub-Categories</option>';
+      filterRows();
+    }
+
+    // Event listeners for filters
+    document.getElementById('gs-search').addEventListener('input', filterRows);
+    document.getElementById('gs-status').addEventListener('change', filterRows);
+    document.getElementById('gs-priority').addEventListener('change', filterRows);
+    document.getElementById('gs-sub-category').addEventListener('change', filterRows);
+
+    // Main category labels
+    var mainCatLabels = {
+      government: '🏛️ Government Services',
+      personal: '👤 Personal Issues',
+      other: '📝 Other'
+    };
+
+    // Open modal
+    function openModal(id, title, mainCat, subCat, subLabel, subject, priority, timeAgo, date, name, phone, description, lat, lng, hasMedia) {
       document.getElementById('modal-id').textContent = id;
       document.getElementById('modal-title').textContent = title;
       document.getElementById('modal-name').textContent = name;
@@ -444,9 +644,8 @@
       document.getElementById('modal-description').textContent = description;
       document.getElementById('modal-lat').textContent = lat.toFixed(6);
       document.getElementById('modal-lng').textContent = lng.toFixed(6);
-      document.getElementById('modal-category').textContent = category;
 
-      // Priority badge color
+      // Priority badge
       var priorityEl = document.getElementById('modal-priority');
       priorityEl.textContent = priority;
       priorityEl.className = 'text-xs font-bold px-3 py-1 rounded-full ';
@@ -455,7 +654,32 @@
       else if (priority === 'Low') priorityEl.className += 'bg-gray-100 text-gray-500';
       else priorityEl.className += 'bg-green-100 text-green-600';
 
-      // Media blocks
+      // Main category badge
+      document.getElementById('modal-main-category-badge').textContent = mainCatLabels[mainCat] || mainCat;
+
+      // Sub category
+      var subRow = document.getElementById('modal-sub-row');
+      if (subCat) {
+        subRow.classList.remove('hidden');
+        document.getElementById('modal-sub-category-badge').textContent = subLabel;
+      } else {
+        subRow.classList.add('hidden');
+      }
+
+      // Subject line
+      var subjectEl = document.getElementById('modal-subject');
+      var subjectTypeEl = document.getElementById('modal-subject-type');
+      if (mainCat === 'government') {
+        subjectEl.textContent = subLabel + ' — Auto-filled';
+        subjectTypeEl.textContent = '✅ Auto-filled from Government sub-category selection';
+        subjectEl.className = 'text-xs font-medium text-green-700 bg-green-50 rounded-lg px-3 py-2 border border-green-100';
+      } else {
+        subjectEl.textContent = subject;
+        subjectTypeEl.textContent = '✏️ Manually entered by citizen';
+        subjectEl.className = 'text-xs font-medium text-orange-700 bg-orange-50 rounded-lg px-3 py-2 border border-orange-100';
+      }
+
+      // Media
       if (hasMedia) {
         document.getElementById('modal-media-block').classList.remove('hidden');
         document.getElementById('modal-no-media-block').classList.add('hidden');
@@ -468,7 +692,7 @@
       document.getElementById('modal-overlay').classList.add('active');
       document.body.style.overflow = 'hidden';
 
-      // Initialize or update map
+      // Map
       setTimeout(function() {
         if (!modalMap) {
           modalMap = L.map('modal-map').setView([lat, lng], 15);
@@ -480,12 +704,10 @@
           modalMap.setView([lat, lng], 15);
           if (modalMarker) modalMap.removeLayer(modalMarker);
         }
-        modalMarker = L.marker([lat, lng])
-          .addTo(modalMap)
-          .bindPopup('📍 ' + title)
-          .openPopup();
-        setTimeout(function() { modalMap.invalidateSize(); }, 300);
-      }, 100);
+        modalMarker = L.marker([lat, lng]).addTo(modalMap)
+          .bindPopup('📍 ' + title).openPopup();
+        modalMap.invalidateSize();
+      }, 300);
     }
 
     function closeModal() {
@@ -494,11 +716,9 @@
     }
 
     function closeModalOutside(event) {
-      if (event.target === document.getElementById('modal-overlay')) {
-        closeModal();
-      }
+      if (event.target === document.getElementById('modal-overlay')) closeModal();
     }
   </script>
-<script src="{% static 'staff/js/live_search_filter.js' %}"></script>
+
 </body>
-</html>
+</html> 
