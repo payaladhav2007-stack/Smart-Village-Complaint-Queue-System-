@@ -72,6 +72,22 @@ class AnalyticsSummaryView(APIView):
             scheduled_time__range=(today_start, today_end)
         ).count()
 
+        # GS-ADV-107: Main category breakdown
+        main_category_breakdown = list(
+            Complaint.objects.values('main_category').annotate(
+                count=Count('id')
+            ).order_by('-count')
+        )
+
+        # GS-ADV-107: Sub category breakdown
+        sub_category_breakdown = list(
+            Complaint.objects.exclude(
+                sub_category=''
+            ).values('main_category', 'sub_category').annotate(
+                count=Count('id')
+            ).order_by('main_category', '-count')
+        )
+
         return Response({
             "analytics_summary": {
                 "generated_at": now.isoformat(),
@@ -85,6 +101,8 @@ class AnalyticsSummaryView(APIView):
                     "avg_resolution_time_hours": avg_resolution_hours,
                     "recent_complaints_last_30_days": recent_complaints,
                     "unresolved_backlog_by_category": backlog_by_category,
+                    "main_category_breakdown": main_category_breakdown,
+                    "sub_category_breakdown": sub_category_breakdown,
                 },
                 "appointment_kpis": {
                     "total_appointments": total_appointments,
