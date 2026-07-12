@@ -1,0 +1,606 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-12 04:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: grievances/templates/grievances/log_complaint.html:9
+msgid "GramSmart — Log a Complaint"
+msgstr "GramSmart — तक्रार नोंदवा"
+
+#: grievances/templates/grievances/log_complaint.html:46
+msgid "Log a Public Grievance"
+msgstr "सार्वजनिक तक्रार नोंदवा"
+
+#: grievances/templates/grievances/log_complaint.html:53
+#: staff/templates/staff/grievance_management.html:111
+msgid "Main Category"
+msgstr "मुख्य श्रेणी"
+
+#: grievances/templates/grievances/log_complaint.html:58
+#: staff/templates/staff/grievance_management.html:120
+msgid "Sub Category"
+msgstr "उप श्रेणी"
+
+#: grievances/templates/grievances/log_complaint.html:63
+#: grievances/templates/grievances/log_complaint.html:276
+msgid "Complaint Details"
+msgstr "तक्रार तपशील"
+
+#: grievances/templates/grievances/log_complaint.html:80
+msgid "What type of complaint is this?"
+msgstr "ही कोणत्या प्रकारची तक्रार आहे?"
+
+#: grievances/templates/grievances/log_complaint.html:81
+msgid "Select the main category that best describes your issue."
+msgstr "तुमच्या समस्येचे सर्वोत्तम वर्णन करणारी मुख्य श्रेणी निवडा."
+
+#: grievances/templates/grievances/log_complaint.html:89
+#: grievances/templates/grievances/log_complaint.html:377
+#: staff/templates/staff/grievance_management.html:114
+#: staff/templates/staff/grievance_management.html:544
+msgid "Government Services"
+msgstr "शासकीय सेवा"
+
+#: grievances/templates/grievances/log_complaint.html:90
+msgid ""
+"Roads, water, electricity, sanitation and other public infrastructure issues"
+msgstr "रस्ते, पाणी, वीज, स्वच्छता आणि इतर सार्वजनिक पायाभूत सुविधांच्या समस्या"
+
+#: grievances/templates/grievances/log_complaint.html:98
+#: grievances/templates/grievances/log_complaint.html:378
+#: staff/templates/staff/grievance_management.html:115
+#: staff/templates/staff/grievance_management.html:545
+msgid "Personal Issues"
+msgstr "वैयक्तिक समस्या"
+
+#: grievances/templates/grievances/log_complaint.html:99
+msgid ""
+"Family disputes, property issues, noise complaints and personal grievances"
+msgstr "कौटुंबिक वाद, मालमत्ता समस्या, आवाजाच्या तक्रारी आणि वैयक्तिक तक्रारी"
+
+#: grievances/templates/grievances/log_complaint.html:107
+#: grievances/templates/grievances/log_complaint.html:379
+#: staff/templates/staff/grievance_management.html:116
+#: staff/templates/staff/grievance_management.html:331
+#: staff/templates/staff/grievance_management.html:546
+msgid "Other"
+msgstr "इतर"
+
+#: grievances/templates/grievances/log_complaint.html:108
+msgid "Any other issue not covered by the above categories"
+msgstr "वरील श्रेणींमध्ये समाविष्ट नसलेली कोणतीही अन्य समस्या"
+
+#: grievances/templates/grievances/log_complaint.html:114
+msgid "Please select a category to continue."
+msgstr "पुढे जाण्यासाठी कृपया एक श्रेणी निवडा."
+
+#: grievances/templates/grievances/log_complaint.html:118
+msgid "Next: Select Sub Category →"
+msgstr "पुढे: उप श्रेणी निवडा →"
+
+#: grievances/templates/grievances/log_complaint.html:125
+#: grievances/templates/grievances/log_complaint.html:275
+msgid "← Back"
+msgstr "← मागे"
+
+#: grievances/templates/grievances/log_complaint.html:126
+#: grievances/templates/grievances/log_complaint.html:375
+msgid "Select the specific issue:"
+msgstr "विशिष्ट समस्या निवडा:"
+
+#: grievances/templates/grievances/log_complaint.html:128
+msgid "Tap a card to select the issue type."
+msgstr "समस्येचा प्रकार निवडण्यासाठी कार्डवर टॅप करा."
+
+#: grievances/templates/grievances/log_complaint.html:134
+#: grievances/templates/grievances/log_complaint.html:136
+#: staff/templates/staff/grievance_management.html:551
+msgid "Roads & Potholes"
+msgstr "रस्ते आणि खड्डे"
+
+#: grievances/templates/grievances/log_complaint.html:139
+#: grievances/templates/grievances/log_complaint.html:141
+#: staff/templates/staff/grievance_management.html:552
+msgid "Water Supply & Pipeline"
+msgstr "पाणीपुरवठा आणि पाइपलाइन"
+
+#: grievances/templates/grievances/log_complaint.html:144
+#: grievances/templates/grievances/log_complaint.html:146
+#: staff/templates/staff/grievance_management.html:553
+msgid "Electricity & Street Lights"
+msgstr "वीज आणि रस्त्यावरील दिवे"
+
+#: grievances/templates/grievances/log_complaint.html:149
+#: grievances/templates/grievances/log_complaint.html:151
+#: staff/templates/staff/grievance_management.html:554
+msgid "Sanitation & Garbage"
+msgstr "स्वच्छता आणि कचरा"
+
+#: grievances/templates/grievances/log_complaint.html:154
+#: grievances/templates/grievances/log_complaint.html:156
+#: staff/templates/staff/grievance_management.html:555
+msgid "Public Property Damage"
+msgstr "सार्वजनिक मालमत्तेचे नुकसान"
+
+#: grievances/templates/grievances/log_complaint.html:159
+#: grievances/templates/grievances/log_complaint.html:161
+#: staff/templates/staff/grievance_management.html:556
+msgid "Drainage & Flooding"
+msgstr "गटार आणि पूर"
+
+#: grievances/templates/grievances/log_complaint.html:164
+#: grievances/templates/grievances/log_complaint.html:166
+#: staff/templates/staff/grievance_management.html:557
+msgid "Tree Fallen / Obstruction"
+msgstr "झाड पडणे / अडथळा"
+
+#: grievances/templates/grievances/log_complaint.html:169
+#: grievances/templates/grievances/log_complaint.html:171
+#: staff/templates/staff/grievance_management.html:558
+msgid "Stray Animal Issues"
+msgstr "भटकी जनावरे समस्या"
+
+#: grievances/templates/grievances/log_complaint.html:174
+#: grievances/templates/grievances/log_complaint.html:176
+#: staff/templates/staff/grievance_management.html:559
+msgid "Internet & Connectivity"
+msgstr "इंटरनेट आणि कनेक्टिव्हिटी"
+
+#: grievances/templates/grievances/log_complaint.html:179
+#: grievances/templates/grievances/log_complaint.html:181
+#: staff/templates/staff/grievance_management.html:560
+msgid "Public Health & Sanitation"
+msgstr "सार्वजनिक आरोग्य आणि स्वच्छता"
+
+#: grievances/templates/grievances/log_complaint.html:184
+#: staff/templates/staff/grievance_management.html:561
+msgid "School & Education Infrastructure"
+msgstr "शाळा आणि शिक्षण पायाभूत सुविधा"
+
+#: grievances/templates/grievances/log_complaint.html:186
+msgid "School & Education"
+msgstr "शाळा आणि शिक्षण"
+
+#: grievances/templates/grievances/log_complaint.html:189
+#: staff/templates/staff/grievance_management.html:562
+msgid "Public Transport Issues"
+msgstr "सार्वजनिक वाहतूक समस्या"
+
+#: grievances/templates/grievances/log_complaint.html:191
+msgid "Public Transport"
+msgstr "सार्वजनिक वाहतूक"
+
+#: grievances/templates/grievances/log_complaint.html:200
+#: grievances/templates/grievances/log_complaint.html:202
+#: staff/templates/staff/grievance_management.html:563
+msgid "Family Dispute"
+msgstr "कौटुंबिक वाद"
+
+#: grievances/templates/grievances/log_complaint.html:205
+#: grievances/templates/grievances/log_complaint.html:207
+#: staff/templates/staff/grievance_management.html:564
+msgid "Property Dispute"
+msgstr "मालमत्ता वाद"
+
+#: grievances/templates/grievances/log_complaint.html:210
+#: grievances/templates/grievances/log_complaint.html:212
+#: staff/templates/staff/grievance_management.html:565
+msgid "Neighbour Water Issue"
+msgstr "शेजारी पाणी समस्या"
+
+#: grievances/templates/grievances/log_complaint.html:215
+#: grievances/templates/grievances/log_complaint.html:217
+#: staff/templates/staff/grievance_management.html:566
+msgid "Noise Complaint"
+msgstr "आवाजाची तक्रार"
+
+#: grievances/templates/grievances/log_complaint.html:220
+#: grievances/templates/grievances/log_complaint.html:222
+#: staff/templates/staff/grievance_management.html:567
+msgid "Housing & Shelter"
+msgstr "घर आणि निवारा"
+
+#: grievances/templates/grievances/log_complaint.html:225
+#: grievances/templates/grievances/log_complaint.html:227
+#: staff/templates/staff/grievance_management.html:568
+msgid "Employment Issue"
+msgstr "रोजगार समस्या"
+
+#: grievances/templates/grievances/log_complaint.html:230
+#: grievances/templates/grievances/log_complaint.html:232
+#: staff/templates/staff/grievance_management.html:569
+msgid "Document & Certificate Delay"
+msgstr "कागदपत्र आणि प्रमाणपत्र विलंब"
+
+#: grievances/templates/grievances/log_complaint.html:235
+#: grievances/templates/grievances/log_complaint.html:237
+#: staff/templates/staff/grievance_management.html:570
+msgid "Financial Fraud"
+msgstr "आर्थिक फसवणूक"
+
+#: grievances/templates/grievances/log_complaint.html:244
+#: grievances/templates/grievances/log_complaint.html:256
+#: grievances/templates/grievances/log_complaint.html:311
+msgid "Complaint Subject"
+msgstr "तक्रार विषय"
+
+#: grievances/templates/grievances/log_complaint.html:247
+msgid "Describe the subject of your complaint..."
+msgstr "तुमच्या तक्रारीचा विषय सांगा..."
+
+#: grievances/templates/grievances/log_complaint.html:259
+msgid "Briefly describe what this complaint is about..."
+msgstr "ही तक्रार कशाबद्दल आहे ते थोडक्यात सांगा..."
+
+#: grievances/templates/grievances/log_complaint.html:264
+msgid "Please select a sub-category and fill in the subject to continue."
+msgstr "पुढे जाण्यासाठी कृपया उप-श्रेणी निवडा आणि विषय भरा."
+
+#: grievances/templates/grievances/log_complaint.html:268
+msgid "Next: Fill Complaint Details →"
+msgstr "पुढे: तक्रार तपशील भरा →"
+
+#: grievances/templates/grievances/log_complaint.html:278
+msgid "Provide details about your complaint."
+msgstr "तुमच्या तक्रारीबद्दल तपशील द्या."
+
+#: grievances/templates/grievances/log_complaint.html:282
+msgid "Your selection:"
+msgstr "तुमची निवड:"
+
+#: grievances/templates/grievances/log_complaint.html:288
+msgid "Full Name"
+msgstr "पूर्ण नाव"
+
+#: grievances/templates/grievances/log_complaint.html:289
+msgid "Enter your full name"
+msgstr "तुमचे पूर्ण नाव टाका"
+
+#: grievances/templates/grievances/log_complaint.html:295
+msgid "Phone Number"
+msgstr "फोन नंबर"
+
+#: grievances/templates/grievances/log_complaint.html:296
+msgid "Enter your 10-digit phone number"
+msgstr "तुमचा 10 अंकी फोन नंबर टाका"
+
+#: grievances/templates/grievances/log_complaint.html:303
+msgid "Ward Number"
+msgstr "वॉर्ड क्रमांक"
+
+#: grievances/templates/grievances/log_complaint.html:314
+msgid "Subject will appear here after category selection..."
+msgstr "श्रेणी निवडल्यानंतर विषय येथे दिसेल..."
+
+#: grievances/templates/grievances/log_complaint.html:322
+#: staff/templates/staff/grievance_management.html:490
+msgid "Complaint Description"
+msgstr "तक्रार वर्णन"
+
+#: grievances/templates/grievances/log_complaint.html:325
+msgid "Describe the issue in detail (minimum 10 characters)..."
+msgstr "समस्येचे तपशीलवार वर्णन करा (किमान 10 अक्षरे)..."
+
+#: grievances/templates/grievances/log_complaint.html:333
+msgid "Attach Photo / Video (Optional)"
+msgstr "फोटो/व्हिडिओ जोडा (ऐच्छिक)"
+
+#: grievances/templates/grievances/log_complaint.html:338
+msgid "Supported: JPG, PNG, MP4 (Max 10MB)"
+msgstr "समर्थित: JPG, PNG, MP4 (कमाल 10MB)"
+
+#: grievances/templates/grievances/log_complaint.html:345
+msgid "Complaint Location (Optional)"
+msgstr "तक्रारीचे स्थान (ऐच्छिक)"
+
+#: grievances/templates/grievances/log_complaint.html:349
+#: grievances/templates/grievances/log_complaint.html:380
+msgid "No location selected yet. Click below to pick on map."
+msgstr "अद्याप कोणतेही स्थान निवडलेले नाही. नकाशावर निवडण्यासाठी खाली क्लिक करा."
+
+#: grievances/templates/grievances/log_complaint.html:353
+msgid "Pick Location on Map"
+msgstr "नकाशावर स्थान निवडा"
+
+#: grievances/templates/grievances/log_complaint.html:360
+#: grievances/templates/grievances/log_complaint.html:383
+msgid "Submit Complaint"
+msgstr "तक्रार सबमिट करा"
+
+#: grievances/templates/grievances/log_complaint.html:368
+msgid "GramSmart — Unified Rural Governance Platform"
+msgstr "GramSmart — एकात्मिक ग्रामीण प्रशासन मंच"
+
+#: grievances/templates/grievances/log_complaint.html:376
+msgid "Describe your complaint:"
+msgstr "तुमच्या तक्रारीचे वर्णन करा:"
+
+#: grievances/templates/grievances/log_complaint.html:381
+msgid "Location selected:"
+msgstr "स्थान निवडले:"
+
+#: grievances/templates/grievances/log_complaint.html:382
+msgid "Submitting..."
+msgstr "सबमिट होत आहे..."
+
+#: grievances/templates/grievances/log_complaint.html:384
+msgid "Complaint submitted successfully! Your complaint ID is #"
+msgstr "तक्रार यशस्वीरित्या सबमिट झाली! तुमचा तक्रार आयडी आहे #"
+
+#: grievances/templates/grievances/log_complaint.html:385
+msgid "Submission failed. Please try again."
+msgstr "सबमिशन अयशस्वी झाले. कृपया पुन्हा प्रयत्न करा."
+
+#: grievances/templates/grievances/log_complaint.html:386
+msgid "Network error. Please check your connection and try again."
+msgstr "नेटवर्क त्रुटी. कृपया तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा."
+
+#: staff/templates/staff/grievance_management.html:8
+msgid "GramSmart — Grievance Management"
+msgstr "GramSmart — तक्रार व्यवस्थापन"
+
+#: staff/templates/staff/grievance_management.html:44
+msgid "Infrastructure Management"
+msgstr "पायाभूत सुविधा व्यवस्थापन"
+
+#: staff/templates/staff/grievance_management.html:59
+msgid "← Back to Workbench"
+msgstr "← वर्कबेंचवर परत जा"
+
+#: staff/templates/staff/grievance_management.html:72
+msgid "Infrastructure Complaints"
+msgstr "पायाभूत सुविधा तक्रारी"
+
+#: staff/templates/staff/grievance_management.html:73
+msgid "Manage and track all incoming public grievances"
+msgstr "सर्व येणाऱ्या सार्वजनिक तक्रारींचे व्यवस्थापन आणि ट्रॅकिंग करा"
+
+#: staff/templates/staff/grievance_management.html:76
+#: staff/templates/staff/grievance_management.html:102
+#: staff/templates/staff/grievance_management.html:164
+#: staff/templates/staff/grievance_management.html:199
+#: staff/templates/staff/grievance_management.html:232
+msgid "High"
+msgstr "उच्च"
+
+#: staff/templates/staff/grievance_management.html:77
+#: staff/templates/staff/grievance_management.html:103
+#: staff/templates/staff/grievance_management.html:265
+#: staff/templates/staff/grievance_management.html:298
+#: staff/templates/staff/grievance_management.html:330
+msgid "Medium"
+msgstr "मध्यम"
+
+#: staff/templates/staff/grievance_management.html:78
+#: staff/templates/staff/grievance_management.html:104
+#: staff/templates/staff/grievance_management.html:362
+msgid "Low"
+msgstr "कमी"
+
+#: staff/templates/staff/grievance_management.html:79
+#: staff/templates/staff/grievance_management.html:98
+#: staff/templates/staff/grievance_management.html:394
+#: staff/templates/staff/grievance_management.html:405
+msgid "Resolved"
+msgstr "निकाली"
+
+#: staff/templates/staff/grievance_management.html:91
+msgid "Search complaints, subjects..."
+msgstr "तक्रारी, विषय शोधा..."
+
+#: staff/templates/staff/grievance_management.html:95
+msgid "All Status"
+msgstr "सर्व स्थिती"
+
+#: staff/templates/staff/grievance_management.html:96
+#: staff/templates/staff/grievance_management.html:178
+#: staff/templates/staff/grievance_management.html:211
+#: staff/templates/staff/grievance_management.html:277
+#: staff/templates/staff/grievance_management.html:309
+#: staff/templates/staff/grievance_management.html:373
+msgid "Open"
+msgstr "उघडे"
+
+#: staff/templates/staff/grievance_management.html:97
+#: staff/templates/staff/grievance_management.html:244
+#: staff/templates/staff/grievance_management.html:341
+msgid "In Progress"
+msgstr "प्रगतीपथावर"
+
+#: staff/templates/staff/grievance_management.html:101
+msgid "All Priorities"
+msgstr "सर्व प्राधान्यक्रम"
+
+#: staff/templates/staff/grievance_management.html:113
+msgid "All Categories"
+msgstr "सर्व श्रेणी"
+
+#: staff/templates/staff/grievance_management.html:122
+#: staff/templates/staff/grievance_management.html:550
+msgid "All Sub-Categories"
+msgstr "सर्व उप-श्रेणी"
+
+#: staff/templates/staff/grievance_management.html:127
+msgid "Clear Filters"
+msgstr "फिल्टर साफ करा"
+
+#: staff/templates/staff/grievance_management.html:134
+msgid "Active filters:"
+msgstr "सक्रिय फिल्टर:"
+
+#: staff/templates/staff/grievance_management.html:142
+msgid "No complaints match your filters"
+msgstr "तुमच्या फिल्टरशी कोणतीही तक्रार जुळत नाही"
+
+#: staff/templates/staff/grievance_management.html:143
+msgid "Try adjusting or clearing the filters"
+msgstr "फिल्टर समायोजित करा किंवा साफ करा"
+
+#: staff/templates/staff/grievance_management.html:166
+#: staff/templates/staff/grievance_management.html:200
+#: staff/templates/staff/grievance_management.html:266
+#: staff/templates/staff/grievance_management.html:363
+#: staff/templates/staff/grievance_management.html:395
+msgid "Government"
+msgstr "शासकीय"
+
+#: staff/templates/staff/grievance_management.html:168
+#: staff/templates/staff/grievance_management.html:202
+#: staff/templates/staff/grievance_management.html:235
+#: staff/templates/staff/grievance_management.html:268
+#: staff/templates/staff/grievance_management.html:301
+#: staff/templates/staff/grievance_management.html:332
+#: staff/templates/staff/grievance_management.html:365
+#: staff/templates/staff/grievance_management.html:397
+msgid "Location"
+msgstr "स्थान"
+
+#: staff/templates/staff/grievance_management.html:169
+#: staff/templates/staff/grievance_management.html:203
+#: staff/templates/staff/grievance_management.html:269
+#: staff/templates/staff/grievance_management.html:333
+msgid "Media"
+msgstr "मीडिया"
+
+#: staff/templates/staff/grievance_management.html:173
+#: staff/templates/staff/grievance_management.html:206
+#: staff/templates/staff/grievance_management.html:239
+#: staff/templates/staff/grievance_management.html:272
+#: staff/templates/staff/grievance_management.html:304
+#: staff/templates/staff/grievance_management.html:336
+#: staff/templates/staff/grievance_management.html:368
+#: staff/templates/staff/grievance_management.html:400
+#: staff/templates/staff/grievance_management.html:455
+msgid "Subject:"
+msgstr "विषय:"
+
+#: staff/templates/staff/grievance_management.html:173
+#: staff/templates/staff/grievance_management.html:206
+#: staff/templates/staff/grievance_management.html:272
+#: staff/templates/staff/grievance_management.html:368
+#: staff/templates/staff/grievance_management.html:400
+msgid "Auto"
+msgstr "स्वयंचलित"
+
+#: staff/templates/staff/grievance_management.html:179
+#: staff/templates/staff/grievance_management.html:212
+#: staff/templates/staff/grievance_management.html:245
+#: staff/templates/staff/grievance_management.html:278
+#: staff/templates/staff/grievance_management.html:310
+#: staff/templates/staff/grievance_management.html:342
+#: staff/templates/staff/grievance_management.html:374
+#: staff/templates/staff/grievance_management.html:406
+msgid "View Details →"
+msgstr "तपशील पहा →"
+
+#: staff/templates/staff/grievance_management.html:233
+#: staff/templates/staff/grievance_management.html:299
+msgid "Personal"
+msgstr "वैयक्तिक"
+
+#: staff/templates/staff/grievance_management.html:422
+msgid "Complaint Title"
+msgstr "तक्रार शीर्षक"
+
+#: staff/templates/staff/grievance_management.html:438
+msgid "Category Hierarchy"
+msgstr "श्रेणी क्रम"
+
+#: staff/templates/staff/grievance_management.html:443
+msgid "Main:"
+msgstr "मुख्य:"
+
+#: staff/templates/staff/grievance_management.html:449
+msgid "Sub-Category:"
+msgstr "उप-श्रेणी:"
+
+#: staff/templates/staff/grievance_management.html:467
+msgid "Citizen Information"
+msgstr "नागरिक माहिती"
+
+#: staff/templates/staff/grievance_management.html:470
+msgid "Name"
+msgstr "नाव"
+
+#: staff/templates/staff/grievance_management.html:474
+msgid "Phone"
+msgstr "फोन"
+
+#: staff/templates/staff/grievance_management.html:478
+msgid "Submitted"
+msgstr "सादर केले"
+
+#: staff/templates/staff/grievance_management.html:482
+msgid "Time Ago"
+msgstr "किती वेळापूर्वी"
+
+#: staff/templates/staff/grievance_management.html:496
+#: staff/templates/staff/grievance_management.html:504
+msgid "Media Attachments"
+msgstr "मीडिया संलग्नक"
+
+#: staff/templates/staff/grievance_management.html:500
+msgid "Add"
+msgstr "जोडा"
+
+#: staff/templates/staff/grievance_management.html:506
+msgid "No media attached"
+msgstr "कोणतेही मीडिया संलग्न नाही"
+
+#: staff/templates/staff/grievance_management.html:512
+msgid "Complaint Location"
+msgstr "तक्रार स्थान"
+
+#: staff/templates/staff/grievance_management.html:516
+msgid "Latitude"
+msgstr "अक्षांश"
+
+#: staff/templates/staff/grievance_management.html:520
+msgid "Longitude"
+msgstr "रेखांश"
+
+#: staff/templates/staff/grievance_management.html:528
+msgid "Actions"
+msgstr "कृती"
+
+#: staff/templates/staff/grievance_management.html:530
+msgid "Mark Resolved"
+msgstr "निकाली म्हणून चिन्हांकित करा"
+
+#: staff/templates/staff/grievance_management.html:531
+msgid "Assign Field Worker"
+msgstr "फील्ड वर्कर नियुक्त करा"
+
+#: staff/templates/staff/grievance_management.html:532
+msgid "Escalate Priority"
+msgstr "प्राधान्य वाढवा"
+
+#: staff/templates/staff/grievance_management.html:533
+msgid "Add Note"
+msgstr "टीप जोडा"
+
+#: staff/templates/staff/grievance_management.html:547
+msgid "Auto-filled"
+msgstr "स्वयं भरले"
+
+#: staff/templates/staff/grievance_management.html:548
+msgid "Auto-filled from Government sub-category selection"
+msgstr "शासकीय उप-श्रेणी निवडीवरून स्वयं भरले"
+
+#: staff/templates/staff/grievance_management.html:549
+msgid "Manually entered by citizen"
+msgstr "नागरिकाने स्वतः नोंदवले"
