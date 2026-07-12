@@ -1,9 +1,11 @@
+
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GramSmart — Grievance Management</title>
+  <title>{% trans "GramSmart — Grievance Management" %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     rel="stylesheet"
@@ -39,11 +41,22 @@
       </div>
       <div>
         <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
-        <p class="text-xs text-gray-400">Infrastructure Management</p>
+        <p class="text-xs text-gray-400">{% trans "Infrastructure Management" %}</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <a href="/staff/workbench/" class="text-xs text-green-600 hover:text-green-800 font-medium transition">← Back to Workbench</a>
+      <form action="{% url 'set_language' %}" method="post" class="inline-block">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()" class="text-xs border border-gray-300 rounded-lg px-2 py-1 text-gray-600">
+          {% get_current_language as CURRENT_LANGUAGE %}
+          {% get_available_languages as LANGUAGES %}
+          {% for lang_code, lang_name in LANGUAGES %}
+            <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>{{ lang_name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      <a href="/staff/workbench/" class="text-xs text-green-600 hover:text-green-800 font-medium transition">{% trans "← Back to Workbench" %}</a>
       <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
         <span class="text-green-700 font-bold text-sm">GS</span>
       </div>
@@ -56,14 +69,14 @@
     <!-- Page Header -->
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h2 class="text-xl font-bold text-gray-800">Infrastructure Complaints</h2>
-        <p class="text-sm text-gray-500 mt-0.5">Manage and track all incoming public grievances</p>
+        <h2 class="text-xl font-bold text-gray-800">{% trans "Infrastructure Complaints" %}</h2>
+        <p class="text-sm text-gray-500 mt-0.5">{% trans "Manage and track all incoming public grievances" %}</p>
       </div>
       <div class="flex gap-2 flex-wrap">
-        <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-full">🔴 3 High</span>
-        <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-3 py-1.5 rounded-full">🟡 3 Medium</span>
-        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-full">⚪ 1 Low</span>
-        <span class="bg-green-100 text-green-600 text-xs font-bold px-3 py-1.5 rounded-full">✅ 2 Resolved</span>
+        <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-full">🔴 3 {% trans "High" %}</span>
+        <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-3 py-1.5 rounded-full">🟡 3 {% trans "Medium" %}</span>
+        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-full">⚪ 1 {% trans "Low" %}</span>
+        <span class="bg-green-100 text-green-600 text-xs font-bold px-3 py-1.5 rounded-full">✅ 2 {% trans "Resolved" %}</span>
       </div>
     </div>
 
@@ -75,50 +88,50 @@
         <input
           type="text"
           id="gs-search"
-          placeholder="🔍 Search complaints, subjects..."
+          placeholder="🔍 {% trans 'Search complaints, subjects...' %}"
           class="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <select id="gs-status" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
-          <option value="">All Status</option>
-          <option value="open">Open</option>
-          <option value="in_progress">In Progress</option>
-          <option value="resolved">Resolved</option>
+          <option value="">{% trans "All Status" %}</option>
+          <option value="open">{% trans "Open" %}</option>
+          <option value="in_progress">{% trans "In Progress" %}</option>
+          <option value="resolved">{% trans "Resolved" %}</option>
         </select>
         <select id="gs-priority" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none">
-          <option value="">All Priorities</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
+          <option value="">{% trans "All Priorities" %}</option>
+          <option value="high">{% trans "High" %}</option>
+          <option value="medium">{% trans "Medium" %}</option>
+          <option value="low">{% trans "Low" %}</option>
         </select>
       </div>
 
       <!-- Row 2: NEW Category Filters -->
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1">
-          <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Main Category</label>
+          <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">{% trans "Main Category" %}</label>
           <select id="gs-main-category" onchange="updateSubCategoryFilter()" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">All Categories</option>
-            <option value="government">🏛️ Government Services</option>
-            <option value="personal">👤 Personal Issues</option>
-            <option value="other">📝 Other</option>
+            <option value="">{% trans "All Categories" %}</option>
+            <option value="government">🏛️ {% trans "Government Services" %}</option>
+            <option value="personal">👤 {% trans "Personal Issues" %}</option>
+            <option value="other">📝 {% trans "Other" %}</option>
           </select>
         </div>
         <div class="flex-1">
-          <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Sub Category</label>
+          <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">{% trans "Sub Category" %}</label>
           <select id="gs-sub-category" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">All Sub-Categories</option>
+            <option value="">{% trans "All Sub-Categories" %}</option>
           </select>
         </div>
         <div class="flex items-end">
           <button onclick="clearFilters()" class="px-4 py-2 text-xs font-semibold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-            Clear Filters
+            {% trans "Clear Filters" %}
           </button>
         </div>
       </div>
 
       <!-- Active Filter Tags -->
       <div id="active-filter-tags" class="hidden flex flex-wrap gap-2 pt-1 border-t border-gray-100">
-        <span class="text-xs text-gray-400 font-medium">Active filters:</span>
+        <span class="text-xs text-gray-400 font-medium">{% trans "Active filters:" %}</span>
       </div>
 
     </div>
@@ -126,8 +139,8 @@
     <!-- Empty State -->
     <div id="empty-state" class="hidden bg-white rounded-xl p-8 text-center mb-3">
       <p class="text-2xl mb-2">🔍</p>
-      <p class="text-sm font-semibold text-gray-600">No complaints match your filters</p>
-      <p class="text-xs text-gray-400 mt-1">Try adjusting or clearing the filters</p>
+      <p class="text-sm font-semibold text-gray-600">{% trans "No complaints match your filters" %}</p>
+      <p class="text-xs text-gray-400 mt-1">{% trans "Try adjusting or clearing the filters" %}</p>
     </div>
 
     <!-- GRIEVANCE LIST GRID -->
@@ -148,22 +161,22 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-001</span>
-                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 {% trans "High" %}</span>
                 <!-- Category Hierarchy -->
-                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ {% trans "Government" %}</span>
                 <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">🚧 Roads & Potholes</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 {% trans "Media" %}</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Large pothole on Main Road</h3>
               <!-- Subject Line -->
-              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Roads & Potholes — Auto</p>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 {% trans "Subject:" %} Roads & Potholes — {% trans "Auto" %}</p>
               <p class="text-xs text-gray-500 mt-0.5">Ward 4, Near Bus Stop — Ramesh Patil • 2 hours ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">{% trans "Open" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -183,20 +196,20 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-002</span>
-                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
-                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 {% trans "High" %}</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ {% trans "Government" %}</span>
                 <span class="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">🗑️ Sanitation & Garbage</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 {% trans "Media" %}</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Sewage overflow on Street 5</h3>
-              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Sanitation & Garbage — Auto</p>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 {% trans "Subject:" %} Sanitation & Garbage — {% trans "Auto" %}</p>
               <p class="text-xs text-gray-500 mt-0.5">Near Primary School — Sunita Deshmukh • 4 hours ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">{% trans "Open" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -216,20 +229,20 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-003</span>
-                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 High</span>
-                <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">👤 Personal</span>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">🔴 {% trans "High" %}</span>
+                <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">👤 {% trans "Personal" %}</span>
                 <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">🔊 Noise Complaint</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Loud construction noise at night</h3>
               <!-- Manual Subject -->
-              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 Subject: Loud construction work every night past midnight disturbing sleep</p>
+              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 {% trans "Subject:" %} Loud construction work every night past midnight disturbing sleep</p>
               <p class="text-xs text-gray-500 mt-0.5">Lane 7, Ward 4 — Manoj Kumar • 6 hours ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">In Progress</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">{% trans "In Progress" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -249,20 +262,20 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-004</span>
-                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
-                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 {% trans "Medium" %}</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ {% trans "Government" %}</span>
                 <span class="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">💧 Water Supply & Pipeline</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 {% trans "Media" %}</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Water pipeline leakage</h3>
-              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Water Supply & Pipeline — Auto</p>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 {% trans "Subject:" %} Water Supply & Pipeline — {% trans "Auto" %}</p>
               <p class="text-xs text-gray-500 mt-0.5">Street 12, Ward 4 — Priya Sharma • 1 day ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">{% trans "Open" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -282,19 +295,19 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-005</span>
-                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
-                <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">👤 Personal</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 {% trans "Medium" %}</span>
+                <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">👤 {% trans "Personal" %}</span>
                 <span class="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">🏠 Property Dispute</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Property boundary dispute</h3>
-              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 Subject: Neighbour illegally constructed wall on my property boundary</p>
+              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 {% trans "Subject:" %} Neighbour illegally constructed wall on my property boundary</p>
               <p class="text-xs text-gray-500 mt-0.5">Ward 4 — Anita Joshi • 1 day ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">{% trans "Open" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -314,19 +327,19 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-006</span>
-                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 Medium</span>
-                <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">📝 Other</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
-                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 Media</span>
+                <span class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-0.5 rounded-full">🟡 {% trans "Medium" %}</span>
+                <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">📝 {% trans "Other" %}</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
+                <span class="bg-blue-50 text-blue-500 text-xs px-2 py-0.5 rounded-full">📸 {% trans "Media" %}</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Stray dog attacked child</h3>
-              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 Subject: Stray dog attacked child near park on 27th June</p>
+              <p class="text-xs text-orange-600 font-medium mt-0.5">📋 {% trans "Subject:" %} Stray dog attacked child near park on 27th June</p>
               <p class="text-xs text-gray-500 mt-0.5">Near Park — Vikram Nair • 2 days ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">In Progress</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">{% trans "In Progress" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -346,19 +359,19 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-007</span>
-                <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">⚪ Low</span>
-                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">⚪ {% trans "Low" %}</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ {% trans "Government" %}</span>
                 <span class="bg-yellow-100 text-yellow-600 text-xs px-2 py-0.5 rounded-full font-medium">💡 Electricity & Street Lights</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
               </div>
               <h3 class="text-sm font-bold text-gray-800">Street lights not working</h3>
-              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Electricity & Street Lights — Auto</p>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 {% trans "Subject:" %} Electricity & Street Lights — {% trans "Auto" %}</p>
               <p class="text-xs text-gray-500 mt-0.5">Near School Gate — Kavita Rao • 3 days ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">Open</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">{% trans "Open" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -378,19 +391,19 @@
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs font-bold text-gray-400">GRV-008</span>
-                <span class="bg-green-100 text-green-600 text-xs font-bold px-2 py-0.5 rounded-full">✅ Resolved</span>
-                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ Government</span>
+                <span class="bg-green-100 text-green-600 text-xs font-bold px-2 py-0.5 rounded-full">✅ {% trans "Resolved" %}</span>
+                <span class="bg-blue-50 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">🏛️ {% trans "Government" %}</span>
                 <span class="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">🚧 Roads & Potholes</span>
-                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 Location</span>
+                <span class="bg-purple-50 text-purple-500 text-xs px-2 py-0.5 rounded-full">📍 {% trans "Location" %}</span>
               </div>
               <h3 class="text-sm font-semibold text-gray-500">Road repair completed</h3>
-              <p class="text-xs text-green-700 font-medium mt-0.5">📋 Subject: Roads & Potholes — Auto</p>
+              <p class="text-xs text-green-700 font-medium mt-0.5">📋 {% trans "Subject:" %} Roads & Potholes — {% trans "Auto" %}</p>
               <p class="text-xs text-gray-400 mt-0.5">Market Area — Suresh Mehta • 5 days ago</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">✓ Resolved</span>
-            <span class="text-xs text-green-600 font-medium">View Details →</span>
+            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">✓ {% trans "Resolved" %}</span>
+            <span class="text-xs text-green-600 font-medium">{% trans "View Details →" %}</span>
           </div>
         </div>
       </div>
@@ -406,7 +419,7 @@
       <div class="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between rounded-t-2xl">
         <div>
           <p class="text-xs text-gray-400 font-medium" id="modal-id">GRV-001</p>
-          <h3 class="text-sm font-bold text-gray-800" id="modal-title">Complaint Title</h3>
+          <h3 class="text-sm font-bold text-gray-800" id="modal-title">{% trans "Complaint Title" %}</h3>
         </div>
         <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 font-bold transition">✕</button>
       </div>
@@ -422,24 +435,24 @@
 
         <!-- UPDATED: Full Category Hierarchy Panel -->
         <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">📂 Category Hierarchy</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">📂 {% trans "Category Hierarchy" %}</p>
           <div class="space-y-2">
 
             <!-- Main Category -->
             <div class="flex items-center gap-2">
-              <span class="text-xs font-semibold text-gray-500 w-24">Main:</span>
+              <span class="text-xs font-semibold text-gray-500 w-24">{% trans "Main:" %}</span>
               <span id="modal-main-category-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-700"></span>
             </div>
 
             <!-- Sub Category -->
             <div class="flex items-center gap-2" id="modal-sub-row">
-              <span class="text-xs font-semibold text-gray-500 w-24">Sub-Category:</span>
+              <span class="text-xs font-semibold text-gray-500 w-24">{% trans "Sub-Category:" %}</span>
               <span id="modal-sub-category-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700"></span>
             </div>
 
             <!-- Complaint Subject -->
             <div class="flex items-start gap-2">
-              <span class="text-xs font-semibold text-gray-500 w-24 mt-0.5">Subject:</span>
+              <span class="text-xs font-semibold text-gray-500 w-24 mt-0.5">{% trans "Subject:" %}</span>
               <div class="flex-1">
                 <p id="modal-subject" class="text-xs font-medium text-gray-800 bg-white rounded-lg px-3 py-2 border border-gray-100"></p>
                 <p id="modal-subject-type" class="text-xs text-gray-400 mt-1"></p>
@@ -451,22 +464,22 @@
 
         <!-- Citizen Info -->
         <div class="bg-gray-50 rounded-xl p-4">
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Citizen Information</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{% trans "Citizen Information" %}</p>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <p class="text-xs text-gray-400">Name</p>
+              <p class="text-xs text-gray-400">{% trans "Name" %}</p>
               <p class="text-sm font-semibold text-gray-800" id="modal-name">—</p>
             </div>
             <div>
-              <p class="text-xs text-gray-400">Phone</p>
+              <p class="text-xs text-gray-400">{% trans "Phone" %}</p>
               <p class="text-sm font-semibold text-gray-800" id="modal-phone">—</p>
             </div>
             <div>
-              <p class="text-xs text-gray-400">Submitted</p>
+              <p class="text-xs text-gray-400">{% trans "Submitted" %}</p>
               <p class="text-sm font-semibold text-gray-800" id="modal-date">—</p>
             </div>
             <div>
-              <p class="text-xs text-gray-400">Time Ago</p>
+              <p class="text-xs text-gray-400">{% trans "Time Ago" %}</p>
               <p class="text-sm font-semibold text-gray-800" id="modal-time">—</p>
             </div>
           </div>
@@ -474,37 +487,37 @@
 
         <!-- Description -->
         <div>
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Complaint Description</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{% trans "Complaint Description" %}</p>
           <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4" id="modal-description">—</p>
         </div>
 
         <!-- Media Block -->
         <div id="modal-media-block">
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 Media Attachments</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 {% trans "Media Attachments" %}</p>
           <div class="grid grid-cols-3 gap-2">
             <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-2xl cursor-pointer hover:bg-gray-200 transition">🖼️</div>
             <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-2xl cursor-pointer hover:bg-gray-200 transition">🖼️</div>
-            <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-gray-400 text-xs font-medium">+ Add</div>
+            <div class="bg-gray-100 rounded-xl h-20 flex items-center justify-center text-gray-400 text-xs font-medium">+ {% trans "Add" %}</div>
           </div>
         </div>
         <div id="modal-no-media-block" class="hidden">
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 Media Attachments</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📸 {% trans "Media Attachments" %}</p>
           <div class="bg-gray-50 rounded-xl p-4 text-center">
-            <p class="text-sm text-gray-400">No media attached</p>
+            <p class="text-sm text-gray-400">{% trans "No media attached" %}</p>
           </div>
         </div>
 
         <!-- Map -->
         <div>
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📍 Complaint Location</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">📍 {% trans "Complaint Location" %}</p>
           <div id="modal-map"></div>
           <div class="grid grid-cols-2 gap-2 mt-2">
             <div class="bg-purple-50 rounded-lg px-3 py-2">
-              <p class="text-xs text-gray-400">Latitude</p>
+              <p class="text-xs text-gray-400">{% trans "Latitude" %}</p>
               <p class="text-sm font-bold text-purple-700" id="modal-lat">—</p>
             </div>
             <div class="bg-purple-50 rounded-lg px-3 py-2">
-              <p class="text-xs text-gray-400">Longitude</p>
+              <p class="text-xs text-gray-400">{% trans "Longitude" %}</p>
               <p class="text-sm font-bold text-purple-700" id="modal-lng">—</p>
             </div>
           </div>
@@ -512,18 +525,51 @@
 
         <!-- Action Buttons -->
         <div class="border-t pt-4">
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Actions</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{% trans "Actions" %}</p>
           <div class="grid grid-cols-2 gap-2">
-            <button class="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">✓ Mark Resolved</button>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">👷 Assign Field Worker</button>
-            <button class="border border-yellow-400 text-yellow-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-yellow-50 transition">⚡ Escalate Priority</button>
-            <button class="border border-gray-200 text-gray-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition">💬 Add Note</button>
+            <button class="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">✓ {% trans "Mark Resolved" %}</button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">👷 {% trans "Assign Field Worker" %}</button>
+            <button class="border border-yellow-400 text-yellow-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-yellow-50 transition">⚡ {% trans "Escalate Priority" %}</button>
+            <button class="border border-gray-200 text-gray-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition">💬 {% trans "Add Note" %}</button>
           </div>
         </div>
 
       </div>
     </div>
   </div>
+
+  <!-- GS-ADV-108: Translated strings for dynamic JS content -->
+  <script>
+    var TRANS = {
+      govServices: "{% trans 'Government Services' %}",
+      personalIssues: "{% trans 'Personal Issues' %}",
+      other: "{% trans 'Other' %}",
+      autoFilledSubject: "{% trans 'Auto-filled' %}",
+      autoFilledNote: "{% trans 'Auto-filled from Government sub-category selection' %}",
+      manualNote: "{% trans 'Manually entered by citizen' %}",
+      allSubCategories: "{% trans 'All Sub-Categories' %}",
+      roads: "🚧 {% trans 'Roads & Potholes' %}",
+      water: "💧 {% trans 'Water Supply & Pipeline' %}",
+      electricity: "💡 {% trans 'Electricity & Street Lights' %}",
+      sanitation: "🗑️ {% trans 'Sanitation & Garbage' %}",
+      property_damage: "🏚️ {% trans 'Public Property Damage' %}",
+      drainage: "🌊 {% trans 'Drainage & Flooding' %}",
+      tree: "🌳 {% trans 'Tree Fallen / Obstruction' %}",
+      stray_animals: "🐕 {% trans 'Stray Animal Issues' %}",
+      internet: "📶 {% trans 'Internet & Connectivity' %}",
+      health: "🏥 {% trans 'Public Health & Sanitation' %}",
+      education: "🏫 {% trans 'School & Education Infrastructure' %}",
+      transport: "🚌 {% trans 'Public Transport Issues' %}",
+      family_dispute: "👨‍👩‍👧 {% trans 'Family Dispute' %}",
+      property_dispute: "🏠 {% trans 'Property Dispute' %}",
+      neighbour_water: "💧 {% trans 'Neighbour Water Issue' %}",
+      noise: "🔊 {% trans 'Noise Complaint' %}",
+      housing: "🏘️ {% trans 'Housing & Shelter' %}",
+      employment: "💼 {% trans 'Employment Issue' %}",
+      document_delay: "📄 {% trans 'Document & Certificate Delay' %}",
+      financial_fraud: "💰 {% trans 'Financial Fraud' %}"
+    };
+  </script>
 
   <!-- JAVASCRIPT -->
   <script>
@@ -533,28 +579,28 @@
     // Sub-category options per main category
     var subCategories = {
       government: [
-        { value: 'roads', label: '🚧 Roads & Potholes' },
-        { value: 'water', label: '💧 Water Supply & Pipeline' },
-        { value: 'electricity', label: '💡 Electricity & Street Lights' },
-        { value: 'sanitation', label: '🗑️ Sanitation & Garbage' },
-        { value: 'property_damage', label: '🏚️ Public Property Damage' },
-        { value: 'drainage', label: '🌊 Drainage & Flooding' },
-        { value: 'tree', label: '🌳 Tree Fallen / Obstruction' },
-        { value: 'stray_animals', label: '🐕 Stray Animal Issues' },
-        { value: 'internet', label: '📶 Internet & Connectivity' },
-        { value: 'health', label: '🏥 Public Health & Sanitation' },
-        { value: 'education', label: '🏫 School & Education Infrastructure' },
-        { value: 'transport', label: '🚌 Public Transport Issues' },
+        { value: 'roads', label: TRANS.roads },
+        { value: 'water', label: TRANS.water },
+        { value: 'electricity', label: TRANS.electricity },
+        { value: 'sanitation', label: TRANS.sanitation },
+        { value: 'property_damage', label: TRANS.property_damage },
+        { value: 'drainage', label: TRANS.drainage },
+        { value: 'tree', label: TRANS.tree },
+        { value: 'stray_animals', label: TRANS.stray_animals },
+        { value: 'internet', label: TRANS.internet },
+        { value: 'health', label: TRANS.health },
+        { value: 'education', label: TRANS.education },
+        { value: 'transport', label: TRANS.transport },
       ],
       personal: [
-        { value: 'family_dispute', label: '👨‍👩‍👧 Family Dispute' },
-        { value: 'property_dispute', label: '🏠 Property Dispute' },
-        { value: 'neighbour_water', label: '💧 Neighbour Water Issue' },
-        { value: 'noise', label: '🔊 Noise Complaint' },
-        { value: 'housing', label: '🏘️ Housing & Shelter' },
-        { value: 'employment', label: '💼 Employment Issue' },
-        { value: 'document_delay', label: '📄 Document & Certificate Delay' },
-        { value: 'financial_fraud', label: '💰 Financial Fraud' },
+        { value: 'family_dispute', label: TRANS.family_dispute },
+        { value: 'property_dispute', label: TRANS.property_dispute },
+        { value: 'neighbour_water', label: TRANS.neighbour_water },
+        { value: 'noise', label: TRANS.noise },
+        { value: 'housing', label: TRANS.housing },
+        { value: 'employment', label: TRANS.employment },
+        { value: 'document_delay', label: TRANS.document_delay },
+        { value: 'financial_fraud', label: TRANS.financial_fraud },
       ],
       other: []
     };
@@ -563,7 +609,7 @@
     function updateSubCategoryFilter() {
       var mainCat = document.getElementById('gs-main-category').value;
       var subSelect = document.getElementById('gs-sub-category');
-      subSelect.innerHTML = '<option value="">All Sub-Categories</option>';
+      subSelect.innerHTML = '<option value="">' + TRANS.allSubCategories + '</option>';
       if (mainCat && subCategories[mainCat]) {
         subCategories[mainCat].forEach(function(sub) {
           var opt = document.createElement('option');
@@ -616,7 +662,7 @@
       document.getElementById('gs-status').value = '';
       document.getElementById('gs-priority').value = '';
       document.getElementById('gs-main-category').value = '';
-      document.getElementById('gs-sub-category').innerHTML = '<option value="">All Sub-Categories</option>';
+      document.getElementById('gs-sub-category').innerHTML = '<option value="">' + TRANS.allSubCategories + '</option>';
       filterRows();
     }
 
@@ -628,9 +674,9 @@
 
     // Main category labels
     var mainCatLabels = {
-      government: '🏛️ Government Services',
-      personal: '👤 Personal Issues',
-      other: '📝 Other'
+      government: '🏛️ ' + TRANS.govServices,
+      personal: '👤 ' + TRANS.personalIssues,
+      other: '📝 ' + TRANS.other
     };
 
     // Open modal
@@ -670,12 +716,12 @@
       var subjectEl = document.getElementById('modal-subject');
       var subjectTypeEl = document.getElementById('modal-subject-type');
       if (mainCat === 'government') {
-        subjectEl.textContent = subLabel + ' — Auto-filled';
-        subjectTypeEl.textContent = '✅ Auto-filled from Government sub-category selection';
+        subjectEl.textContent = subLabel + ' — ' + TRANS.autoFilledSubject;
+        subjectTypeEl.textContent = '✅ ' + TRANS.autoFilledNote;
         subjectEl.className = 'text-xs font-medium text-green-700 bg-green-50 rounded-lg px-3 py-2 border border-green-100';
       } else {
         subjectEl.textContent = subject;
-        subjectTypeEl.textContent = '✏️ Manually entered by citizen';
+        subjectTypeEl.textContent = '✏️ ' + TRANS.manualNote;
         subjectEl.className = 'text-xs font-medium text-orange-700 bg-orange-50 rounded-lg px-3 py-2 border border-orange-100';
       }
 
@@ -721,4 +767,4 @@
   </script>
 
 </body>
-</html> 
+</html>
