@@ -52,7 +52,7 @@
 
     <p class="text-center text-sm text-gray-500 mt-6">
       Don't have an account?
-      <a href="register.html" class="text-blue-600 font-medium hover:underline">Register</a>
+      <a href="/api/auth/register-page/" class="text-blue-600 font-medium hover:underline">Register</a>
     </p>
 
   </div>
@@ -162,9 +162,9 @@
           if (role === 'admin') {
             window.location.href = '/admin/';
           } else if (role === 'staff') {
-            window.location.href = '/staff/dashboard/';
+            window.location.href = '/staff/workbench/';
           } else {
-            window.location.href = '/citizen/dashboard/';
+            window.location.href = '/grievances/my-complaints/';
           }
 
         } else {

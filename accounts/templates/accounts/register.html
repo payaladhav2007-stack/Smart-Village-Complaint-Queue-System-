@@ -73,7 +73,7 @@
 
     <p class="text-center text-sm text-gray-500 mt-6">
       Already have an account?
-      <a href="#" class="text-blue-600 font-medium hover:underline">Login</a>
+      <a href="/api/auth/login-page/" class="text-blue-600 font-medium hover:underline">Login</a>
     </p>
 
   </div>
@@ -165,7 +165,48 @@
 
       // --- All checks passed: submit to API ---
       if (isValid) {
-        form.submit();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Registering...';
+
+        fetch('/api/auth/register/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify({
+            username: phoneVal,
+            email: '',
+            password: password.value,
+            phone_number: phoneVal,
+            ward_number: ward.value
+          })
+        })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            return { status: response.status, body: data };
+          });
+        })
+        .then(function (result) {
+          if (result.status === 201) {
+            alert('Registration successful! Please log in.');
+            window.location.href = '/api/auth/login-page/';
+          } else {
+            let messages = [];
+            for (const field in result.body) {
+              messages.push(field + ': ' + result.body[field]);
+            }
+            alert('Registration failed:\n' + messages.join('\n'));
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Register';
+          }
+        })
+        .catch(function (err) {
+          alert('Something went wrong. Please try again.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Register';
+        });
       }
     });
 
@@ -173,3 +214,4 @@
 </script>
 
 </body>
+</html>
