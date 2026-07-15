@@ -1,9 +1,10 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GramSmart — Regional Analytics Dashboard</title>
+  <title>{% trans "GramSmart — Regional Analytics Dashboard" %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -36,16 +37,27 @@
       </div>
       <div>
         <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
-        <p class="text-xs text-gray-400">Regional Analytics Dashboard</p>
+        <p class="text-xs text-gray-400">{% trans "Regional Analytics Dashboard" %}</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
       <span class="text-xs text-gray-400 hidden sm:block" id="current-date"></span>
       <span class="flex items-center gap-1.5 text-xs text-green-600 font-medium">
         <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
-        Live
+        {% trans "Live" %}
       </span>
-      <a href="/staff/workbench/" class="text-xs text-green-600 hover:text-green-800 font-medium transition">← Workbench</a>
+      <form action="{% url 'set_language' %}" method="post" class="inline-block">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()" class="text-xs border border-gray-300 rounded-lg px-2 py-1 text-gray-600">
+          {% get_current_language as CURRENT_LANGUAGE %}
+          {% get_available_languages as LANGUAGES %}
+          {% for lang_code, lang_name in LANGUAGES %}
+            <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>{{ lang_name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      <a href="/staff/workbench/" class="text-xs text-green-600 hover:text-green-800 font-medium transition">{% trans "← Workbench" %}</a>
       <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
         <span class="text-green-700 font-bold text-sm">RL</span>
       </div>
@@ -58,18 +70,18 @@
     <!-- Page Header -->
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h2 class="text-xl font-bold text-gray-800">Regional Performance Overview</h2>
-        <p class="text-sm text-gray-500 mt-0.5">All wards — GramSmart system health metrics</p>
+        <h2 class="text-xl font-bold text-gray-800">{% trans "Regional Performance Overview" %}</h2>
+        <p class="text-sm text-gray-500 mt-0.5">{% trans "All wards — GramSmart system health metrics" %}</p>
       </div>
       <div class="flex gap-2 flex-wrap">
         <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
-          <option>This Month</option>
-          <option>Last Month</option>
-          <option>Last 3 Months</option>
-          <option>This Year</option>
+          <option>{% trans "This Month" %}</option>
+          <option>{% trans "Last Month" %}</option>
+          <option>{% trans "Last 3 Months" %}</option>
+          <option>{% trans "This Year" %}</option>
         </select>
         <select class="border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 focus:outline-none">
-          <option>All Wards</option>
+          <option>{% trans "All Wards" %}</option>
           <option>Ward 1</option>
           <option>Ward 2</option>
           <option>Ward 3</option>
@@ -77,7 +89,7 @@
           <option>Ward 5</option>
         </select>
         <button class="bg-green-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg hover:bg-green-700 transition">
-          Export Report
+          {% trans "Export Report" %}
         </button>
       </div>
     </div>
@@ -89,44 +101,44 @@
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-blue-500">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">📋</span>
-          <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">Total</span>
+          <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">{% trans "Total" %}</span>
         </div>
         <p class="text-3xl font-black text-gray-800" id="kpi-total-complaints">142</p>
-        <p class="text-xs text-gray-500 mt-1">Total Complaints</p>
-        <p class="text-xs text-green-600 font-medium mt-2">↑ 12% from last month</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Total Complaints" %}</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↑ 12% {% trans "from last month" %}</p>
       </div>
 
       <!-- Resolved -->
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-green-500">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">✅</span>
-          <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">Resolved</span>
+          <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">{% trans "Resolved" %}</span>
         </div>
         <p class="text-3xl font-black text-green-600" id="kpi-resolved">98</p>
-        <p class="text-xs text-gray-500 mt-1">Complaints Resolved</p>
-        <p class="text-xs text-green-600 font-medium mt-2">69% resolution rate</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Complaints Resolved" %}</p>
+        <p class="text-xs text-green-600 font-medium mt-2">69% {% trans "resolution rate" %}</p>
       </div>
 
       <!-- Pending -->
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-yellow-400">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">⏳</span>
-          <span class="text-xs bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">Pending</span>
+          <span class="text-xs bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">{% trans "Pending" %}</span>
         </div>
         <p class="text-3xl font-black text-yellow-500" id="kpi-pending">32</p>
-        <p class="text-xs text-gray-500 mt-1">Complaints Pending</p>
-        <p class="text-xs text-red-500 font-medium mt-2">↑ 5 new today</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Complaints Pending" %}</p>
+        <p class="text-xs text-red-500 font-medium mt-2">↑ 5 {% trans "new today" %}</p>
       </div>
 
       <!-- Avg Resolution Time -->
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-purple-500">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">⚡</span>
-          <span class="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">Avg Time</span>
+          <span class="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">{% trans "Avg Time" %}</span>
         </div>
         <p class="text-3xl font-black text-purple-600" id="kpi-avg-time">2.4d</p>
-        <p class="text-xs text-gray-500 mt-1">Avg Resolution Time</p>
-        <p class="text-xs text-green-600 font-medium mt-2">↓ 0.3d faster this month</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Avg Resolution Time" %}</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↓ 0.3d {% trans "faster this month" %}</p>
       </div>
 
     </div>
@@ -138,56 +150,55 @@
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-teal-500">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">📅</span>
-          <span class="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full font-medium">Appointments</span>
+          <span class="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full font-medium">{% trans "Appointments" %}</span>
         </div>
         <p class="text-3xl font-black text-gray-800">215</p>
-        <p class="text-xs text-gray-500 mt-1">Total Appointments</p>
-        <p class="text-xs text-green-600 font-medium mt-2">↑ 18% from last month</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Total Appointments" %}</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↑ 18% {% trans "from last month" %}</p>
       </div>
 
       <!-- Completed Appointments -->
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-green-400">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">🎟️</span>
-          <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">Completed</span>
+          <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">{% trans "Completed" %}</span>
         </div>
         <p class="text-3xl font-black text-green-600">187</p>
-        <p class="text-xs text-gray-500 mt-1">Appointments Completed</p>
-        <p class="text-xs text-green-600 font-medium mt-2">87% completion rate</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Appointments Completed" %}</p>
+        <p class="text-xs text-green-600 font-medium mt-2">87% {% trans "completion rate" %}</p>
       </div>
 
       <!-- Citizen Feedback Score -->
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-amber-400">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">⭐</span>
-          <span class="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-medium">Rating</span>
+          <span class="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-medium">{% trans "Rating" %}</span>
         </div>
         <p class="text-3xl font-black text-amber-500">4.2</p>
-        <p class="text-xs text-gray-500 mt-1">Avg Citizen Rating</p>
-        <p class="text-xs text-green-600 font-medium mt-2">↑ 0.3 from last month</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Avg Citizen Rating" %}</p>
+        <p class="text-xs text-green-600 font-medium mt-2">↑ 0.3 {% trans "from last month" %}</p>
       </div>
 
       <!-- Active Wards -->
       <div class="metric-card bg-white rounded-2xl shadow-sm p-5 border-l-4 border-indigo-500">
         <div class="flex items-center justify-between mb-2">
           <span class="text-2xl">🏘️</span>
-          <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">Wards</span>
+          <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">{% trans "Wards" %}</span>
         </div>
         <p class="text-3xl font-black text-indigo-600">5</p>
-        <p class="text-xs text-gray-500 mt-1">Active Wards</p>
-        <p class="text-xs text-green-600 font-medium mt-2">All wards reporting</p>
+        <p class="text-xs text-gray-500 mt-1">{% trans "Active Wards" %}</p>
+        <p class="text-xs text-green-600 font-medium mt-2">{% trans "All wards reporting" %}</p>
       </div>
 
     </div>
-
     <!-- MAIN GRID: Charts + Backlog -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
       <!-- Complaints by Category Chart -->
       <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-gray-800">Complaints by Category</h3>
-          <span class="text-xs text-gray-400">This Month</span>
+          <h3 class="text-sm font-bold text-gray-800">{% trans "Complaints by Category" %}</h3>
+          <span class="text-xs text-gray-400">{% trans "This Month" %}</span>
         </div>
         <canvas id="categoryChart" height="120"></canvas>
       </div>
@@ -195,57 +206,57 @@
       <!-- Aggregate Backlog Cards -->
       <div class="bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-gray-800">Backlog Summary</h3>
-          <span class="text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-medium">44 Open</span>
+          <h3 class="text-sm font-bold text-gray-800">{% trans "Backlog Summary" %}</h3>
+          <span class="text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-medium">44 {% trans "Open" %}</span>
         </div>
         <div class="space-y-4">
 
           <!-- Roads -->
           <div>
             <div class="flex justify-between mb-1">
-              <span class="text-xs font-medium text-gray-700">🚧 Roads / Potholes</span>
-              <span class="text-xs font-bold text-red-500">14 open</span>
+              <span class="text-xs font-medium text-gray-700">🚧 {% trans "Roads / Potholes" %}</span>
+              <span class="text-xs font-bold text-red-500">14 {% trans "open" %}</span>
             </div>
             <div class="progress-bar">
               <div class="progress-fill bg-red-400" style="width: 68%"></div>
             </div>
-            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 3.2 days</p>
+            <p class="text-xs text-gray-400 mt-0.5">{% trans "Avg wait:" %} 3.2 {% trans "days" %}</p>
           </div>
 
           <!-- Water -->
           <div>
             <div class="flex justify-between mb-1">
-              <span class="text-xs font-medium text-gray-700">💧 Water Supply</span>
-              <span class="text-xs font-bold text-yellow-500">9 open</span>
+              <span class="text-xs font-medium text-gray-700">💧 {% trans "Water Supply" %}</span>
+              <span class="text-xs font-bold text-yellow-500">9 {% trans "open" %}</span>
             </div>
             <div class="progress-bar">
               <div class="progress-fill bg-yellow-400" style="width: 45%"></div>
             </div>
-            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 2.1 days</p>
+            <p class="text-xs text-gray-400 mt-0.5">{% trans "Avg wait:" %} 2.1 {% trans "days" %}</p>
           </div>
 
           <!-- Electricity -->
           <div>
             <div class="flex justify-between mb-1">
-              <span class="text-xs font-medium text-gray-700">💡 Electricity</span>
-              <span class="text-xs font-bold text-yellow-500">11 open</span>
+              <span class="text-xs font-medium text-gray-700">💡 {% trans "Electricity" %}</span>
+              <span class="text-xs font-bold text-yellow-500">11 {% trans "open" %}</span>
             </div>
             <div class="progress-bar">
               <div class="progress-fill bg-yellow-500" style="width: 55%"></div>
             </div>
-            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 1.8 days</p>
+            <p class="text-xs text-gray-400 mt-0.5">{% trans "Avg wait:" %} 1.8 {% trans "days" %}</p>
           </div>
 
           <!-- Sanitation -->
           <div>
             <div class="flex justify-between mb-1">
-              <span class="text-xs font-medium text-gray-700">🗑️ Sanitation</span>
-              <span class="text-xs font-bold text-green-500">10 open</span>
+              <span class="text-xs font-medium text-gray-700">🗑️ {% trans "Sanitation" %}</span>
+              <span class="text-xs font-bold text-green-500">10 {% trans "open" %}</span>
             </div>
             <div class="progress-bar">
               <div class="progress-fill bg-green-400" style="width: 50%"></div>
             </div>
-            <p class="text-xs text-gray-400 mt-0.5">Avg wait: 1.5 days</p>
+            <p class="text-xs text-gray-400 mt-0.5">{% trans "Avg wait:" %} 1.5 {% trans "days" %}</p>
           </div>
 
         </div>
@@ -256,21 +267,21 @@
     <!-- WARD PERFORMANCE TABLE -->
     <div class="bg-white rounded-2xl shadow-sm p-5 mb-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-bold text-gray-800">Ward-wise Performance Table</h3>
-        <span class="text-xs text-gray-400">Sorted by Resolution Rate</span>
+        <h3 class="text-sm font-bold text-gray-800">{% trans "Ward-wise Performance Table" %}</h3>
+        <span class="text-xs text-gray-400">{% trans "Sorted by Resolution Rate" %}</span>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-gray-100">
-              <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">Ward</th>
-              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Total</th>
-              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Resolved</th>
-              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Pending</th>
-              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Avg Time</th>
-              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Rating</th>
-              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">Resolution %</th>
-              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3">Status</th>
+              <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 pr-4">{% trans "Ward" %}</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">{% trans "Total" %}</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">{% trans "Resolved" %}</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">{% trans "Pending" %}</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">{% trans "Avg Time" %}</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">{% trans "Rating" %}</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3 px-4">{% trans "Resolution %" %}</th>
+              <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wide pb-3">{% trans "Status" %}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -282,7 +293,7 @@
                   <div class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center text-xs font-bold text-green-700">W2</div>
                   <div>
                     <p class="text-sm font-semibold text-gray-800">Ward 2</p>
-                    <p class="text-xs text-gray-400">North Zone</p>
+                    <p class="text-xs text-gray-400">{% trans "North Zone" %}</p>
                   </div>
                 </div>
               </td>
@@ -302,7 +313,7 @@
                 </div>
               </td>
               <td class="text-center py-3">
-                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-semibold">Excellent</span>
+                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-semibold">{% trans "Excellent" %}</span>
               </td>
             </tr>
 
@@ -313,7 +324,7 @@
                   <div class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center text-xs font-bold text-green-700">W1</div>
                   <div>
                     <p class="text-sm font-semibold text-gray-800">Ward 1</p>
-                    <p class="text-xs text-gray-400">Central Zone</p>
+                    <p class="text-xs text-gray-400">{% trans "Central Zone" %}</p>
                   </div>
                 </div>
               </td>
@@ -333,7 +344,7 @@
                 </div>
               </td>
               <td class="text-center py-3">
-                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-semibold">Good</span>
+                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-semibold">{% trans "Good" %}</span>
               </td>
             </tr>
 
@@ -344,7 +355,7 @@
                   <div class="w-7 h-7 bg-yellow-100 rounded-lg flex items-center justify-center text-xs font-bold text-yellow-700">W4</div>
                   <div>
                     <p class="text-sm font-semibold text-gray-800">Ward 4</p>
-                    <p class="text-xs text-gray-400">East Zone</p>
+                    <p class="text-xs text-gray-400">{% trans "East Zone" %}</p>
                   </div>
                 </div>
               </td>
@@ -364,7 +375,7 @@
                 </div>
               </td>
               <td class="text-center py-3">
-                <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-semibold">Average</span>
+                <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-semibold">{% trans "Average" %}</span>
               </td>
             </tr>
 
@@ -375,7 +386,7 @@
                   <div class="w-7 h-7 bg-yellow-100 rounded-lg flex items-center justify-center text-xs font-bold text-yellow-700">W3</div>
                   <div>
                     <p class="text-sm font-semibold text-gray-800">Ward 3</p>
-                    <p class="text-xs text-gray-400">West Zone</p>
+                    <p class="text-xs text-gray-400">{% trans "West Zone" %}</p>
                   </div>
                 </div>
               </td>
@@ -395,7 +406,7 @@
                 </div>
               </td>
               <td class="text-center py-3">
-                <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-semibold">Average</span>
+                <span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full font-semibold">{% trans "Average" %}</span>
               </td>
             </tr>
 
@@ -406,7 +417,7 @@
                   <div class="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center text-xs font-bold text-red-600">W5</div>
                   <div>
                     <p class="text-sm font-semibold text-gray-800">Ward 5</p>
-                    <p class="text-xs text-gray-400">South Zone</p>
+                    <p class="text-xs text-gray-400">{% trans "South Zone" %}</p>
                   </div>
                 </div>
               </td>
@@ -426,7 +437,7 @@
                 </div>
               </td>
               <td class="text-center py-3">
-                <span class="text-xs bg-red-100 text-red-500 px-2 py-1 rounded-full font-semibold">Needs Attention</span>
+                <span class="text-xs bg-red-100 text-red-500 px-2 py-1 rounded-full font-semibold">{% trans "Needs Attention" %}</span>
               </td>
             </tr>
 
@@ -434,7 +445,6 @@
         </table>
       </div>
     </div>
-
     <!-- BOTTOM GRID: Resolution Trend + Top Complaints -->
      <!-- GS-ADV-107: 3-TIER CATEGORY ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
@@ -443,10 +453,10 @@
       <div class="bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-sm font-bold text-gray-800">Main Category Distribution</h3>
-            <p class="text-xs text-gray-400 mt-0.5">Government vs Personal vs Other</p>
+            <h3 class="text-sm font-bold text-gray-800">{% trans "Main Category Distribution" %}</h3>
+            <p class="text-xs text-gray-400 mt-0.5">{% trans "Government vs Personal vs Other" %}</p>
           </div>
-          <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">3-Tier</span>
+          <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">{% trans "3-Tier" %}</span>
         </div>
         <div class="flex items-center gap-6">
           <div class="flex-1">
@@ -455,17 +465,17 @@
           <div class="space-y-3 flex-shrink-0">
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-sm bg-blue-500 inline-block"></span>
-              <span class="text-xs text-gray-600">Government</span>
+              <span class="text-xs text-gray-600">{% trans "Government" %}</span>
               <span class="text-xs font-bold text-gray-800 ml-1" id="gov-count">—</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-sm bg-purple-500 inline-block"></span>
-              <span class="text-xs text-gray-600">Personal</span>
+              <span class="text-xs text-gray-600">{% trans "Personal" %}</span>
               <span class="text-xs font-bold text-gray-800 ml-1" id="personal-count">—</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-sm bg-gray-400 inline-block"></span>
-              <span class="text-xs text-gray-600">Other</span>
+              <span class="text-xs text-gray-600">{% trans "Other" %}</span>
               <span class="text-xs font-bold text-gray-800 ml-1" id="other-count">—</span>
             </div>
           </div>
@@ -476,16 +486,16 @@
       <div class="bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-sm font-bold text-gray-800">Sub-Category Ticket Density</h3>
-            <p class="text-xs text-gray-400 mt-0.5">Frequency across all sub-categories</p>
+            <h3 class="text-sm font-bold text-gray-800">{% trans "Sub-Category Ticket Density" %}</h3>
+            <p class="text-xs text-gray-400 mt-0.5">{% trans "Frequency across all sub-categories" %}</p>
           </div>
           <div class="flex gap-1">
             <button onclick="filterSubChart('all')" id="btn-all"
-              class="text-xs bg-gray-800 text-white px-2 py-1 rounded-lg font-medium">All</button>
+              class="text-xs bg-gray-800 text-white px-2 py-1 rounded-lg font-medium">{% trans "All" %}</button>
             <button onclick="filterSubChart('government')" id="btn-government"
-              class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg font-medium hover:bg-blue-50">Govt</button>
+              class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg font-medium hover:bg-blue-50">{% trans "Govt" %}</button>
             <button onclick="filterSubChart('personal')" id="btn-personal"
-              class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg font-medium hover:bg-purple-50">Personal</button>
+              class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg font-medium hover:bg-purple-50">{% trans "Personal" %}</button>
           </div>
         </div>
         <canvas id="subCategoryBarChart" height="200"></canvas>
@@ -499,20 +509,19 @@
       <!-- Government Sub-Categories -->
       <div class="bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-gray-800">🏛️ Government Sub-Categories</h3>
-          <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium" id="govt-total-badge">Loading...</span>
+          <h3 class="text-sm font-bold text-gray-800">🏛️ {% trans "Government Sub-Categories" %}</h3>
+          <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium" id="govt-total-badge">{% trans "Loading..." %}</span>
         </div>
         <div class="space-y-3" id="govt-sub-bars">
-          <!-- Populated by JS -->
           <div class="space-y-2">
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🚧 Roads & Potholes</span><span class="text-xs font-bold text-gray-700" id="sub-roads">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" id="bar-roads" style="width:0%"></div></div></div>
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💧 Water Supply</span><span class="text-xs font-bold text-gray-700" id="sub-water">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-400 rounded-full" id="bar-water" style="width:0%"></div></div></div>
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">⚡ Electricity</span><span class="text-xs font-bold text-gray-700" id="sub-electricity">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-yellow-400 rounded-full" id="bar-electricity" style="width:0%"></div></div></div>
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🧹 Sanitation</span><span class="text-xs font-bold text-gray-700" id="sub-sanitation">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-green-400 rounded-full" id="bar-sanitation" style="width:0%"></div></div></div>
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🏚️ Property Damage</span><span class="text-xs font-bold text-gray-700" id="sub-property_damage">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-orange-400 rounded-full" id="bar-property_damage" style="width:0%"></div></div></div>
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🌊 Drainage</span><span class="text-xs font-bold text-gray-700" id="sub-drainage">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-teal-400 rounded-full" id="bar-drainage" style="width:0%"></div></div></div>
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🌳 Tree / Obstruction</span><span class="text-xs font-bold text-gray-700" id="sub-tree">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-green-600 rounded-full" id="bar-tree" style="width:0%"></div></div></div>
-            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🐄 Stray Animals</span><span class="text-xs font-bold text-gray-700" id="sub-stray_animals">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-amber-400 rounded-full" id="bar-stray_animals" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🚧 {% trans "Roads & Potholes" %}</span><span class="text-xs font-bold text-gray-700" id="sub-roads">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" id="bar-roads" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💧 {% trans "Water Supply" %}</span><span class="text-xs font-bold text-gray-700" id="sub-water">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-400 rounded-full" id="bar-water" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">⚡ {% trans "Electricity" %}</span><span class="text-xs font-bold text-gray-700" id="sub-electricity">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-yellow-400 rounded-full" id="bar-electricity" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🧹 {% trans "Sanitation" %}</span><span class="text-xs font-bold text-gray-700" id="sub-sanitation">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-green-400 rounded-full" id="bar-sanitation" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🏚️ {% trans "Property Damage" %}</span><span class="text-xs font-bold text-gray-700" id="sub-property_damage">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-orange-400 rounded-full" id="bar-property_damage" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🌊 {% trans "Drainage" %}</span><span class="text-xs font-bold text-gray-700" id="sub-drainage">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-teal-400 rounded-full" id="bar-drainage" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🌳 {% trans "Tree / Obstruction" %}</span><span class="text-xs font-bold text-gray-700" id="sub-tree">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-green-600 rounded-full" id="bar-tree" style="width:0%"></div></div></div>
+            <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🐄 {% trans "Stray Animals" %}</span><span class="text-xs font-bold text-gray-700" id="sub-stray_animals">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-amber-400 rounded-full" id="bar-stray_animals" style="width:0%"></div></div></div>
           </div>
         </div>
       </div>
@@ -520,18 +529,18 @@
       <!-- Personal Sub-Categories -->
       <div class="bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-gray-800">👤 Personal Sub-Categories</h3>
-          <span class="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium" id="personal-total-badge">Loading...</span>
+          <h3 class="text-sm font-bold text-gray-800">👤 {% trans "Personal Sub-Categories" %}</h3>
+          <span class="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium" id="personal-total-badge">{% trans "Loading..." %}</span>
         </div>
         <div class="space-y-2">
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">👨‍👩‍👧 Family Dispute</span><span class="text-xs font-bold text-gray-700" id="sub-family_dispute">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-purple-500 rounded-full" id="bar-family_dispute" style="width:0%"></div></div></div>
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🏠 Property Dispute</span><span class="text-xs font-bold text-gray-700" id="sub-property_dispute">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-purple-400 rounded-full" id="bar-property_dispute" style="width:0%"></div></div></div>
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💧 Neighbour Water</span><span class="text-xs font-bold text-gray-700" id="sub-neighbour_water">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-400 rounded-full" id="bar-neighbour_water" style="width:0%"></div></div></div>
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🔊 Noise Complaint</span><span class="text-xs font-bold text-gray-700" id="sub-noise">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-red-400 rounded-full" id="bar-noise" style="width:0%"></div></div></div>
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🏘️ Housing & Shelter</span><span class="text-xs font-bold text-gray-700" id="sub-housing">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-400 rounded-full" id="bar-housing" style="width:0%"></div></div></div>
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💼 Employment</span><span class="text-xs font-bold text-gray-700" id="sub-employment">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-teal-400 rounded-full" id="bar-employment" style="width:0%"></div></div></div>
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">📄 Document Delay</span><span class="text-xs font-bold text-gray-700" id="sub-document_delay">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-orange-400 rounded-full" id="bar-document_delay" style="width:0%"></div></div></div>
-          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💰 Financial Fraud</span><span class="text-xs font-bold text-gray-700" id="sub-financial_fraud">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-red-600 rounded-full" id="bar-financial_fraud" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">👨‍👩‍👧 {% trans "Family Dispute" %}</span><span class="text-xs font-bold text-gray-700" id="sub-family_dispute">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-purple-500 rounded-full" id="bar-family_dispute" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🏠 {% trans "Property Dispute" %}</span><span class="text-xs font-bold text-gray-700" id="sub-property_dispute">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-purple-400 rounded-full" id="bar-property_dispute" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💧 {% trans "Neighbour Water" %}</span><span class="text-xs font-bold text-gray-700" id="sub-neighbour_water">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-400 rounded-full" id="bar-neighbour_water" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🔊 {% trans "Noise Complaint" %}</span><span class="text-xs font-bold text-gray-700" id="sub-noise">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-red-400 rounded-full" id="bar-noise" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">🏘️ {% trans "Housing & Shelter" %}</span><span class="text-xs font-bold text-gray-700" id="sub-housing">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-400 rounded-full" id="bar-housing" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💼 {% trans "Employment" %}</span><span class="text-xs font-bold text-gray-700" id="sub-employment">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-teal-400 rounded-full" id="bar-employment" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">📄 {% trans "Document Delay" %}</span><span class="text-xs font-bold text-gray-700" id="sub-document_delay">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-orange-400 rounded-full" id="bar-document_delay" style="width:0%"></div></div></div>
+          <div><div class="flex justify-between mb-1"><span class="text-xs text-gray-600">💰 {% trans "Financial Fraud" %}</span><span class="text-xs font-bold text-gray-700" id="sub-financial_fraud">—</span></div><div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-red-600 rounded-full" id="bar-financial_fraud" style="width:0%"></div></div></div>
         </div>
       </div>
 
@@ -541,8 +550,8 @@
       <!-- Resolution Trend Chart -->
       <div class="bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-gray-800">Monthly Resolution Trend</h3>
-          <span class="text-xs text-gray-400">Last 6 months</span>
+          <h3 class="text-sm font-bold text-gray-800">{% trans "Monthly Resolution Trend" %}</h3>
+          <span class="text-xs text-gray-400">{% trans "Last 6 months" %}</span>
         </div>
         <canvas id="trendChart" height="150"></canvas>
       </div>
@@ -550,8 +559,8 @@
       <!-- Top Complaint Categories -->
       <div class="bg-white rounded-2xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-gray-800">Top Complaint Categories</h3>
-          <span class="text-xs text-gray-400">This Month</span>
+          <h3 class="text-sm font-bold text-gray-800">{% trans "Top Complaint Categories" %}</h3>
+          <span class="text-xs text-gray-400">{% trans "This Month" %}</span>
         </div>
         <div class="space-y-3">
 
@@ -559,7 +568,7 @@
             <span class="text-base w-6">🚧</span>
             <div class="flex-1">
               <div class="flex justify-between mb-1">
-                <span class="text-xs font-medium text-gray-700">Roads / Potholes</span>
+                <span class="text-xs font-medium text-gray-700">{% trans "Roads / Potholes" %}</span>
                 <span class="text-xs font-bold text-gray-600">42 (30%)</span>
               </div>
               <div class="progress-bar">
@@ -572,7 +581,7 @@
             <span class="text-base w-6">💡</span>
             <div class="flex-1">
               <div class="flex justify-between mb-1">
-                <span class="text-xs font-medium text-gray-700">Electricity</span>
+                <span class="text-xs font-medium text-gray-700">{% trans "Electricity" %}</span>
                 <span class="text-xs font-bold text-gray-600">38 (27%)</span>
               </div>
               <div class="progress-bar">
@@ -585,7 +594,7 @@
             <span class="text-base w-6">💧</span>
             <div class="flex-1">
               <div class="flex justify-between mb-1">
-                <span class="text-xs font-medium text-gray-700">Water Supply</span>
+                <span class="text-xs font-medium text-gray-700">{% trans "Water Supply" %}</span>
                 <span class="text-xs font-bold text-gray-600">35 (25%)</span>
               </div>
               <div class="progress-bar">
@@ -598,7 +607,7 @@
             <span class="text-base w-6">🗑️</span>
             <div class="flex-1">
               <div class="flex justify-between mb-1">
-                <span class="text-xs font-medium text-gray-700">Sanitation</span>
+                <span class="text-xs font-medium text-gray-700">{% trans "Sanitation" %}</span>
                 <span class="text-xs font-bold text-gray-600">27 (18%)</span>
               </div>
               <div class="progress-bar">
@@ -611,19 +620,19 @@
 
         <!-- Feedback Score Summary -->
         <div class="mt-5 border-t pt-4">
-          <p class="text-xs font-semibold text-gray-700 mb-3">Citizen Satisfaction Scores</p>
+          <p class="text-xs font-semibold text-gray-700 mb-3">{% trans "Citizen Satisfaction Scores" %}</p>
           <div class="grid grid-cols-3 gap-2">
             <div class="text-center bg-green-50 rounded-xl p-3">
               <p class="text-lg font-black text-green-600">4.2</p>
-              <p class="text-xs text-gray-400">Overall</p>
+              <p class="text-xs text-gray-400">{% trans "Overall" %}</p>
             </div>
             <div class="text-center bg-blue-50 rounded-xl p-3">
               <p class="text-lg font-black text-blue-600">4.5</p>
-              <p class="text-xs text-gray-400">Speed</p>
+              <p class="text-xs text-gray-400">{% trans "Speed" %}</p>
             </div>
             <div class="text-center bg-amber-50 rounded-xl p-3">
               <p class="text-lg font-black text-amber-600">4.0</p>
-              <p class="text-xs text-gray-400">Staff</p>
+              <p class="text-xs text-gray-400">{% trans "Staff" %}</p>
             </div>
           </div>
         </div>
@@ -633,10 +642,38 @@
     </div>
 
   </div>
+  <!-- GS-ADV-108: Translated strings for dynamic JS content -->
+  <script>
+    var TRANS = {
+      govServices: "{% trans 'Government Services' %}",
+      personalIssues: "{% trans 'Personal Issues' %}",
+      other: "{% trans 'Other' %}",
+      ticketCount: "{% trans 'Ticket Count' %}",
+      totalLabel: "{% trans 'total' %}",
+      resolved: "{% trans 'Resolved' %}",
+      pending: "{% trans 'Pending' %}",
+      newComplaints: "{% trans 'New Complaints' %}",
+      roads: "🚧 {% trans 'Roads' %}",
+      water: "💧 {% trans 'Water' %}",
+      electric: "⚡ {% trans 'Electric' %}",
+      sanitation: "🧹 {% trans 'Sanitation' %}",
+      property: "🏚️ {% trans 'Property' %}",
+      drainage: "🌊 {% trans 'Drainage' %}",
+      tree: "🌳 {% trans 'Tree' %}",
+      animals: "🐄 {% trans 'Animals' %}",
+      family: "👨‍👩‍👧 {% trans 'Family' %}",
+      propertyDispute: "🏠 {% trans 'Property' %}",
+      neighbour: "💧 {% trans 'Neighbour' %}",
+      noise: "🔊 {% trans 'Noise' %}",
+      housing: "🏘️ {% trans 'Housing' %}",
+      employment: "💼 {% trans 'Employment' %}",
+      docs: "📄 {% trans 'Docs' %}",
+      fraud: "💰 {% trans 'Fraud' %}"
+    };
+  </script>
 
   <!-- CHART.JS SCRIPTS -->
 <script>
-  // --- Helper: get CSRF cookie ---
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -650,7 +687,6 @@
     return cookieValue;
   }
 
-  // --- Fetch live analytics summary from API ---
   function fetchAnalyticsSummary() {
     const token = sessionStorage.getItem('gramsmart_token') || '';
 
@@ -665,7 +701,6 @@
     })
     .then(function (response) { return response.json(); })
     .then(function (data) {
-      // --- Inject top metric numbers ---
       const kpis = data.analytics_summary && data.analytics_summary.grievance_kpis;
       if (kpis) {
           const totalEl = document.getElementById('kpi-total-complaints');
@@ -680,7 +715,6 @@
           }
       }
 
-      // --- Update backlog progress bars if backend sends per-category backlog array ---
       if (Array.isArray(data.backlog_by_category)) {
         data.backlog_by_category.forEach(function (item) {
           console.log('Backlog:', item.category, item.open_count, item.avg_wait_days);
@@ -692,16 +726,13 @@
     });
   }
 
-  // --- Run on page load ---
   window.addEventListener('load', function () {
     fetchAnalyticsSummary();
-    // Auto-refresh every 60 seconds
     setInterval(fetchAnalyticsSummary, 60000);
   });
   </script>
 <!-- GS-ADV-107: 3-Tier Category Charts -->
   <script>
-    // Static fallback data for 3-tier charts
     var mainCategoryData = { government: 85, personal: 32, other: 25 };
     var subCategoryData = {
       government: {
@@ -732,7 +763,7 @@
       pieChart = new Chart(document.getElementById('mainCategoryPieChart').getContext('2d'), {
         type: 'pie',
         data: {
-          labels: ['Government Services', 'Personal Issues', 'Other'],
+          labels: [TRANS.govServices, TRANS.personalIssues, TRANS.other],
           datasets: [{
             data: [gov, personal, other],
             backgroundColor: ['#3b82f6', '#8b5cf6', '#9ca3af'],
@@ -762,9 +793,9 @@
 
       if (filter === 'all' || filter === 'government') {
         var govLabels = {
-          roads: '🚧 Roads', water: '💧 Water', electricity: '⚡ Electric',
-          sanitation: '🧹 Sanitation', property_damage: '🏚️ Property',
-          drainage: '🌊 Drainage', tree: '🌳 Tree', stray_animals: '🐄 Animals'
+          roads: TRANS.roads, water: TRANS.water, electricity: TRANS.electric,
+          sanitation: TRANS.sanitation, property_damage: TRANS.property,
+          drainage: TRANS.drainage, tree: TRANS.tree, stray_animals: TRANS.animals
         };
         Object.entries(subCategoryData.government).forEach(function([k, v]) {
           labels.push(govLabels[k] || k);
@@ -775,10 +806,10 @@
 
       if (filter === 'all' || filter === 'personal') {
         var personalLabels = {
-          family_dispute: '👨‍👩‍👧 Family', property_dispute: '🏠 Property',
-          neighbour_water: '💧 Neighbour', noise: '🔊 Noise',
-          housing: '🏘️ Housing', employment: '💼 Employment',
-          document_delay: '📄 Docs', financial_fraud: '💰 Fraud'
+          family_dispute: TRANS.family, property_dispute: TRANS.propertyDispute,
+          neighbour_water: TRANS.neighbour, noise: TRANS.noise,
+          housing: TRANS.housing, employment: TRANS.employment,
+          document_delay: TRANS.docs, financial_fraud: TRANS.fraud
         };
         Object.entries(subCategoryData.personal).forEach(function([k, v]) {
           labels.push(personalLabels[k] || k);
@@ -793,7 +824,7 @@
         data: {
           labels: labels,
           datasets: [{
-            label: 'Ticket Count',
+            label: TRANS.ticketCount,
             data: counts,
             backgroundColor: colors,
             borderRadius: 4
@@ -809,7 +840,6 @@
         }
       });
 
-      // Update filter buttons
       ['all', 'government', 'personal'].forEach(function(f) {
         var btn = document.getElementById('btn-' + f);
         if (btn) {
@@ -832,8 +862,8 @@
       var govTotal = Object.values(govData).reduce(function(a,b){return a+b;}, 0);
       var personalTotal = Object.values(personalData).reduce(function(a,b){return a+b;}, 0);
 
-      document.getElementById('govt-total-badge').textContent = govTotal + ' total';
-      document.getElementById('personal-total-badge').textContent = personalTotal + ' total';
+      document.getElementById('govt-total-badge').textContent = govTotal + ' ' + TRANS.totalLabel;
+      document.getElementById('personal-total-badge').textContent = personalTotal + ' ' + TRANS.totalLabel;
 
       Object.entries(govData).forEach(function([key, val]) {
         var el = document.getElementById('sub-' + key);
@@ -850,7 +880,6 @@
       });
     }
 
-    // Try to load live data from API, fall back to static
     function loadCategoryAnalytics() {
       var token = sessionStorage.getItem('gramsmart_token') || '';
       fetch('/api/analytics/summary/', {
@@ -901,11 +930,9 @@
    };
   </script>
   <script>
-    // Auto date
     document.getElementById('current-date').textContent =
       new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 
-    // Category Bar Chart
     var ctx1 = document.getElementById('categoryChart').getContext('2d');
     new Chart(ctx1, {
       type: 'bar',
@@ -913,13 +940,13 @@
         labels: ['Roads', 'Electricity', 'Water Supply', 'Sanitation'],
         datasets: [
           {
-            label: 'Resolved',
+            label: TRANS.resolved,
             data: [28, 26, 24, 20],
             backgroundColor: '#4ade80',
             borderRadius: 6
           },
           {
-            label: 'Pending',
+            label: TRANS.pending,
             data: [14, 12, 11, 7],
             backgroundColor: '#fbbf24',
             borderRadius: 6
@@ -936,7 +963,6 @@
       }
     });
 
-    // Trend Line Chart
     var ctx2 = document.getElementById('trendChart').getContext('2d');
     new Chart(ctx2, {
       type: 'line',
@@ -944,7 +970,7 @@
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         datasets: [
           {
-            label: 'Resolved',
+            label: TRANS.resolved,
             data: [12, 18, 22, 19, 28, 32],
             borderColor: '#16a34a',
             backgroundColor: 'rgba(22, 163, 74, 0.08)',
@@ -954,7 +980,7 @@
             pointRadius: 4
           },
           {
-            label: 'New Complaints',
+            label: TRANS.newComplaints,
             data: [15, 20, 25, 22, 30, 35],
             borderColor: '#f59e0b',
             backgroundColor: 'rgba(245, 158, 11, 0.08)',

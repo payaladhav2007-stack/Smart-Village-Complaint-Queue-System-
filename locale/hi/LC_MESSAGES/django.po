@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-12 04:20+0000\n"
+"POT-Creation-Date: 2026-07-14 12:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,522 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: analytics/templates/analytics/regional_dashboard.html:7
+msgid "GramSmart — Regional Analytics Dashboard"
+msgstr "ग्रामस्मार्ट — क्षेत्रीय विश्लेषण डैशबोर्ड"
+
+#: analytics/templates/analytics/regional_dashboard.html:40
+msgid "Regional Analytics Dashboard"
+msgstr "क्षेत्रीय विश्लेषण डैशबोर्ड"
+
+#: analytics/templates/analytics/regional_dashboard.html:47
+msgid "Live"
+msgstr "लाइव"
+
+#: analytics/templates/analytics/regional_dashboard.html:60
+msgid "← Workbench"
+msgstr "← वर्कबेंच"
+
+#: analytics/templates/analytics/regional_dashboard.html:73
+msgid "Regional Performance Overview"
+msgstr "क्षेत्रीय प्रदर्शन अवलोकन"
+
+#: analytics/templates/analytics/regional_dashboard.html:74
+msgid "All wards — GramSmart system health metrics"
+msgstr "सभी वार्ड — ग्रामस्मार्ट प्रणाली स्वास्थ्य मापदंड"
+
+#: analytics/templates/analytics/regional_dashboard.html:78
+#: analytics/templates/analytics/regional_dashboard.html:201
+#: analytics/templates/analytics/regional_dashboard.html:563
+msgid "This Month"
+msgstr "इस महीने"
+
+#: analytics/templates/analytics/regional_dashboard.html:79
+msgid "Last Month"
+msgstr "पिछला महीना"
+
+#: analytics/templates/analytics/regional_dashboard.html:80
+msgid "Last 3 Months"
+msgstr "पिछले ३ महीने"
+
+#: analytics/templates/analytics/regional_dashboard.html:81
+msgid "This Year"
+msgstr "इस वर्ष"
+
+#: analytics/templates/analytics/regional_dashboard.html:84
+msgid "All Wards"
+msgstr "सभी वार्ड"
+
+#: analytics/templates/analytics/regional_dashboard.html:92
+msgid "Export Report"
+msgstr "रिपोर्ट निर्यात करें"
+
+#: analytics/templates/analytics/regional_dashboard.html:104
+#: analytics/templates/analytics/regional_dashboard.html:278
+msgid "Total"
+msgstr "कुल"
+
+#: analytics/templates/analytics/regional_dashboard.html:107
+msgid "Total Complaints"
+msgstr "कुल शिकायतें"
+
+#: analytics/templates/analytics/regional_dashboard.html:108
+#: analytics/templates/analytics/regional_dashboard.html:157
+#: analytics/templates/analytics/regional_dashboard.html:179
+msgid "from last month"
+msgstr "पिछले महीने की तुलना में"
+
+#: analytics/templates/analytics/regional_dashboard.html:115
+#: analytics/templates/analytics/regional_dashboard.html:279
+#: analytics/templates/analytics/regional_dashboard.html:653
+#: staff/templates/staff/grievance_management.html:79
+#: staff/templates/staff/grievance_management.html:98
+#: staff/templates/staff/grievance_management.html:394
+#: staff/templates/staff/grievance_management.html:405
+msgid "Resolved"
+msgstr "हल हो गया"
+
+#: analytics/templates/analytics/regional_dashboard.html:118
+msgid "Complaints Resolved"
+msgstr "समाधान की गई शिकायतें"
+
+#: analytics/templates/analytics/regional_dashboard.html:119
+msgid "resolution rate"
+msgstr "समाधान दर"
+
+#: analytics/templates/analytics/regional_dashboard.html:126
+#: analytics/templates/analytics/regional_dashboard.html:280
+#: analytics/templates/analytics/regional_dashboard.html:654
+msgid "Pending"
+msgstr "लंबित"
+
+#: analytics/templates/analytics/regional_dashboard.html:129
+msgid "Complaints Pending"
+msgstr "लंबित शिकायतें"
+
+#: analytics/templates/analytics/regional_dashboard.html:130
+msgid "new today"
+msgstr "आज नए"
+
+#: analytics/templates/analytics/regional_dashboard.html:137
+#: analytics/templates/analytics/regional_dashboard.html:281
+msgid "Avg Time"
+msgstr "औसत समय"
+
+#: analytics/templates/analytics/regional_dashboard.html:140
+msgid "Avg Resolution Time"
+msgstr "औसत समाधान समय"
+
+#: analytics/templates/analytics/regional_dashboard.html:141
+msgid "faster this month"
+msgstr "इस महीने तेज़"
+
+#: analytics/templates/analytics/regional_dashboard.html:153
+msgid "Appointments"
+msgstr "अपॉइंटमेंट"
+
+#: analytics/templates/analytics/regional_dashboard.html:156
+msgid "Total Appointments"
+msgstr "कुल अपॉइंटमेंट"
+
+#: analytics/templates/analytics/regional_dashboard.html:164
+msgid "Completed"
+msgstr "पूर्ण"
+
+#: analytics/templates/analytics/regional_dashboard.html:167
+msgid "Appointments Completed"
+msgstr "पूर्ण अपॉइंटमेंट"
+
+#: analytics/templates/analytics/regional_dashboard.html:168
+msgid "completion rate"
+msgstr "पूर्णता दर"
+
+#: analytics/templates/analytics/regional_dashboard.html:175
+#: analytics/templates/analytics/regional_dashboard.html:282
+msgid "Rating"
+msgstr "रेटिंग"
+
+#: analytics/templates/analytics/regional_dashboard.html:178
+msgid "Avg Citizen Rating"
+msgstr "औसत नागरिक रेटिंग"
+
+#: analytics/templates/analytics/regional_dashboard.html:186
+msgid "Wards"
+msgstr "वार्ड"
+
+#: analytics/templates/analytics/regional_dashboard.html:189
+msgid "Active Wards"
+msgstr "सक्रिय वार्ड"
+
+#: analytics/templates/analytics/regional_dashboard.html:190
+msgid "All wards reporting"
+msgstr "सभी वार्ड रिपोर्ट कर रहे हैं"
+
+#: analytics/templates/analytics/regional_dashboard.html:200
+msgid "Complaints by Category"
+msgstr "श्रेणी के अनुसार शिकायतें"
+
+#: analytics/templates/analytics/regional_dashboard.html:209
+msgid "Backlog Summary"
+msgstr "लंबित कार्यों का सारांश"
+
+#: analytics/templates/analytics/regional_dashboard.html:210
+#: staff/templates/staff/grievance_management.html:96
+#: staff/templates/staff/grievance_management.html:178
+#: staff/templates/staff/grievance_management.html:211
+#: staff/templates/staff/grievance_management.html:277
+#: staff/templates/staff/grievance_management.html:309
+#: staff/templates/staff/grievance_management.html:373
+msgid "Open"
+msgstr "खुला"
+
+#: analytics/templates/analytics/regional_dashboard.html:217
+#: analytics/templates/analytics/regional_dashboard.html:571
+msgid "Roads / Potholes"
+msgstr "सड़कें / गड्ढे"
+
+#: analytics/templates/analytics/regional_dashboard.html:218
+#: analytics/templates/analytics/regional_dashboard.html:230
+#: analytics/templates/analytics/regional_dashboard.html:242
+#: analytics/templates/analytics/regional_dashboard.html:254
+msgid "open"
+msgstr "खुले"
+
+#: analytics/templates/analytics/regional_dashboard.html:223
+#: analytics/templates/analytics/regional_dashboard.html:235
+#: analytics/templates/analytics/regional_dashboard.html:247
+#: analytics/templates/analytics/regional_dashboard.html:259
+msgid "Avg wait:"
+msgstr "औसत प्रतीक्षा:"
+
+#: analytics/templates/analytics/regional_dashboard.html:223
+#: analytics/templates/analytics/regional_dashboard.html:235
+#: analytics/templates/analytics/regional_dashboard.html:247
+#: analytics/templates/analytics/regional_dashboard.html:259
+msgid "days"
+msgstr "दिन"
+
+#: analytics/templates/analytics/regional_dashboard.html:229
+#: analytics/templates/analytics/regional_dashboard.html:518
+#: analytics/templates/analytics/regional_dashboard.html:597
+msgid "Water Supply"
+msgstr "जल आपूर्ति"
+
+#: analytics/templates/analytics/regional_dashboard.html:241
+#: analytics/templates/analytics/regional_dashboard.html:519
+#: analytics/templates/analytics/regional_dashboard.html:584
+msgid "Electricity"
+msgstr "बिजली"
+
+#: analytics/templates/analytics/regional_dashboard.html:253
+#: analytics/templates/analytics/regional_dashboard.html:520
+#: analytics/templates/analytics/regional_dashboard.html:610
+#: analytics/templates/analytics/regional_dashboard.html:659
+msgid "Sanitation"
+msgstr "स्वच्छता"
+
+#: analytics/templates/analytics/regional_dashboard.html:270
+msgid "Ward-wise Performance Table"
+msgstr "वार्डवार प्रदर्शन तालिका"
+
+#: analytics/templates/analytics/regional_dashboard.html:271
+msgid "Sorted by Resolution Rate"
+msgstr "समाधान दर के अनुसार क्रमबद्ध"
+
+#: analytics/templates/analytics/regional_dashboard.html:277
+msgid "Ward"
+msgstr "वार्ड"
+
+#: analytics/templates/analytics/regional_dashboard.html:283
+#, python-format
+msgid "Resolution %%"
+msgstr "समाधान %%"
+
+#: analytics/templates/analytics/regional_dashboard.html:284
+msgid "Status"
+msgstr "स्थिति"
+
+#: analytics/templates/analytics/regional_dashboard.html:296
+msgid "North Zone"
+msgstr "उत्तर क्षेत्र"
+
+#: analytics/templates/analytics/regional_dashboard.html:316
+msgid "Excellent"
+msgstr "उत्कृष्ट"
+
+#: analytics/templates/analytics/regional_dashboard.html:327
+msgid "Central Zone"
+msgstr "मध्य क्षेत्र"
+
+#: analytics/templates/analytics/regional_dashboard.html:347
+msgid "Good"
+msgstr "अच्छा"
+
+#: analytics/templates/analytics/regional_dashboard.html:358
+msgid "East Zone"
+msgstr "पूर्व क्षेत्र"
+
+#: analytics/templates/analytics/regional_dashboard.html:378
+#: analytics/templates/analytics/regional_dashboard.html:409
+msgid "Average"
+msgstr "औसत"
+
+#: analytics/templates/analytics/regional_dashboard.html:389
+msgid "West Zone"
+msgstr "पश्चिम क्षेत्र"
+
+#: analytics/templates/analytics/regional_dashboard.html:420
+msgid "South Zone"
+msgstr "दक्षिण क्षेत्र"
+
+#: analytics/templates/analytics/regional_dashboard.html:440
+msgid "Needs Attention"
+msgstr "ध्यान देने की आवश्यकता"
+
+#: analytics/templates/analytics/regional_dashboard.html:456
+msgid "Main Category Distribution"
+msgstr "मुख्य श्रेणी वितरण"
+
+#: analytics/templates/analytics/regional_dashboard.html:457
+msgid "Government vs Personal vs Other"
+msgstr "सरकारी बनाम व्यक्तिगत बनाम अन्य"
+
+#: analytics/templates/analytics/regional_dashboard.html:459
+msgid "3-Tier"
+msgstr "३-स्तरीय"
+
+#: analytics/templates/analytics/regional_dashboard.html:468
+#: staff/templates/staff/grievance_management.html:166
+#: staff/templates/staff/grievance_management.html:200
+#: staff/templates/staff/grievance_management.html:266
+#: staff/templates/staff/grievance_management.html:363
+#: staff/templates/staff/grievance_management.html:395
+msgid "Government"
+msgstr "सरकारी"
+
+#: analytics/templates/analytics/regional_dashboard.html:473
+#: analytics/templates/analytics/regional_dashboard.html:498
+#: staff/templates/staff/grievance_management.html:233
+#: staff/templates/staff/grievance_management.html:299
+msgid "Personal"
+msgstr "व्यक्तिगत"
+
+#: analytics/templates/analytics/regional_dashboard.html:478
+#: analytics/templates/analytics/regional_dashboard.html:650
+#: grievances/templates/grievances/log_complaint.html:107
+#: grievances/templates/grievances/log_complaint.html:379
+#: staff/templates/staff/grievance_management.html:116
+#: staff/templates/staff/grievance_management.html:331
+#: staff/templates/staff/grievance_management.html:546
+msgid "Other"
+msgstr "अन्य"
+
+#: analytics/templates/analytics/regional_dashboard.html:489
+msgid "Sub-Category Ticket Density"
+msgstr "उप-श्रेणी टिकट घनत्व"
+
+#: analytics/templates/analytics/regional_dashboard.html:490
+msgid "Frequency across all sub-categories"
+msgstr "सभी उप-श्रेणियों में आवृत्ति"
+
+#: analytics/templates/analytics/regional_dashboard.html:494
+msgid "All"
+msgstr "सभी"
+
+#: analytics/templates/analytics/regional_dashboard.html:496
+msgid "Govt"
+msgstr "सरकारी"
+
+#: analytics/templates/analytics/regional_dashboard.html:512
+msgid "Government Sub-Categories"
+msgstr "सरकारी उप-श्रेणियाँ"
+
+#: analytics/templates/analytics/regional_dashboard.html:513
+#: analytics/templates/analytics/regional_dashboard.html:533
+msgid "Loading..."
+msgstr "लोड हो रहा है..."
+
+#: analytics/templates/analytics/regional_dashboard.html:517
+#: grievances/templates/grievances/log_complaint.html:134
+#: grievances/templates/grievances/log_complaint.html:136
+#: staff/templates/staff/grievance_management.html:551
+msgid "Roads & Potholes"
+msgstr "सड़कें और गड्ढे"
+
+#: analytics/templates/analytics/regional_dashboard.html:521
+msgid "Property Damage"
+msgstr "संपत्ति क्षति"
+
+#: analytics/templates/analytics/regional_dashboard.html:522
+#: analytics/templates/analytics/regional_dashboard.html:661
+msgid "Drainage"
+msgstr "जल निकासी"
+
+#: analytics/templates/analytics/regional_dashboard.html:523
+msgid "Tree / Obstruction"
+msgstr "पेड़ / बाधा"
+
+#: analytics/templates/analytics/regional_dashboard.html:524
+msgid "Stray Animals"
+msgstr "आवारा पशु"
+
+#: analytics/templates/analytics/regional_dashboard.html:532
+msgid "Personal Sub-Categories"
+msgstr "व्यक्तिगत उप-श्रेणियाँ"
+
+#: analytics/templates/analytics/regional_dashboard.html:536
+#: grievances/templates/grievances/log_complaint.html:200
+#: grievances/templates/grievances/log_complaint.html:202
+#: staff/templates/staff/grievance_management.html:563
+msgid "Family Dispute"
+msgstr "पारिवारिक विवाद"
+
+#: analytics/templates/analytics/regional_dashboard.html:537
+#: grievances/templates/grievances/log_complaint.html:205
+#: grievances/templates/grievances/log_complaint.html:207
+#: staff/templates/staff/grievance_management.html:564
+msgid "Property Dispute"
+msgstr "संपत्ति विवाद"
+
+#: analytics/templates/analytics/regional_dashboard.html:538
+msgid "Neighbour Water"
+msgstr "पड़ोसी जल विवाद"
+
+#: analytics/templates/analytics/regional_dashboard.html:539
+#: grievances/templates/grievances/log_complaint.html:215
+#: grievances/templates/grievances/log_complaint.html:217
+#: staff/templates/staff/grievance_management.html:566
+msgid "Noise Complaint"
+msgstr "शोर की शिकायत"
+
+#: analytics/templates/analytics/regional_dashboard.html:540
+#: grievances/templates/grievances/log_complaint.html:220
+#: grievances/templates/grievances/log_complaint.html:222
+#: staff/templates/staff/grievance_management.html:567
+msgid "Housing & Shelter"
+msgstr "आवास और शरण"
+
+#: analytics/templates/analytics/regional_dashboard.html:541
+#: analytics/templates/analytics/regional_dashboard.html:669
+msgid "Employment"
+msgstr "रोज़गार"
+
+#: analytics/templates/analytics/regional_dashboard.html:542
+msgid "Document Delay"
+msgstr "दस्तावेज़ विलंब"
+
+#: analytics/templates/analytics/regional_dashboard.html:543
+#: grievances/templates/grievances/log_complaint.html:235
+#: grievances/templates/grievances/log_complaint.html:237
+#: staff/templates/staff/grievance_management.html:570
+msgid "Financial Fraud"
+msgstr "वित्तीय धोखाधड़ी"
+
+#: analytics/templates/analytics/regional_dashboard.html:553
+msgid "Monthly Resolution Trend"
+msgstr "मासिक समाधान प्रवृत्ति"
+
+#: analytics/templates/analytics/regional_dashboard.html:554
+msgid "Last 6 months"
+msgstr "पिछले ६ महीने"
+
+#: analytics/templates/analytics/regional_dashboard.html:562
+msgid "Top Complaint Categories"
+msgstr "शीर्ष शिकायत श्रेणियाँ"
+
+#: analytics/templates/analytics/regional_dashboard.html:623
+msgid "Citizen Satisfaction Scores"
+msgstr "नागरिक संतुष्टि स्कोर"
+
+#: analytics/templates/analytics/regional_dashboard.html:627
+msgid "Overall"
+msgstr "कुल मिलाकर"
+
+#: analytics/templates/analytics/regional_dashboard.html:631
+msgid "Speed"
+msgstr "गति"
+
+#: analytics/templates/analytics/regional_dashboard.html:635
+msgid "Staff"
+msgstr "कर्मचारी"
+
+#: analytics/templates/analytics/regional_dashboard.html:648
+#: grievances/templates/grievances/log_complaint.html:89
+#: grievances/templates/grievances/log_complaint.html:377
+#: staff/templates/staff/grievance_management.html:114
+#: staff/templates/staff/grievance_management.html:544
+msgid "Government Services"
+msgstr "सरकारी सेवाएं"
+
+#: analytics/templates/analytics/regional_dashboard.html:649
+#: grievances/templates/grievances/log_complaint.html:98
+#: grievances/templates/grievances/log_complaint.html:378
+#: staff/templates/staff/grievance_management.html:115
+#: staff/templates/staff/grievance_management.html:545
+msgid "Personal Issues"
+msgstr "व्यक्तिगत समस्याएं"
+
+#: analytics/templates/analytics/regional_dashboard.html:651
+msgid "Ticket Count"
+msgstr "टिकट संख्या"
+
+#: analytics/templates/analytics/regional_dashboard.html:652
+msgid "total"
+msgstr "कुल"
+
+#: analytics/templates/analytics/regional_dashboard.html:655
+msgid "New Complaints"
+msgstr "नई शिकायतें"
+
+#: analytics/templates/analytics/regional_dashboard.html:656
+msgid "Roads"
+msgstr "सड़कें"
+
+#: analytics/templates/analytics/regional_dashboard.html:657
+msgid "Water"
+msgstr "पानी"
+
+#: analytics/templates/analytics/regional_dashboard.html:658
+msgid "Electric"
+msgstr "बिजली"
+
+#: analytics/templates/analytics/regional_dashboard.html:660
+#: analytics/templates/analytics/regional_dashboard.html:665
+msgid "Property"
+msgstr "संपत्ति"
+
+#: analytics/templates/analytics/regional_dashboard.html:662
+msgid "Tree"
+msgstr "पेड़"
+
+#: analytics/templates/analytics/regional_dashboard.html:663
+msgid "Animals"
+msgstr "जानवर"
+
+#: analytics/templates/analytics/regional_dashboard.html:664
+msgid "Family"
+msgstr "परिवार"
+
+#: analytics/templates/analytics/regional_dashboard.html:666
+msgid "Neighbour"
+msgstr "पड़ोसी"
+
+#: analytics/templates/analytics/regional_dashboard.html:667
+msgid "Noise"
+msgstr "शोर"
+
+#: analytics/templates/analytics/regional_dashboard.html:668
+msgid "Housing"
+msgstr "आवास"
+
+#: analytics/templates/analytics/regional_dashboard.html:670
+msgid "Docs"
+msgstr "दस्तावेज़"
+
+#: analytics/templates/analytics/regional_dashboard.html:671
+msgid "Fraud"
+msgstr "धोखाधड़ी"
 
 #: grievances/templates/grievances/log_complaint.html:9
 msgid "GramSmart — Log a Complaint"
@@ -48,37 +564,15 @@ msgstr "यह किस प्रकार की शिकायत है?"
 msgid "Select the main category that best describes your issue."
 msgstr "वह मुख्य श्रेणी चुनें जो आपकी समस्या का सबसे अच्छा वर्णन करती हो।"
 
-#: grievances/templates/grievances/log_complaint.html:89
-#: grievances/templates/grievances/log_complaint.html:377
-#: staff/templates/staff/grievance_management.html:114
-#: staff/templates/staff/grievance_management.html:544
-msgid "Government Services"
-msgstr "सरकारी सेवाएं"
-
 #: grievances/templates/grievances/log_complaint.html:90
 msgid ""
 "Roads, water, electricity, sanitation and other public infrastructure issues"
 msgstr "सड़कें, पानी, बिजली, स्वच्छता और अन्य सार्वजनिक अवसंरचना संबंधी समस्याएं"
 
-#: grievances/templates/grievances/log_complaint.html:98
-#: grievances/templates/grievances/log_complaint.html:378
-#: staff/templates/staff/grievance_management.html:115
-#: staff/templates/staff/grievance_management.html:545
-msgid "Personal Issues"
-msgstr "व्यक्तिगत समस्याएं"
-
 #: grievances/templates/grievances/log_complaint.html:99
 msgid ""
 "Family disputes, property issues, noise complaints and personal grievances"
 msgstr "पारिवारिक विवाद, संपत्ति की समस्याएं, शोर की शिकायतें और व्यक्तिगत शिकायतें"
-
-#: grievances/templates/grievances/log_complaint.html:107
-#: grievances/templates/grievances/log_complaint.html:379
-#: staff/templates/staff/grievance_management.html:116
-#: staff/templates/staff/grievance_management.html:331
-#: staff/templates/staff/grievance_management.html:546
-msgid "Other"
-msgstr "अन्य"
 
 #: grievances/templates/grievances/log_complaint.html:108
 msgid "Any other issue not covered by the above categories"
@@ -105,12 +599,6 @@ msgstr "विशिष्ट समस्या चुनें:"
 #: grievances/templates/grievances/log_complaint.html:128
 msgid "Tap a card to select the issue type."
 msgstr "समस्या का प्रकार चुनने के लिए कार्ड पर टैप करें।"
-
-#: grievances/templates/grievances/log_complaint.html:134
-#: grievances/templates/grievances/log_complaint.html:136
-#: staff/templates/staff/grievance_management.html:551
-msgid "Roads & Potholes"
-msgstr "सड़कें और गड्ढे"
 
 #: grievances/templates/grievances/log_complaint.html:139
 #: grievances/templates/grievances/log_complaint.html:141
@@ -184,35 +672,11 @@ msgstr "सार्वजनिक परिवहन समस्याएं"
 msgid "Public Transport"
 msgstr "सार्वजनिक परिवहन"
 
-#: grievances/templates/grievances/log_complaint.html:200
-#: grievances/templates/grievances/log_complaint.html:202
-#: staff/templates/staff/grievance_management.html:563
-msgid "Family Dispute"
-msgstr "पारिवारिक विवाद"
-
-#: grievances/templates/grievances/log_complaint.html:205
-#: grievances/templates/grievances/log_complaint.html:207
-#: staff/templates/staff/grievance_management.html:564
-msgid "Property Dispute"
-msgstr "संपत्ति विवाद"
-
 #: grievances/templates/grievances/log_complaint.html:210
 #: grievances/templates/grievances/log_complaint.html:212
 #: staff/templates/staff/grievance_management.html:565
 msgid "Neighbour Water Issue"
 msgstr "पड़ोसी जल समस्या"
-
-#: grievances/templates/grievances/log_complaint.html:215
-#: grievances/templates/grievances/log_complaint.html:217
-#: staff/templates/staff/grievance_management.html:566
-msgid "Noise Complaint"
-msgstr "शोर की शिकायत"
-
-#: grievances/templates/grievances/log_complaint.html:220
-#: grievances/templates/grievances/log_complaint.html:222
-#: staff/templates/staff/grievance_management.html:567
-msgid "Housing & Shelter"
-msgstr "आवास और शरण"
 
 #: grievances/templates/grievances/log_complaint.html:225
 #: grievances/templates/grievances/log_complaint.html:227
@@ -225,12 +689,6 @@ msgstr "रोजगार समस्या"
 #: staff/templates/staff/grievance_management.html:569
 msgid "Document & Certificate Delay"
 msgstr "दस्तावेज़ और प्रमाणपत्र में देरी"
-
-#: grievances/templates/grievances/log_complaint.html:235
-#: grievances/templates/grievances/log_complaint.html:237
-#: staff/templates/staff/grievance_management.html:570
-msgid "Financial Fraud"
-msgstr "वित्तीय धोखाधड़ी"
 
 #: grievances/templates/grievances/log_complaint.html:244
 #: grievances/templates/grievances/log_complaint.html:256
@@ -391,13 +849,6 @@ msgstr "मध्यम"
 msgid "Low"
 msgstr "निम्न"
 
-#: staff/templates/staff/grievance_management.html:79
-#: staff/templates/staff/grievance_management.html:98
-#: staff/templates/staff/grievance_management.html:394
-#: staff/templates/staff/grievance_management.html:405
-msgid "Resolved"
-msgstr "हल हो गया"
-
 #: staff/templates/staff/grievance_management.html:91
 msgid "Search complaints, subjects..."
 msgstr "शिकायतें, विषय खोजें..."
@@ -405,15 +856,6 @@ msgstr "शिकायतें, विषय खोजें..."
 #: staff/templates/staff/grievance_management.html:95
 msgid "All Status"
 msgstr "सभी स्थिति"
-
-#: staff/templates/staff/grievance_management.html:96
-#: staff/templates/staff/grievance_management.html:178
-#: staff/templates/staff/grievance_management.html:211
-#: staff/templates/staff/grievance_management.html:277
-#: staff/templates/staff/grievance_management.html:309
-#: staff/templates/staff/grievance_management.html:373
-msgid "Open"
-msgstr "खुला"
 
 #: staff/templates/staff/grievance_management.html:97
 #: staff/templates/staff/grievance_management.html:244
@@ -449,14 +891,6 @@ msgstr "आपके फ़िल्टर से कोई शिकायत �
 #: staff/templates/staff/grievance_management.html:143
 msgid "Try adjusting or clearing the filters"
 msgstr "फ़िल्टर समायोजित करें या साफ़ करें"
-
-#: staff/templates/staff/grievance_management.html:166
-#: staff/templates/staff/grievance_management.html:200
-#: staff/templates/staff/grievance_management.html:266
-#: staff/templates/staff/grievance_management.html:363
-#: staff/templates/staff/grievance_management.html:395
-msgid "Government"
-msgstr "सरकारी"
 
 #: staff/templates/staff/grievance_management.html:168
 #: staff/templates/staff/grievance_management.html:202
@@ -506,11 +940,6 @@ msgstr "स्वचालित"
 #: staff/templates/staff/grievance_management.html:406
 msgid "View Details →"
 msgstr "विवरण देखें →"
-
-#: staff/templates/staff/grievance_management.html:233
-#: staff/templates/staff/grievance_management.html:299
-msgid "Personal"
-msgstr "व्यक्तिगत"
 
 #: staff/templates/staff/grievance_management.html:422
 msgid "Complaint Title"
