@@ -555,11 +555,11 @@
 
   <!-- GS-211: AJAX Submission (preserved from Vaishnavi) -->
   <script>
-  document.querySelector('form').addEventListener('submit', function (e) {
+  document.getElementById('complaint-form').addEventListener('submit', function (e) {
     e.preventDefault();
     e.stopPropagation();
 
-    const form = document.querySelector('form');
+    const form = document.getElementById('complaint-form');
     const submitBtn = form.querySelector('button[type="submit"]');
 
     const existing = document.getElementById('submission-message');
@@ -570,6 +570,9 @@
     formData.append('description', form.querySelector('[name="description"]').value);
     formData.append('latitude', document.getElementById('latitude').value);
     formData.append('longitude', document.getElementById('longitude').value);
+    formData.append('main_category', document.getElementById('main_category').value);
+    formData.append('sub_category', document.getElementById('sub_category').value);
+    formData.append('complaint_subject', document.getElementById('complaint_subject_hidden').value);
 
     const mediaInput = form.querySelector('[name="media"]');
     if (mediaInput && mediaInput.files.length > 0) {
