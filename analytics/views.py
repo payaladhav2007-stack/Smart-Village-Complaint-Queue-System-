@@ -41,7 +41,7 @@ class AnalyticsSummaryView(APIView):
         backlog_by_category = list(
             Complaint.objects.filter(
                 status__in=['pending', 'in_progress']
-            ).values('category').annotate(
+            ).values('main_category').annotate(
                 count=Count('id')
             ).order_by('-count')
         )
