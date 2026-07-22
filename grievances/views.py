@@ -30,7 +30,7 @@ class ListComplaintsView(ListAPIView):
         user = self.request.user
         role = getattr(user, 'role', 'citizen')
 
-        if role in ['admin', 'staff']:
+        if role in ['sarpanch', 'staff']:
             queryset = Complaint.objects.all()
         else:
             queryset = Complaint.objects.filter(user=user)
