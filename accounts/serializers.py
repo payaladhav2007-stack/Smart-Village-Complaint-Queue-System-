@@ -141,3 +141,27 @@ class SarpanchRegistrationSerializer(BaseRoleRegistrationSerializer):
             role='sarpanch',
             approval_status='pending',
         )
+
+
+# ---------------------------------------------------------------------
+# GS-REG-104: Read-only serializers for cascading location dropdowns
+# ---------------------------------------------------------------------
+from .models import District, Taluka, VillageCity
+
+
+class DistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = ['id', 'name', 'lgd_code']
+
+
+class TalukaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Taluka
+        fields = ['id', 'name', 'lgd_code', 'district_id']
+
+
+class VillageCitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VillageCity
+        fields = ['id', 'name', 'lgd_code', 'taluka_id']
