@@ -14,6 +14,7 @@ urlpatterns = [
     path('', health_check),
     path('i18n/', include('django.conf.urls.i18n')),
     path('api/auth/', include('accounts.urls')),
+    path('api/accounts/', include('accounts.urls')),
     path('grievances/', include('grievances.urls')),
     path('api/grievances/', include('grievances.urls')),
     path('appointments/', include('appointments.urls')),
