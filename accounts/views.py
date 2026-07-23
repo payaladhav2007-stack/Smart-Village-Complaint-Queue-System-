@@ -5,6 +5,8 @@ from rest_framework import status
 from django.contrib.auth import login, logout
 from rest_framework.permissions import AllowAny
 from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import CitizenRegistrationSerializer, StaffRegistrationSerializer, SarpanchRegistrationSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -59,3 +61,72 @@ def register_page(request):
 
 def login_page(request):
     return render(request, 'accounts/login.html')
+
+
+# ---------------------------------------------------------------------
+# GS-REG-103: Role-specific registration views
+# ---------------------------------------------------------------------
+class CitizenRegistrationView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = CitizenRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                "success": True,
+                "message": "Registration successful. You can log in now.",
+                "approval_status": user.approval_status,
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "role": user.role,
+                    "village_city": user.village_city_id,
+                }
+            }, status=status.HTTP_201_CREATED)
+        return Response({"success": False, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StaffRegistrationView(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        serializer = StaffRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                "success": True,
+                "message": "Registration submitted. Awaiting Sarpanch approval.",
+                "approval_status": user.approval_status,
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "role": user.role,
+                    "village_city": user.village_city_id,
+                    "supervisor": user.supervisor_id,
+                }
+            }, status=status.HTTP_201_CREATED)
+        return Response({"success": False, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SarpanchRegistrationView(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        serializer = SarpanchRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                "success": True,
+                "message": "Registration submitted. Awaiting Django Admin approval.",
+                "approval_status": user.approval_status,
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "role": user.role,
+                    "village_city": user.village_city_id,
+                }
+            }, status=status.HTTP_201_CREATED)
+        return Response({"success": False, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
