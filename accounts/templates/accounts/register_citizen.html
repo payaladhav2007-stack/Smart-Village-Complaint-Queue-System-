@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Citizen Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-gray-100 min-h-screen flex items-center justify-center px-4 py-10">
+
+  <div class="bg-white w-full max-w-lg rounded-3xl shadow-xl p-6 sm:p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <span class="text-2xl">👤</span>
+      </div>
+      <h1 class="text-xl font-bold text-gray-800">Citizen Registration</h1>
+      <p class="text-sm text-gray-500 mt-1">Create your account instantly — no approval needed</p>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="bg-purple-50 border border-purple-200 rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
+      <span class="text-purple-600 text-lg">✅</span>
+      <p class="text-xs text-purple-700 font-medium">Your account will be active immediately after registration.</p>
+    </div>
+
+    <!-- Form -->
+    <form id="citizen-form" class="space-y-4">
+
+      <!-- Full Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+        <input type="text" id="full_name" placeholder="Enter your full name" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      </div>
+
+      <!-- Username -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Username <span class="text-red-500">*</span></label>
+        <input type="text" id="username" placeholder="Choose a username" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input type="email" id="email" placeholder="your@email.com"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      </div>
+
+      <!-- Phone Number -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number <span class="text-red-500">*</span></label>
+        <input type="tel" id="phone_number" placeholder="10-digit mobile number" maxlength="15" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      </div>
+
+      <!-- Ward Number (optional) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Ward Number <span class="text-xs text-gray-400">(Optional)</span></label>
+        <input type="text" id="ward_number" placeholder="e.g. W-04"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      </div>
+
+      <!-- Location Cascade -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+        <select id="state-select" disabled
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option value="">Maharashtra</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">District <span class="text-red-500">*</span></label>
+        <select id="district-select" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option value="">-- Select District --</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Taluka <span class="text-red-500">*</span></label>
+        <select id="taluka-select" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option value="">-- Select Taluka --</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Village / City <span class="text-red-500">*</span></label>
+        <select id="village-select" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option value="">-- Select Village/City --</option>
+        </select>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+        <input type="password" id="password" placeholder="Minimum 6 characters" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password <span class="text-red-500">*</span></label>
+        <input type="password" id="confirm_password" placeholder="Re-enter password" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      </div>
+
+      <!-- Error / Success Message -->
+      <div id="form-message" class="hidden"></div>
+
+      <!-- Submit -->
+      <button type="submit" id="submit-btn"
+        class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-2xl text-sm transition duration-200 mt-2">
+        Register as Citizen
+      </button>
+
+    </form>
+
+    <p class="text-center text-sm text-gray-500 mt-6">
+      Already registered? <a href="/api/auth/login-page/" class="text-purple-600 font-semibold hover:underline">Log In</a>
+    </p>
+    <p class="text-center text-xs text-gray-400 mt-2">
+      <a href="/api/auth/register-landing/" class="hover:underline">← Back to category selection</a>
+    </p>
+    <p class="text-center text-xs text-gray-400 mt-4">GramSmart — Unified Rural Governance Platform</p>
+
+  </div>
+
+  <script>
+    // Load districts on page load
+    fetch('/api/locations/districts/')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var sel = document.getElementById('district-select');
+        data.forEach(function(d) {
+          var opt = document.createElement('option');
+          opt.value = d.id;
+          opt.textContent = d.name;
+          sel.appendChild(opt);
+        });
+      });
+
+    // Load talukas when district changes
+    document.getElementById('district-select').addEventListener('change', function() {
+      var distId = this.value;
+      var talukaSel = document.getElementById('taluka-select');
+      var villageSel = document.getElementById('village-select');
+      talukaSel.innerHTML = '<option value="">-- Select Taluka --</option>';
+      villageSel.innerHTML = '<option value="">-- Select Village/City --</option>';
+      if (!distId) return;
+      fetch('/api/locations/talukas/?district_id=' + distId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          data.forEach(function(t) {
+            var opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = t.name;
+            talukaSel.appendChild(opt);
+          });
+        });
+    });
+
+    // Load villages when taluka changes
+    document.getElementById('taluka-select').addEventListener('change', function() {
+      var distId = document.getElementById('district-select').value;
+      var talukaId = this.value;
+      var villageSel = document.getElementById('village-select');
+      villageSel.innerHTML = '<option value="">-- Select Village/City --</option>';
+      if (!talukaId) return;
+      fetch('/api/locations/villages/?district_id=' + distId + '&taluka_id=' + talukaId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          data.forEach(function(v) {
+            var opt = document.createElement('option');
+            opt.value = v.id;
+            opt.textContent = v.name;
+            villageSel.appendChild(opt);
+          });
+        });
+    });
+
+    // Form submission
+    document.getElementById('citizen-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var password = document.getElementById('password').value;
+      var confirm = document.getElementById('confirm_password').value;
+      var msgEl = document.getElementById('form-message');
+
+      if (password !== confirm) {
+        msgEl.className = 'text-red-500 text-sm text-center mt-2 p-3 bg-red-50 rounded-xl border border-red-200';
+        msgEl.textContent = '⚠ Passwords do not match.';
+        msgEl.classList.remove('hidden');
+        return;
+      }
+
+      var btn = document.getElementById('submit-btn');
+      btn.textContent = 'Registering...';
+      btn.disabled = true;
+
+      var formData = new FormData();
+      formData.append('username', document.getElementById('username').value);
+      formData.append('email', document.getElementById('email').value);
+      formData.append('phone_number', document.getElementById('phone_number').value);
+      formData.append('ward_number', document.getElementById('ward_number').value);
+      formData.append('village_city', document.getElementById('village-select').value);
+      formData.append('password', password);
+
+      fetch('/api/auth/register/citizen/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData,
+        credentials: 'same-origin'
+      })
+      .then(function(r) { return r.json().then(function(d) { return {status: r.status, data: d}; }); })
+      .then(function(result) {
+        btn.textContent = 'Register as Citizen';
+        btn.disabled = false;
+        if (result.status === 201) {
+          msgEl.className = 'text-green-600 text-sm text-center mt-2 p-3 bg-green-50 rounded-xl border border-green-200';
+          msgEl.textContent = '✅ Registration successful! Your account is now active. You can log in.';
+          msgEl.classList.remove('hidden');
+          document.getElementById('citizen-form').reset();
+        } else {
+          var err = result.data.detail || result.data.username || result.data.phone_number || 'Registration failed. Please check your details.';
+          msgEl.className = 'text-red-500 text-sm text-center mt-2 p-3 bg-red-50 rounded-xl border border-red-200';
+          msgEl.textContent = '⚠ ' + (Array.isArray(err) ? err[0] : err);
+          msgEl.classList.remove('hidden');
+        }
+      })
+      .catch(function() {
+        btn.textContent = 'Register as Citizen';
+        btn.disabled = false;
+        msgEl.className = 'text-red-500 text-sm text-center mt-2 p-3 bg-red-50 rounded-xl border border-red-200';
+        msgEl.textContent = '⚠ Network error. Please try again.';
+        msgEl.classList.remove('hidden');
+      });
+    });
+  </script>
+
+</body>
+</html>

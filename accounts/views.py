@@ -175,3 +175,15 @@ class VillageCityListView(APIView):
             taluka__district_id=district_id
         ).order_by('name')
         return Response(VillageCitySerializer(villages, many=True).data, status=status.HTTP_200_OK)
+def register_landing(request):
+    return render(request, 'accounts/register_landing.html')
+
+def register_citizen_page(request):
+    return render(request, 'accounts/register_citizen.html')
+
+def register_staff_page(request):
+    return render(request, 'accounts/register_staff.html')
+
+def register_sarpanch_page(request):
+    return render(request, 'accounts/register_sarpanch.html')
+    
