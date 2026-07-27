@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
-from .views import RegisterView, LoginView, LogoutView, register_page, login_page
+from .views import RegisterView, LoginView, LogoutView, register_page, login_page, register_landing, register_citizen_page, register_staff_page, register_sarpanch_page
 from .views import CitizenRegistrationView, StaffRegistrationView, SarpanchRegistrationView
 
 urlpatterns = [
@@ -13,4 +13,8 @@ urlpatterns = [
     path('register/citizen/', CitizenRegistrationView.as_view(), name='register-citizen'),
     path('register/staff/', StaffRegistrationView.as_view(), name='register-staff'),
     path('register/sarpanch/', SarpanchRegistrationView.as_view(), name='register-sarpanch'),
+    path('register-landing/', register_landing, name='register-landing'),
+    path('register-citizen-page/', register_citizen_page, name='register-citizen-page'),
+    path('register-staff-page/', register_staff_page, name='register-staff-page'),
+    path('register-sarpanch-page/', register_sarpanch_page, name='register-sarpanch-page'),
 ]

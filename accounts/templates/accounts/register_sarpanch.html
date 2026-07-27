@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Sarpanch Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-yellow-50 to-gray-100 min-h-screen flex items-center justify-center px-4 py-10">
+
+  <div class="bg-white w-full max-w-lg rounded-3xl shadow-xl p-6 sm:p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <span class="text-2xl">👑</span>
+      </div>
+      <h1 class="text-xl font-bold text-gray-800">Sarpanch / Nagarsevak Registration</h1>
+      <p class="text-sm text-gray-500 mt-1">Requires identity document and Django Admin approval</p>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
+      <span class="text-yellow-600 text-lg">🔒</span>
+      <p class="text-xs text-yellow-700 font-medium">After submitting, your registration will be reviewed by the GramSmart administrator through the Django Admin panel before your account is activated.</p>
+    </div>
+
+    <!-- Success Panel (hidden) -->
+    <div id="success-panel" class="hidden text-center py-6">
+      <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-4xl">🔒</span>
+      </div>
+      <h2 class="text-lg font-bold text-gray-800 mb-2">Registration Submitted</h2>
+      <p class="text-sm text-gray-500 mb-2">Your application is now under review.</p>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 text-left">
+        <p class="text-xs text-yellow-700 font-semibold">Awaiting Django Admin Approval</p>
+        <p class="text-xs text-yellow-600 mt-1">A GramSmart administrator will verify your identity document and approve your Sarpanch/Nagarsevak account. You will be notified once the review is complete.</p>
+      </div>
+      <a href="/api/auth/login-page/" class="inline-block mt-4 bg-yellow-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-yellow-700 transition">
+        Go to Login
+      </a>
+    </div>
+
+    <!-- Form -->
+    <form id="sarpanch-form" class="space-y-4">
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+        <input type="text" id="full_name" placeholder="Enter your full name" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Username <span class="text-red-500">*</span></label>
+        <input type="text" id="username" placeholder="Choose a username" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input type="email" id="email" placeholder="your@email.com"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number <span class="text-red-500">*</span></label>
+        <input type="tel" id="phone_number" placeholder="10-digit mobile number" maxlength="15" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Ward Number <span class="text-xs text-gray-400">(Optional)</span></label>
+        <input type="text" id="ward_number" placeholder="e.g. W-04"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+      </div>
+
+      <!-- Location Cascade -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+        <select disabled class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm bg-gray-50">
+          <option>Maharashtra</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">District <span class="text-red-500">*</span></label>
+        <select id="district-select" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <option value="">-- Select District --</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Taluka <span class="text-red-500">*</span></label>
+        <select id="taluka-select" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <option value="">-- Select Taluka --</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Village / City <span class="text-red-500">*</span></label>
+        <select id="village-select" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <option value="">-- Select Village/City --</option>
+        </select>
+      </div>
+
+      <!-- Identity Document -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Identity Document <span class="text-red-500">*</span></label>
+        <div class="w-full border-2 border-dashed border-gray-300 rounded-xl px-4 py-4 text-center hover:border-yellow-400 transition">
+          <input type="file" id="identity_document" accept=".pdf,.jpg,.jpeg,.png" required
+            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-yellow-50 file:text-yellow-700" />
+          <p class="text-xs text-gray-400 mt-2">Accepted: PDF, JPG, PNG — Government-issued ID required</p>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+        <input type="password" id="password" placeholder="Minimum 6 characters" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password <span class="text-red-500">*</span></label>
+        <input type="password" id="confirm_password" placeholder="Re-enter password" required
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+      </div>
+
+      <div id="form-message" class="hidden"></div>
+
+      <button type="submit" id="submit-btn"
+        class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 rounded-2xl text-sm transition duration-200 mt-2">
+        Submit Sarpanch Registration
+      </button>
+
+    </form>
+
+    <p class="text-center text-xs text-gray-400 mt-4">
+      <a href="/api/auth/register-landing/" class="hover:underline">← Back to category selection</a>
+    </p>
+    <p class="text-center text-xs text-gray-400 mt-2">GramSmart — Unified Rural Governance Platform</p>
+
+  </div>
+
+  <script>
+    fetch('/api/locations/districts/')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var sel = document.getElementById('district-select');
+        data.forEach(function(d) {
+          var opt = document.createElement('option');
+          opt.value = d.id; opt.textContent = d.name;
+          sel.appendChild(opt);
+        });
+      });
+
+    document.getElementById('district-select').addEventListener('change', function() {
+      var distId = this.value;
+      var t = document.getElementById('taluka-select');
+      var v = document.getElementById('village-select');
+      t.innerHTML = '<option value="">-- Select Taluka --</option>';
+      v.innerHTML = '<option value="">-- Select Village/City --</option>';
+      if (!distId) return;
+      fetch('/api/locations/talukas/?district_id=' + distId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          data.forEach(function(item) {
+            var opt = document.createElement('option');
+            opt.value = item.id; opt.textContent = item.name;
+            t.appendChild(opt);
+          });
+        });
+    });
+
+    document.getElementById('taluka-select').addEventListener('change', function() {
+      var distId = document.getElementById('district-select').value;
+      var talukaId = this.value;
+      var v = document.getElementById('village-select');
+      v.innerHTML = '<option value="">-- Select Village/City --</option>';
+      if (!talukaId) return;
+      fetch('/api/locations/villages/?district_id=' + distId + '&taluka_id=' + talukaId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          data.forEach(function(item) {
+            var opt = document.createElement('option');
+            opt.value = item.id; opt.textContent = item.name;
+            v.appendChild(opt);
+          });
+        });
+    });
+
+    document.getElementById('sarpanch-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var password = document.getElementById('password').value;
+      var confirm = document.getElementById('confirm_password').value;
+      var msgEl = document.getElementById('form-message');
+
+      if (password !== confirm) {
+        msgEl.className = 'text-red-500 text-sm text-center mt-2 p-3 bg-red-50 rounded-xl border border-red-200';
+        msgEl.textContent = '⚠ Passwords do not match.';
+        msgEl.classList.remove('hidden');
+        return;
+      }
+
+      var btn = document.getElementById('submit-btn');
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
+
+      var formData = new FormData();
+      formData.append('username', document.getElementById('username').value);
+      formData.append('email', document.getElementById('email').value);
+      formData.append('phone_number', document.getElementById('phone_number').value);
+      formData.append('ward_number', document.getElementById('ward_number').value);
+      formData.append('village_city', document.getElementById('village-select').value);
+      formData.append('password', password);
+      var docFile = document.getElementById('identity_document').files[0];
+      if (docFile) formData.append('identity_document', docFile);
+
+      fetch('/api/auth/register/sarpanch/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        body: formData,
+        credentials: 'same-origin'
+      })
+      .then(function(r) { return r.json().then(function(d) { return {status: r.status, data: d}; }); })
+      .then(function(result) {
+        btn.textContent = 'Submit Sarpanch Registration';
+        btn.disabled = false;
+        if (result.status === 201) {
+          document.getElementById('sarpanch-form').classList.add('hidden');
+          document.getElementById('success-panel').classList.remove('hidden');
+        } else {
+          var err = result.data.detail || result.data.username || result.data.phone_number || 'Registration failed.';
+          msgEl.className = 'text-red-500 text-sm text-center mt-2 p-3 bg-red-50 rounded-xl border border-red-200';
+          msgEl.textContent = '⚠ ' + (Array.isArray(err) ? err[0] : err);
+          msgEl.classList.remove('hidden');
+        }
+      })
+      .catch(function() {
+        btn.textContent = 'Submit Sarpanch Registration';
+        btn.disabled = false;
+        msgEl.className = 'text-red-500 text-sm text-center mt-2 p-3 bg-red-50 rounded-xl border border-red-200';
+        msgEl.textContent = '⚠ Network error. Please try again.';
+        msgEl.classList.remove('hidden');
+      });
+    });
+  </script>
+
+</body>
+</html>
