@@ -3,11 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import login, logout
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RegisterSerializer, LoginSerializer
 from .serializers import CitizenRegistrationSerializer, StaffRegistrationSerializer, SarpanchRegistrationSerializer
 from .serializers import DistrictSerializer, TalukaSerializer, VillageCitySerializer
 from .models import District, Taluka, VillageCity
+from .models import User
+from .serializers import PendingStaffSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 
 class RegisterView(APIView):
@@ -187,3 +189,72 @@ def register_staff_page(request):
 def register_sarpanch_page(request):
     return render(request, 'accounts/register_sarpanch.html')
     
+
+# ---------------------------------------------------------------------
+# GS-REG-107: Sarpanch dashboard — approve/reject pending Staff
+# ---------------------------------------------------------------------
+class PendingStaffListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.role != 'sarpanch':
+            return Response({"error": "Only Sarpanch/Nagarsevak accounts can access this."}, status=status.HTTP_403_FORBIDDEN)
+
+        pending_staff = User.objects.filter(
+            role='staff',
+            approval_status='pending',
+            village_city=user.village_city
+        ).order_by('username')
+
+        serializer = PendingStaffSerializer(pending_staff, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ApproveStaffView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        sarpanch = request.user
+        if sarpanch.role != 'sarpanch':
+            return Response({"error": "Only Sarpanch/Nagarsevak accounts can approve Staff."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            staff_user = User.objects.get(id=user_id, role='staff', village_city=sarpanch.village_city)
+        except User.DoesNotExist:
+            return Response({"error": "Staff registration not found in your area."}, status=status.HTTP_404_NOT_FOUND)
+
+        staff_user.approval_status = 'approved'
+        staff_user.approved_by = sarpanch
+        staff_user.supervisor = sarpanch
+        staff_user.save(update_fields=['approval_status', 'approved_by', 'supervisor'])
+
+        return Response({
+            "success": True,
+            "message": f"{staff_user.username} approved successfully.",
+            "approval_status": staff_user.approval_status
+        }, status=status.HTTP_200_OK)
+
+
+class RejectStaffView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        sarpanch = request.user
+        if sarpanch.role != 'sarpanch':
+            return Response({"error": "Only Sarpanch/Nagarsevak accounts can reject Staff."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            staff_user = User.objects.get(id=user_id, role='staff', village_city=sarpanch.village_city)
+        except User.DoesNotExist:
+            return Response({"error": "Staff registration not found in your area."}, status=status.HTTP_404_NOT_FOUND)
+
+        staff_user.approval_status = 'rejected'
+        staff_user.approved_by = sarpanch
+        staff_user.save(update_fields=['approval_status', 'approved_by'])
+
+        return Response({
+            "success": True,
+            "message": f"{staff_user.username} rejected.",
+            "approval_status": staff_user.approval_status
+        }, status=status.HTTP_200_OK)
