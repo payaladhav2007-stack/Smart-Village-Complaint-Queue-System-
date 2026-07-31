@@ -3,11 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import login, logout
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RegisterSerializer, LoginSerializer
 from .serializers import CitizenRegistrationSerializer, StaffRegistrationSerializer, SarpanchRegistrationSerializer
 from .serializers import DistrictSerializer, TalukaSerializer, VillageCitySerializer
 from .models import District, Taluka, VillageCity
+from .models import User
+from .serializers import PendingStaffSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 
 class RegisterView(APIView):
@@ -195,11 +197,6 @@ from django.utils import timezone
 from sms_auth.models import SmsOtp
 
 class SarpanchPasswordCheckView(APIView):
-    """
-    Step 1 of Sarpanch login — verify username + password.
-    If valid and role == sarpanch, generate and send OTP.
-    Staff and Citizens are rejected here (they use the standard LoginView).
-    """
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -239,7 +236,6 @@ class SarpanchPasswordCheckView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Generate 6-digit OTP valid for 7 minutes
         otp_code = str(random.randint(100000, 999999))
         SmsOtp.objects.create(
             phone_number=user.phone_number,
@@ -247,22 +243,17 @@ class SarpanchPasswordCheckView(APIView):
             expires_at=timezone.now() + timedelta(minutes=7),
         )
 
-        # In production this would send via SMS/Email
-        # For development, print to console so you can test
         print(f"[GS-REG-108] OTP for Sarpanch {username} ({user.phone_number}): {otp_code}")
 
         return Response({
             'success': True,
             'message': 'OTP sent to your registered mobile number.',
-            'phone_number': user.phone_number[:4] + '******',  # masked
+            'phone_number': user.phone_number[:4] + '******',
             'username': username,
         }, status=status.HTTP_200_OK)
 
 
 class SarpanchOTPVerifyView(APIView):
-    """
-    Step 2 of Sarpanch login — verify OTP and establish session.
-    """
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -292,7 +283,6 @@ class SarpanchOTPVerifyView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Find the most recent unused OTP for this phone number
         otp = SmsOtp.objects.filter(
             phone_number=user.phone_number,
             is_used=False
@@ -304,11 +294,9 @@ class SarpanchOTPVerifyView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Mark OTP as used
         otp.is_used = True
         otp.save()
 
-        # Establish Django session
         login(request, user)
 
         return Response({
@@ -326,9 +314,6 @@ class SarpanchOTPVerifyView(APIView):
 
 
 class SarpanchOTPResendView(APIView):
-    """
-    Resend OTP for Sarpanch login — generates a fresh code.
-    """
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -357,13 +342,11 @@ class SarpanchOTPResendView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Invalidate all previous unused OTPs for this number
         SmsOtp.objects.filter(
             phone_number=user.phone_number,
             is_used=False
         ).update(is_used=True)
 
-        # Generate fresh OTP
         otp_code = str(random.randint(100000, 999999))
         SmsOtp.objects.create(
             phone_number=user.phone_number,
@@ -381,4 +364,73 @@ class SarpanchOTPResendView(APIView):
 
 def sarpanch_login_page(request):
     return render(request, 'accounts/sarpanch_login.html')
-    
+
+
+# ---------------------------------------------------------------------
+# GS-REG-107: Sarpanch dashboard — approve/reject pending Staff
+# ---------------------------------------------------------------------
+class PendingStaffListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.role != 'sarpanch':
+            return Response({"error": "Only Sarpanch/Nagarsevak accounts can access this."}, status=status.HTTP_403_FORBIDDEN)
+
+        pending_staff = User.objects.filter(
+            role='staff',
+            approval_status='pending',
+            village_city=user.village_city
+        ).order_by('username')
+
+        serializer = PendingStaffSerializer(pending_staff, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ApproveStaffView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        sarpanch = request.user
+        if sarpanch.role != 'sarpanch':
+            return Response({"error": "Only Sarpanch/Nagarsevak accounts can approve Staff."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            staff_user = User.objects.get(id=user_id, role='staff', village_city=sarpanch.village_city)
+        except User.DoesNotExist:
+            return Response({"error": "Staff registration not found in your area."}, status=status.HTTP_404_NOT_FOUND)
+
+        staff_user.approval_status = 'approved'
+        staff_user.approved_by = sarpanch
+        staff_user.supervisor = sarpanch
+        staff_user.save(update_fields=['approval_status', 'approved_by', 'supervisor'])
+
+        return Response({
+            "success": True,
+            "message": f"{staff_user.username} approved successfully.",
+            "approval_status": staff_user.approval_status
+        }, status=status.HTTP_200_OK)
+
+
+class RejectStaffView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        sarpanch = request.user
+        if sarpanch.role != 'sarpanch':
+            return Response({"error": "Only Sarpanch/Nagarsevak accounts can reject Staff."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            staff_user = User.objects.get(id=user_id, role='staff', village_city=sarpanch.village_city)
+        except User.DoesNotExist:
+            return Response({"error": "Staff registration not found in your area."}, status=status.HTTP_404_NOT_FOUND)
+
+        staff_user.approval_status = 'rejected'
+        staff_user.approved_by = sarpanch
+        staff_user.save(update_fields=['approval_status', 'approved_by'])
+
+        return Response({
+            "success": True,
+            "message": f"{staff_user.username} rejected.",
+            "approval_status": staff_user.approval_status
+        }, status=status.HTTP_200_OK)

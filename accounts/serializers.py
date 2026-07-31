@@ -46,6 +46,18 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid username or password.")
         if not user.is_active:
             raise serializers.ValidationError("This account is inactive.")
+
+        # GS-REG-107: block unapproved/rejected Staff and Sarpanch accounts
+        if user.role in ('staff', 'sarpanch'):
+            if user.approval_status == 'pending':
+                raise serializers.ValidationError(
+                    "Your registration is still awaiting approval. Please check back later."
+                )
+            if user.approval_status == 'rejected':
+                raise serializers.ValidationError(
+                    "Your registration was rejected. Please contact your Sarpanch or the site administrator for details."
+                )
+
         data['user'] = user
         return data
 
@@ -165,3 +177,20 @@ class VillageCitySerializer(serializers.ModelSerializer):
     class Meta:
         model = VillageCity
         fields = ['id', 'name', 'lgd_code', 'taluka_id']
+
+
+# ---------------------------------------------------------------------
+# GS-REG-107: Pending Staff list for Sarpanch approval dashboard
+# ---------------------------------------------------------------------
+class PendingStaffSerializer(serializers.ModelSerializer):
+    identity_document_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'phone_number', 'village_city', 'identity_document_url', 'approval_status']
+
+    def get_identity_document_url(self, obj):
+        request = self.context.get('request')
+        if obj.identity_document and request:
+            return request.build_absolute_uri(obj.identity_document.url)
+        return None
