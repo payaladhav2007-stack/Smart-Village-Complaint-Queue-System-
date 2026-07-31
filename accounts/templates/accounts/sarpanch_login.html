@@ -1,0 +1,347 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Sarpanch Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .step { display: none; }
+    .step.active { display: block; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .shake { animation: shake 0.4s ease; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-yellow-50 to-gray-100 min-h-screen flex items-center justify-center px-4 py-10">
+
+  <div class="bg-white w-full max-w-md rounded-3xl shadow-xl p-6 sm:p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <span class="text-3xl">👑</span>
+      </div>
+      <h1 class="text-xl font-bold text-gray-800">Sarpanch / Nagarsevak Login</h1>
+      <p class="text-sm text-gray-500 mt-1">Two-step secure login with OTP verification</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="flex items-center justify-center gap-3 mb-8">
+      <div class="flex items-center gap-2">
+        <div id="prog-1" class="w-8 h-8 rounded-full bg-yellow-500 text-white text-xs flex items-center justify-center font-bold">1</div>
+        <span class="text-xs text-yellow-600 font-medium">Password</span>
+      </div>
+      <div class="w-8 h-0.5 bg-gray-300"></div>
+      <div class="flex items-center gap-2">
+        <div id="prog-2" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 text-xs flex items-center justify-center font-bold">2</div>
+        <span id="prog-2-label" class="text-xs text-gray-400">OTP</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: Password -->
+    <div class="step active" id="step-1">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Username <span class="text-red-500">*</span></label>
+          <input type="text" id="username" placeholder="Enter your username" required
+            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+          <input type="password" id="password" placeholder="Enter your password" required
+            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+        </div>
+
+        <div id="step1-message" class="hidden"></div>
+
+        <button onclick="submitPassword()" id="password-btn"
+          class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 rounded-2xl text-sm transition duration-200">
+          Continue → Send OTP
+        </button>
+      </div>
+
+      <div class="mt-6 text-center">
+        <p class="text-xs text-gray-400">Staff or Citizen?
+          <a href="/api/auth/login-page/" class="text-green-600 font-medium hover:underline">Use standard login</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- STEP 2: OTP -->
+    <div class="step" id="step-2">
+      <div class="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 mb-5 text-center">
+        <p class="text-xs text-yellow-700 font-medium">A 6-digit OTP has been sent to your registered mobile number.</p>
+        <p class="text-xs text-yellow-600 mt-1" id="phone-display"></p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1 text-center">Enter 6-Digit OTP <span class="text-red-500">*</span></label>
+          <input type="text" id="otp_code" maxlength="6" placeholder="• • • • • •"
+            class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-center text-2xl font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500" />
+        </div>
+
+        <!-- OTP Timer -->
+        <div class="text-center">
+          <p class="text-xs text-gray-500">OTP expires in <span id="timer" class="font-bold text-yellow-600">7:00</span></p>
+        </div>
+
+        <div id="step2-message" class="hidden"></div>
+
+        <button onclick="submitOTP()" id="otp-btn"
+          class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 rounded-2xl text-sm transition duration-200">
+          Verify OTP & Login
+        </button>
+
+        <!-- Resend OTP -->
+        <div class="text-center">
+          <button onclick="resendOTP()" id="resend-btn" disabled
+            class="text-xs text-gray-400 font-medium cursor-not-allowed" id="resend-btn">
+            Resend OTP <span id="resend-countdown">(wait 60s)</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="mt-4 text-center">
+        <button onclick="goBack()" class="text-xs text-green-600 hover:underline">← Back to password</button>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-6">GramSmart — Unified Rural Governance Platform</p>
+
+  </div>
+
+  <script>
+    var currentUsername = '';
+    var otpTimerInterval = null;
+    var resendCountdownInterval = null;
+
+    function showMessage(elId, message, isError) {
+      var el = document.getElementById(elId);
+      el.className = isError
+        ? 'text-red-500 text-sm text-center mt-2 p-3 bg-red-50 rounded-xl border border-red-200'
+        : 'text-green-600 text-sm text-center mt-2 p-3 bg-green-50 rounded-xl border border-green-200';
+      el.textContent = isError ? '⚠ ' + message : '✅ ' + message;
+      el.classList.remove('hidden');
+    }
+
+    function goToStep(stepNum) {
+      document.querySelectorAll('.step').forEach(function(s) {
+        s.classList.remove('active');
+      });
+      document.getElementById('step-' + stepNum).classList.add('active');
+
+      if (stepNum === 2) {
+        document.getElementById('prog-1').className = 'w-8 h-8 rounded-full bg-yellow-500 text-white text-xs flex items-center justify-center font-bold';
+        document.getElementById('prog-1').textContent = '✓';
+        document.getElementById('prog-2').className = 'w-8 h-8 rounded-full bg-yellow-500 text-white text-xs flex items-center justify-center font-bold';
+        document.getElementById('prog-2').textContent = '2';
+        document.getElementById('prog-2-label').className = 'text-xs text-yellow-600 font-medium';
+        startOTPTimer(7 * 60);
+        startResendCountdown(60);
+      }
+    }
+
+    function goBack() {
+      clearInterval(otpTimerInterval);
+      clearInterval(resendCountdownInterval);
+      goToStep(1);
+      document.getElementById('prog-1').className = 'w-8 h-8 rounded-full bg-yellow-500 text-white text-xs flex items-center justify-center font-bold';
+      document.getElementById('prog-1').textContent = '1';
+      document.getElementById('prog-2').className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-500 text-xs flex items-center justify-center font-bold';
+      document.getElementById('prog-2').textContent = '2';
+      document.getElementById('prog-2-label').className = 'text-xs text-gray-400';
+    }
+
+    function startOTPTimer(seconds) {
+      clearInterval(otpTimerInterval);
+      var remaining = seconds;
+      var timerEl = document.getElementById('timer');
+      otpTimerInterval = setInterval(function() {
+        remaining--;
+        var mins = Math.floor(remaining / 60);
+        var secs = remaining % 60;
+        timerEl.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+        if (remaining <= 0) {
+          clearInterval(otpTimerInterval);
+          timerEl.textContent = 'Expired';
+          timerEl.className = 'font-bold text-red-500';
+        }
+      }, 1000);
+    }
+
+    function startResendCountdown(seconds) {
+      clearInterval(resendCountdownInterval);
+      var remaining = seconds;
+      var resendBtn = document.getElementById('resend-btn');
+      var countdownEl = document.getElementById('resend-countdown');
+      resendBtn.disabled = true;
+      resendBtn.className = 'text-xs text-gray-400 font-medium cursor-not-allowed';
+
+      resendCountdownInterval = setInterval(function() {
+        remaining--;
+        countdownEl.textContent = '(wait ' + remaining + 's)';
+        if (remaining <= 0) {
+          clearInterval(resendCountdownInterval);
+          countdownEl.textContent = '';
+          resendBtn.disabled = false;
+          resendBtn.className = 'text-xs text-yellow-600 font-medium hover:underline cursor-pointer';
+        }
+      }, 1000);
+    }
+
+    function submitPassword() {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value.trim();
+      var btn = document.getElementById('password-btn');
+
+      if (!username || !password) {
+        showMessage('step1-message', 'Please enter both username and password.', true);
+        return;
+      }
+
+      btn.textContent = 'Verifying...';
+      btn.disabled = true;
+
+      fetch('/api/auth/sarpanch/password-check/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ username: username, password: password }),
+        credentials: 'same-origin'
+      })
+      .then(function(r) { return r.json().then(function(d) { return {status: r.status, data: d}; }); })
+      .then(function(result) {
+        btn.textContent = 'Continue → Send OTP';
+        btn.disabled = false;
+        if (result.status === 200 && result.data.success) {
+          currentUsername = username;
+          document.getElementById('phone-display').textContent =
+            'Mobile: ' + (result.data.phone_number || '');
+          document.getElementById('step1-message').classList.add('hidden');
+          goToStep(2);
+        } else {
+          showMessage('step1-message', result.data.message || 'Login failed. Please try again.', true);
+          document.getElementById('password').classList.add('shake');
+          setTimeout(function() {
+            document.getElementById('password').classList.remove('shake');
+          }, 400);
+        }
+      })
+      .catch(function() {
+        btn.textContent = 'Continue → Send OTP';
+        btn.disabled = false;
+        showMessage('step1-message', 'Network error. Please try again.', true);
+      });
+    }
+
+    function submitOTP() {
+      var otpCode = document.getElementById('otp_code').value.trim();
+      var btn = document.getElementById('otp-btn');
+
+      if (!otpCode || otpCode.length !== 6) {
+        showMessage('step2-message', 'Please enter the 6-digit OTP.', true);
+        return;
+      }
+
+      btn.textContent = 'Verifying...';
+      btn.disabled = true;
+
+      fetch('/api/auth/sarpanch/verify-otp/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ username: currentUsername, otp_code: otpCode }),
+        credentials: 'same-origin'
+      })
+      .then(function(r) { return r.json().then(function(d) { return {status: r.status, data: d}; }); })
+      .then(function(result) {
+        btn.textContent = 'Verify OTP & Login';
+        btn.disabled = false;
+        if (result.status === 200 && result.data.success) {
+          clearInterval(otpTimerInterval);
+          clearInterval(resendCountdownInterval);
+          // Store role and token in sessionStorage for dashboard routing
+          sessionStorage.setItem('gramsmart_role', result.data.user.role);
+          sessionStorage.setItem('gramsmart_username', result.data.user.username);
+          showMessage('step2-message', 'Login successful! Redirecting...', false);
+          setTimeout(function() {
+            window.location.href = '/staff/workbench/';
+          }, 1000);
+        } else {
+          showMessage('step2-message', result.data.message || 'Invalid OTP. Please try again.', true);
+          document.getElementById('otp_code').classList.add('shake');
+          setTimeout(function() {
+            document.getElementById('otp_code').classList.remove('shake');
+          }, 400);
+        }
+      })
+      .catch(function() {
+        btn.textContent = 'Verify OTP & Login';
+        btn.disabled = false;
+        showMessage('step2-message', 'Network error. Please try again.', true);
+      });
+    }
+
+    function resendOTP() {
+      fetch('/api/auth/sarpanch/resend-otp/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ username: currentUsername }),
+        credentials: 'same-origin'
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          showMessage('step2-message', 'New OTP sent successfully.', false);
+          startOTPTimer(7 * 60);
+          startResendCountdown(60);
+          document.getElementById('otp_code').value = '';
+        } else {
+          showMessage('step2-message', data.message || 'Failed to resend OTP.', true);
+        }
+      })
+      .catch(function() {
+        showMessage('step2-message', 'Network error. Please try again.', true);
+      });
+    }
+
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function(cookie) {
+          var trimmed = cookie.trim();
+          if (trimmed.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
+    }
+
+    // Allow pressing Enter to submit
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var step1 = document.getElementById('step-1');
+        var step2 = document.getElementById('step-2');
+        if (step1.classList.contains('active')) submitPassword();
+        else if (step2.classList.contains('active')) submitOTP();
+      }
+    });
+  </script>
+
+</body>
+</html>
