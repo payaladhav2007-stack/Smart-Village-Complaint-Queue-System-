@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GramSmart — Sarpanch Work Assignment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+  <!-- NAVBAR -->
+  <nav class="bg-white border-b border-gray-200 shadow-sm h-16 flex items-center px-6 justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+        <span class="text-white font-black text-sm">GS</span>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-gray-800">GramSmart</h1>
+        <p class="text-xs text-gray-400">Sarpanch Work Assignment Panel</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-gray-600 font-medium">{{ user.username }}</span>
+      <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">Sarpanch</span>
+      <span class="text-xs text-gray-400">{{ user.village_city }}</span>
+      <a href="/api/auth/logout/" class="text-xs text-red-500 hover:text-red-700 font-medium">Logout</a>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-4 py-8">
+
+    <!-- Summary Pills -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow-sm p-4 text-center border-l-4 border-yellow-400">
+        <p class="text-2xl font-black text-yellow-500">{{ pending_count }}</p>
+        <p class="text-xs text-gray-500 mt-1">Pending</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4 text-center border-l-4 border-blue-500">
+        <p class="text-2xl font-black text-blue-600">{{ in_progress_count }}</p>
+        <p class="text-xs text-gray-500 mt-1">In Progress</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4 text-center border-l-4 border-green-500">
+        <p class="text-2xl font-black text-green-600">{{ completed_count }}</p>
+        <p class="text-xs text-gray-500 mt-1">Completed</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Assign New Task Form -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="text-sm font-bold text-gray-800 mb-4">➕ Assign New Task</h2>
+
+        <form method="POST" action="/api/work/assign/" id="assign-form" class="space-y-4">
+          {% csrf_token %}
+
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Assign To (Staff Member) *</label>
+            <select name="assigned_to" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="" disabled selected>-- Select staff member --</option>
+              {% for staff in staff_list %}
+              <option value="{{ staff.id }}">{{ staff.username }} — {{ staff.phone_number }}</option>
+              {% empty %}
+              <option disabled>No approved staff in your area</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Task Title *</label>
+            <input type="text" name="title" required placeholder="Enter task title"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Description *</label>
+            <textarea name="description" rows="3" required placeholder="Describe the task in detail..."
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Due Date (Optional)</label>
+            <input type="date" name="due_date"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          <button type="submit"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
+            Assign Task ✔
+          </button>
+        </form>
+      </div>
+
+      <!-- Assigned Tasks List -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="text-sm font-bold text-gray-800 mb-4">📋 All Assigned Tasks</h2>
+
+        {% if assignments %}
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+          {% for task in assignments %}
+          <div class="border border-gray-100 rounded-xl p-4 hover:bg-gray-50 transition">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-gray-800">{{ task.title }}</p>
+              {% if task.status == 'pending' %}
+                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">🕐 Pending</span>
+              {% elif task.status == 'in_progress' %}
+                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">🔧 In Progress</span>
+              {% elif task.status == 'completed' %}
+                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">✅ Completed</span>
+              {% endif %}
+            </div>
+            <p class="text-xs text-gray-500 mb-1">{{ task.description|truncatechars:80 }}</p>
+            <div class="flex items-center justify-between text-xs text-gray-400">
+              <span>👤 Assigned to: <strong>{{ task.assigned_to.username }}</strong></span>
+              {% if task.due_date %}<span>📅 Due: {{ task.due_date }}</span>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-10">
+          <p class="text-4xl mb-2">📭</p>
+          <p class="text-sm text-gray-500">No tasks assigned yet.</p>
+          <p class="text-xs text-gray-400 mt-1">Use the form to assign your first task.</p>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

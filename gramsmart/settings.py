@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'feedback',  # ADD THIS
     'analytics',  # ADD THIS
     'sms_auth',
+    'work_assignment',
 ]
 
 MIDDLEWARE = [

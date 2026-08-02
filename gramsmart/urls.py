@@ -27,4 +27,8 @@ urlpatterns = [
     path('api/feedback/submit/', SubmitFeedbackView.as_view(), name='feedback_submit_direct'),
     path('feedback/', include('feedback.urls')),
     path('api/feedback/', include('feedback.urls')),
-    path('analytics/', include('analytics.urls')),] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('analytics/', include('analytics.urls')),
+    path('api/work/', include('work_assignment.urls')),
+    path('work/', include('work_assignment.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
