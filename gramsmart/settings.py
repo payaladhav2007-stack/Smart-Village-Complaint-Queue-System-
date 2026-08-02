@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'analytics',  # ADD THIS
     'sms_auth',
     'work_assignment',
+    'notice_board',
 ]
 
 MIDDLEWARE = [

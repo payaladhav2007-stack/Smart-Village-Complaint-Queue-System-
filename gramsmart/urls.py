@@ -30,5 +30,6 @@ urlpatterns = [
     path('analytics/', include('analytics.urls')),
     path('api/work/', include('work_assignment.urls')),
     path('work/', include('work_assignment.urls')),
+    path('api/notices/', include('notice_board.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     
