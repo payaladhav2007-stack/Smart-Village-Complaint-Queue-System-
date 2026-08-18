@@ -10,6 +10,7 @@ from .serializers import DistrictSerializer, TalukaSerializer, VillageCitySerial
 from .models import District, Taluka, VillageCity
 from .models import User
 from .serializers import PendingStaffSerializer
+from .serializers import StaffOverviewItemSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 
 class RegisterView(APIView):
@@ -434,3 +435,46 @@ class RejectStaffView(APIView):
             "message": f"{staff_user.username} rejected.",
             "approval_status": staff_user.approval_status
         }, status=status.HTTP_200_OK)
+
+# ---------------------------------------------------------------------
+# GS-REG-112: Sarpanch Staff Overview Dashboard
+# ---------------------------------------------------------------------
+class SarpanchStaffOverviewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        sarpanch = request.user
+        if sarpanch.role != 'sarpanch':
+            return Response({"error": "Only Sarpanch/Nagarsevak accounts can access this."}, status=status.HTTP_403_FORBIDDEN)
+
+        base_qs = User.objects.filter(role='staff', village_city=sarpanch.village_city)
+
+        counts = {
+            "total": base_qs.count(),
+            "pending": base_qs.filter(approval_status='pending').count(),
+            "approved": base_qs.filter(approval_status='approved').count(),
+            "rejected": base_qs.filter(approval_status='rejected').count(),
+        }
+
+        status_filter = request.query_params.get('approval_status')
+        staff_qs = base_qs
+        if status_filter:
+            if status_filter not in ('pending', 'approved', 'rejected'):
+                return Response(
+                    {"error": "approval_status must be one of: pending, approved, rejected."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            staff_qs = staff_qs.filter(approval_status=status_filter)
+
+        staff_qs = staff_qs.order_by('username')
+        staff_data = StaffOverviewItemSerializer(staff_qs, many=True, context={'request': request}).data
+
+        return Response({
+            "counts": counts,
+            "staff": staff_data,
+        }, status=status.HTTP_200_OK)
+
+
+def sarpanch_staff_overview_page(request):
+    from django.shortcuts import render
+    return render(request, 'accounts/sarpanch_staff_overview.html')

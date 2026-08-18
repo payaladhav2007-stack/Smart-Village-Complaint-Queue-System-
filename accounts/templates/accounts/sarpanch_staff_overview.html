@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Staff Overview — Sarpanch Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
+  h1 { color: #1a3c5e; }
+  .top-nav { margin-bottom: 20px; }
+  .top-nav a {
+    display: inline-block; margin-right: 10px; padding: 8px 14px;
+    background: #1a3c5e; color: #fff; text-decoration: none; border-radius: 4px; font-size: 14px;
+  }
+  .top-nav a:hover { background: #14304a; }
+  .cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .card {
+    flex: 1; min-width: 140px; background: #fff; border-radius: 8px; padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center;
+  }
+  .card .count { font-size: 28px; font-weight: bold; }
+  .card.total .count { color: #1a3c5e; }
+  .card.pending .count { color: #b8860b; }
+  .card.approved .count { color: #2e7d32; }
+  .card.rejected .count { color: #c62828; }
+  .card .label { color: #666; font-size: 13px; margin-top: 4px; }
+  .filter-bar { margin-bottom: 16px; }
+  .filter-bar select {
+    padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;
+  }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+  th { background: #1a3c5e; color: #fff; }
+  .status-badge {
+    padding: 3px 8px; border-radius: 10px; font-size: 12px; color: #fff;
+  }
+  .status-pending { background: #b8860b; }
+  .status-approved { background: #2e7d32; }
+  .status-rejected { background: #c62828; }
+  .actions button {
+    padding: 5px 10px; margin-right: 5px; border: none; border-radius: 4px;
+    cursor: pointer; color: #fff; font-size: 13px;
+  }
+  .btn-approve { background: #2e7d32; }
+  .btn-reject { background: #c62828; }
+  .btn-approve:disabled, .btn-reject:disabled { background: #ccc; cursor: not-allowed; }
+  #message { margin-bottom: 12px; padding: 10px; border-radius: 4px; display: none; }
+  #message.success { background: #e8f5e9; color: #2e7d32; display: block; }
+  #message.error { background: #ffebee; color: #c62828; display: block; }
+  .doc-link { color: #1a3c5e; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+{% csrf_token %}
+<h1>Staff Overview</h1>
+
+<div class="top-nav">
+  <a href="/api/auth/sarpanch/pending-staff/">Pending Approvals (API)</a>
+  <a href="/work/dashboard/sarpanch/">Task Assignments</a>
+</div>
+
+<div id="message"></div>
+
+<div class="cards">
+  <div class="card total"><div class="count" id="count-total">–</div><div class="label">Total Staff</div></div>
+  <div class="card pending"><div class="count" id="count-pending">–</div><div class="label">Pending</div></div>
+  <div class="card approved"><div class="count" id="count-approved">–</div><div class="label">Approved</div></div>
+  <div class="card rejected"><div class="count" id="count-rejected">–</div><div class="label">Rejected</div></div>
+</div>
+
+<div class="filter-bar">
+  <label for="statusFilter">Filter by status: </label>
+  <select id="statusFilter" onchange="loadOverview()">
+    <option value="">All</option>
+    <option value="pending">Pending</option>
+    <option value="approved">Approved</option>
+    <option value="rejected">Rejected</option>
+  </select>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Status</th>
+      <th>Document</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="staff-table-body">
+    <tr><td colspan="6">Loading...</td></tr>
+  </tbody>
+</table>
+
+<script>
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
+
+function showMessage(text, type) {
+  const el = document.getElementById('message');
+  el.textContent = text;
+  el.className = type;
+  setTimeout(() => { el.className = ''; el.textContent = ''; }, 4000);
+}
+
+async function loadOverview() {
+  const statusFilter = document.getElementById('statusFilter').value;
+  let url = '/api/auth/sarpanch/staff-overview/';
+  if (statusFilter) url += '?approval_status=' + statusFilter;
+
+  const resp = await fetch(url, { credentials: 'same-origin' });
+  if (!resp.ok) {
+    showMessage('Failed to load staff overview.', 'error');
+    return;
+  }
+  const data = await resp.json();
+
+  document.getElementById('count-total').textContent = data.counts.total;
+  document.getElementById('count-pending').textContent = data.counts.pending;
+  document.getElementById('count-approved').textContent = data.counts.approved;
+  document.getElementById('count-rejected').textContent = data.counts.rejected;
+
+  const tbody = document.getElementById('staff-table-body');
+  tbody.innerHTML = '';
+
+  if (data.staff.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6">No staff found for this filter.</td></tr>';
+    return;
+  }
+
+  data.staff.forEach(staff => {
+    const row = document.createElement('tr');
+    const docCell = staff.identity_document_url
+      ? `<a class="doc-link" href="${staff.identity_document_url}" target="_blank">View</a>`
+      : 'No document';
+
+    const isPending = staff.approval_status === 'pending';
+
+    row.innerHTML = `
+      <td>${staff.username}</td>
+      <td>${staff.email || '-'}</td>
+      <td>${staff.phone_number || '-'}</td>
+      <td><span class="status-badge status-${staff.approval_status}">${staff.approval_status}</span></td>
+      <td>${docCell}</td>
+      <td class="actions">
+        <button class="btn-approve" ${isPending ? '' : 'disabled'} onclick="actOnStaff(${staff.id}, 'approve')">Approve</button>
+        <button class="btn-reject" ${isPending ? '' : 'disabled'} onclick="actOnStaff(${staff.id}, 'reject')">Reject</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+async function actOnStaff(userId, action) {
+  const url = `/api/auth/sarpanch/${action}-staff/${userId}/`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+  });
+  const data = await resp.json();
+
+  if (resp.ok && data.success) {
+    showMessage(data.message, 'success');
+    loadOverview();
+  } else {
+    showMessage(data.error || 'Action failed.', 'error');
+  }
+}
+
+loadOverview();
+</script>
+
+</body>
+</html>

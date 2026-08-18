@@ -194,3 +194,20 @@ class PendingStaffSerializer(serializers.ModelSerializer):
         if obj.identity_document and request:
             return request.build_absolute_uri(obj.identity_document.url)
         return None
+
+
+# ---------------------------------------------------------------------
+# GS-REG-112: Sarpanch Staff Overview Dashboard
+# ---------------------------------------------------------------------
+class StaffOverviewItemSerializer(serializers.ModelSerializer):
+    identity_document_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'phone_number', 'approval_status', 'identity_document_url']
+
+    def get_identity_document_url(self, obj):
+        request = self.context.get('request')
+        if obj.identity_document and request:
+            return request.build_absolute_uri(obj.identity_document.url)
+        return None

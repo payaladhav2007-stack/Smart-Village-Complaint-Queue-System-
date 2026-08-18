@@ -3,6 +3,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from .views import RegisterView, LoginView, LogoutView, register_page, login_page, register_landing, register_citizen_page, register_staff_page, register_sarpanch_page, SarpanchPasswordCheckView, SarpanchOTPVerifyView, SarpanchOTPResendView, sarpanch_login_page
 from .views import CitizenRegistrationView, StaffRegistrationView, SarpanchRegistrationView
 from .views import PendingStaffListView, ApproveStaffView, RejectStaffView
+from .views import SarpanchStaffOverviewView, sarpanch_staff_overview_page
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -17,6 +18,8 @@ urlpatterns = [
     path('sarpanch/pending-staff/', PendingStaffListView.as_view(), name='pending-staff-list'),
     path('sarpanch/approve-staff/<int:user_id>/', ApproveStaffView.as_view(), name='approve-staff'),
     path('sarpanch/reject-staff/<int:user_id>/', RejectStaffView.as_view(), name='reject-staff'),
+    path('sarpanch/staff-overview/', SarpanchStaffOverviewView.as_view(), name='sarpanch-staff-overview'),
+    path('sarpanch/staff-overview-page/', sarpanch_staff_overview_page, name='sarpanch-staff-overview-page'),
     path('register-landing/', register_landing, name='register-landing'),
     path('register-citizen-page/', register_citizen_page, name='register-citizen-page'),
     path('register-staff-page/', register_staff_page, name='register-staff-page'),
