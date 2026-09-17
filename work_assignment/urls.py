@@ -21,5 +21,5 @@ urlpatterns = [
     # Frontend dashboard views
     path('dashboard/sarpanch/', sarpanch_dashboard, name='sarpanch_dashboard'),
     path('dashboard/staff/', staff_dashboard, name='staff_dashboard'),
-    path('tasks/<int:pk>/update-status/', update_task_status_form, name='update_task_status_form'),
+    path('tasks/<int:pk>/update-status-form/', update_task_status_form, name='update_task_status_form'),
 ]

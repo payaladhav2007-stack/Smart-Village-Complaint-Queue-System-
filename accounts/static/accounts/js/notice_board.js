@@ -20,7 +20,7 @@
       headers: { "Authorization": `Token ${authToken}` }
     })
     .then(res => res.json())
-    .then(data => renderNotices(data))
+    .then(data => renderNotices(data.notices))
     .catch(() => {
       document.getElementById("notice-list").innerHTML =
         `<p class="text-red-400 text-center py-10">Failed to load notices. Please refresh.</p>`;

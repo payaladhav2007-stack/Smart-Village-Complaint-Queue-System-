@@ -158,14 +158,11 @@
           sessionStorage.setItem('gramsmart_logged_in', 'true');
 
           // Route based on role
-          const role = result.data.user.role;
-          if (role === 'admin') {
-            window.location.href = '/admin/';
-          } else if (role === 'staff') {
-            window.location.href = '/work/dashboard/staff/';
-          } else {
-            window.location.href = '/grievances/my-complaints/';
-          }
+            const role = result.data.user.role;
+if (role === 'admin') {
+  window.location.href = '/admin/';
+} else if (role === 'staff') {
+  window.location.href = '/work/dashboard/staff/';
 
         } else {
           // Show error from server
