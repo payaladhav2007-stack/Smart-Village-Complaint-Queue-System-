@@ -136,7 +136,15 @@
          class="border border-green-600 text-green-600 font-semibold px-5 py-2 rounded-lg text-sm hover:bg-green-50 transition">
         + New Complaint
       </a>
-      <a href="/accounts/logout/"
+      <a href="/appointments/request/"
+         class="border border-blue-600 text-blue-600 font-semibold px-5 py-2 rounded-lg text-sm hover:bg-blue-50 transition">
+        📄 Apply for Certificate
+      </a>
+      <a href="/api/auth/notice-board/"
+         class="border border-orange-500 text-orange-600 font-semibold px-5 py-2 rounded-lg text-sm hover:bg-orange-50 transition">
+        📋 Notice Board
+      </a>
+      <a href="#" onclick="fetch('/api/auth/logout/', {method: 'POST', headers: {'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || ''}}).then(() => window.location.href = '/api/auth/login-page/'); return false;"
          class="border border-gray-300 text-gray-500 font-semibold px-5 py-2 rounded-lg text-sm hover:bg-gray-50 transition">
         Logout
       </a>
