@@ -242,10 +242,10 @@
           ? 'bg-white rounded-xl shadow-sm border border-gray-100 p-4 opacity-60'
           : 'bg-white rounded-xl shadow-sm border border-red-100 p-4 hover:shadow-md transition';
         return '<div class="' + cardClass + '">' +
-          '<div class="flex items-start justify-between mb-2"><div class="flex items-center gap-2"><span class="text-sm">' + getCategoryIcon(complaint.category) + '</span>' + getPriorityBadge(complaint.status) + '</div><span class="text-xs text-gray-400">' + timeAgo(complaint.created_at) + '</span></div>' +
+          '<div class="flex items-start justify-between mb-2"><div class="flex items-center gap-2"><span class="text-sm">' + getCategoryIcon(complaint.sub_category) + '</span>' + getPriorityBadge(complaint.status) + '</div><span class="text-xs text-gray-400">' + timeAgo(complaint.created_at) + '</span></div>' +
           '<h3 class="text-sm font-semibold text-gray-800 mb-1">' + complaint.description.substring(0, 60) + '...</h3>' +
           '<p class="text-xs text-gray-500 mb-3">Complaint #' + complaint.id + '</p>' +
-          '<div class="flex items-center justify-between"><span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">' + getCategoryLabel(complaint.category) + '</span>' +
+          '<div class="flex items-center justify-between"><span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">' + getCategoryLabel(complaint.sub_category) + '</span>' +
           (isResolved ? '<button class="text-xs border border-gray-200 text-gray-500 px-3 py-1 rounded-lg">View</button>' : '<div class="flex gap-2"><button class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition font-medium">Assign</button><button class="text-xs border border-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50 transition">View</button></div>') +
           '</div></div>';
       }).join('');

@@ -276,7 +276,7 @@
           sessionStorage.setItem('gramsmart_username', result.data.user.username);
           showMessage('step2-message', 'Login successful! Redirecting...', false);
           setTimeout(function() {
-            window.location.href = '/staff/workbench/';
+            window.location.href = '/work/dashboard/sarpanch/';
           }, 1000);
         } else {
           showMessage('step2-message', result.data.message || 'Invalid OTP. Please try again.', true);

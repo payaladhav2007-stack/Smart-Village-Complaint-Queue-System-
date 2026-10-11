@@ -66,6 +66,9 @@ def register_page(request):
 def login_page(request):
     return render(request, 'accounts/login.html')
 
+def notice_board_page(request):
+    return render(request, 'accounts/notice_board.html')
+
 
 # ---------------------------------------------------------------------
 # GS-REG-103: Role-specific registration views

@@ -23,7 +23,9 @@
       <span class="text-xs text-gray-600 font-medium">{{ user.username }}</span>
       <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">Sarpanch</span>
       <span class="text-xs text-gray-400">{{ user.village_city }}</span>
-      <a href="/api/auth/logout/" class="text-xs text-red-500 hover:text-red-700 font-medium">Logout</a>
+      <a href="/api/auth/notice-board/" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Notice Board</a>
+      <a href="/staff/workbench/" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Grievance Workbench</a>
+      <a href="#" onclick="fetch('/api/auth/logout/', {method: 'POST', headers: {'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || ''}}).then(() => window.location.href = '/api/auth/login-page/'); return false;" class="text-xs text-red-500 hover:text-red-700 font-medium">Logout</a>
     </div>
   </nav>
 
