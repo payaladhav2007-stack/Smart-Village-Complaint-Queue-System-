@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<section class="text-center py-12">
+  <h1 class="text-4xl font-bold text-blue-900">GramSmart</h1>
+  <p class="mt-3 text-gray-600">{% trans "One window for village grievances, certificates and notices" %}</p>
+  <div class="mt-8 flex justify-center gap-4 flex-wrap">
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="bg-blue-900 text-white px-6 py-3 rounded">{% trans "Go to Dashboard" %}</a>
+    {% else %}
+      <a href="{% url 'login-landing' %}" class="bg-blue-900 text-white px-6 py-3 rounded">{% trans "Login" %}</a>
+      <a href="{% url 'register-landing' %}" class="bg-green-700 text-white px-6 py-3 rounded">{% trans "Register" %}</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
