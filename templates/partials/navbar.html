@@ -1,0 +1,47 @@
+{% load i18n %}
+{% url 'notice_page' as notice_url %}
+<nav class="bg-blue-900 text-white p-3 flex flex-wrap gap-4 items-center">
+  <a href="{% url 'home' %}" class="font-bold text-lg">GramSmart</a>
+
+  {% if user.is_authenticated %}
+    <a href="{% url 'dashboard' %}">{% trans "Dashboard" %}</a>
+    {% if notice_url %}<a href="{{ notice_url }}">{% trans "Notice Board" %}</a>{% endif %}
+
+    {% if user.role == 'citizen' %}
+      <a href="{% url 'log_complaint' %}">{% trans "Log Complaint" %}</a>
+      <a href="{% url 'my_complaints' %}">{% trans "My Complaints" %}</a>
+      <a href="{% url 'certificate_request' %}">{% trans "Apply for Certificate" %}</a>
+    {% elif user.role == 'staff' %}
+      <a href="{% url 'staff_dashboard' %}">{% trans "My Tasks" %}</a>
+      <a href="{% url 'grievance_management' %}">{% trans "Grievance Workbench" %}</a>
+      <a href="{% url 'queue_dashboard' %}">{% trans "Token Queue" %}</a>
+    {% elif user.role == 'sarpanch' %}
+      <a href="{% url 'sarpanch_dashboard' %}">{% trans "Assign Work" %}</a>
+      <a href="{% url 'grievance_management' %}">{% trans "Grievance Workbench" %}</a>
+      <a href="{% url 'regional_dashboard' %}">{% trans "Analytics" %}</a>
+      <a href="{% url 'queue_dashboard' %}">{% trans "Token Queue" %}</a>
+    {% endif %}
+  {% endif %}
+
+  <div class="ml-auto flex items-center gap-3">
+    {% if user.is_authenticated %}
+      <span class="text-sm">{{ user.username }}</span>
+      <form method="post" action="{% url 'logout-page' %}">{% csrf_token %}
+        <button class="bg-red-600 px-3 py-1 rounded">{% trans "Logout" %}</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login-landing' %}">{% trans "Login" %}</a>
+      <a href="{% url 'register-landing' %}" class="bg-white text-blue-900 px-3 py-1 rounded">{% trans "Register" %}</a>
+    {% endif %}
+
+    <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      {% get_current_language as CUR %}
+      <select name="language" onchange="this.form.submit()" class="text-black rounded px-1">
+        <option value="en" {% if CUR == 'en' %}selected{% endif %}>English</option>
+        <option value="hi" {% if CUR == 'hi' %}selected{% endif %}>हिन्दी</option>
+        <option value="mr" {% if CUR == 'mr' %}selected{% endif %}>मराठी</option>
+      </select>
+    </form>
+  </div>
+</nav>

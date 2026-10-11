@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-14 11:58+0000\n"
+"POT-Creation-Date: 2026-10-11 04:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,144 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/templates/accounts/login.html:3
+msgid "Login - GramSmart"
+msgstr "लॉग इन - ग्रामस्मार्ट"
+
+#: accounts/templates/accounts/login.html:16
+#, fuzzy
+#| msgid "Staff / Officer"
+msgid "Staff / Officer Login"
+msgstr "कर्मचारी / अधिकारी"
+
+#: accounts/templates/accounts/login.html:17
+#, fuzzy
+#| msgid "Citizen"
+msgid "Citizen Login"
+msgstr "नागरिक"
+
+#: accounts/templates/accounts/login.html:18
+msgid "Welcome Back"
+msgstr "पुन्हा स्वागत आहे"
+
+#: accounts/templates/accounts/login.html:20
+msgid "Log in to access GramSmart services"
+msgstr "ग्रामस्मार्ट सेवा वापरण्यासाठी लॉग इन करा"
+
+#: accounts/templates/accounts/login.html:26
+#, fuzzy
+#| msgid "Phone Number"
+msgid "Contact Number"
+msgstr "फोन नंबर"
+
+#: accounts/templates/accounts/login.html:29
+#, fuzzy
+#| msgid "Enter your 10-digit phone number"
+msgid "10-digit mobile number"
+msgstr "तुमचा 10 अंकी फोन नंबर टाका"
+
+#: accounts/templates/accounts/login.html:34
+msgid "Password"
+msgstr "पासवर्ड"
+
+#: accounts/templates/accounts/login.html:36
+#, fuzzy
+#| msgid "Enter your full name"
+msgid "Enter your password"
+msgstr "तुमचे पूर्ण नाव टाका"
+
+#: accounts/templates/accounts/login.html:41
+msgid "Forgot password?"
+msgstr "पासवर्ड विसरलात?"
+
+#: accounts/templates/accounts/login.html:46
+#: accounts/templates/accounts/login.html:64
+msgid "Log In"
+msgstr "लॉग इन"
+
+#: accounts/templates/accounts/login.html:51
+#: accounts/templates/accounts/login_landing.html:35
+msgid "Don't have an account?"
+msgstr "खाते नाही?"
+
+#: accounts/templates/accounts/login.html:52
+#: accounts/templates/accounts/login_landing.html:36 templates/home.html:12
+#: templates/partials/navbar.html:34
+msgid "Register"
+msgstr "नोंदणी करा"
+
+#: accounts/templates/accounts/login.html:59
+msgid "Contact number is required."
+msgstr "संपर्क क्रमांक आवश्यक आहे."
+
+#: accounts/templates/accounts/login.html:60
+msgid "Contact number must contain digits only."
+msgstr "संपर्क क्रमांकात फक्त अंक असावेत."
+
+#: accounts/templates/accounts/login.html:61
+msgid "Contact number must be exactly 10 digits."
+msgstr "संपर्क क्रमांक अचूक 10 अंकी असावा."
+
+#: accounts/templates/accounts/login.html:62
+#, fuzzy
+#| msgid "Password + OTP secured login"
+msgid "Password is required."
+msgstr "पासवर्ड + OTP सुरक्षित लॉग इन"
+
+#: accounts/templates/accounts/login.html:63
+msgid "Logging in..."
+msgstr "लॉग इन होत आहे..."
+
+#: accounts/templates/accounts/login.html:65
+#, fuzzy
+#| msgid "Submission failed. Please try again."
+msgid "Invalid credentials. Please try again."
+msgstr "सबमिशन अयशस्वी झाले. कृपया पुन्हा प्रयत्न करा."
+
+#: accounts/templates/accounts/login.html:66
+#: grievances/templates/grievances/log_complaint.html:386
+msgid "Network error. Please check your connection and try again."
+msgstr "नेटवर्क त्रुटी. कृपया तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा."
+
+#: accounts/templates/accounts/login.html:67
+msgid ""
+"Sarpanch / Nagarsevak accounts must log in from the Sarpanch login page."
+msgstr "सरपंच / नगरसेवक खात्यांनी सरपंच लॉग इन पृष्ठावरूनच लॉग इन करावे."
+
+#: accounts/templates/accounts/login_landing.html:6
+msgid "Login as"
+msgstr "या स्वरूपात लॉग इन करा"
+
+#: accounts/templates/accounts/login_landing.html:7
+msgid "Choose your account type to continue"
+msgstr "पुढे जाण्यासाठी खात्याचा प्रकार निवडा"
+
+#: accounts/templates/accounts/login_landing.html:14
+msgid "Citizen"
+msgstr "नागरिक"
+
+#: accounts/templates/accounts/login_landing.html:15
+msgid "Log complaints, apply for certificates, view notices"
+msgstr "तक्रारी नोंदवा, प्रमाणपत्रासाठी अर्ज करा, सूचना पहा"
+
+#: accounts/templates/accounts/login_landing.html:21
+msgid "Staff / Officer"
+msgstr "कर्मचारी / अधिकारी"
+
+#: accounts/templates/accounts/login_landing.html:22
+#, fuzzy
+#| msgid "Manage and track all incoming public grievances"
+msgid "Handle assigned tasks and grievances"
+msgstr "सर्व येणाऱ्या सार्वजनिक तक्रारींचे व्यवस्थापन आणि ट्रॅकिंग करा"
+
+#: accounts/templates/accounts/login_landing.html:28
+msgid "Sarpanch / Nagarsevak"
+msgstr "सरपंच / नगरसेवक"
+
+#: accounts/templates/accounts/login_landing.html:29
+msgid "Password + OTP secured login"
+msgstr "पासवर्ड + OTP सुरक्षित लॉग इन"
 
 #: analytics/templates/analytics/regional_dashboard.html:7
 msgid "GramSmart — Regional Analytics Dashboard"
@@ -567,7 +705,8 @@ msgstr "तुमच्या समस्येचे सर्वोत्त�
 #: grievances/templates/grievances/log_complaint.html:90
 msgid ""
 "Roads, water, electricity, sanitation and other public infrastructure issues"
-msgstr "रस्ते, पाणी, वीज, स्वच्छता आणि इतर सार्वजनिक पायाभूत सुविधांच्या समस्या"
+msgstr ""
+"रस्ते, पाणी, वीज, स्वच्छता आणि इतर सार्वजनिक पायाभूत सुविधांच्या समस्या"
 
 #: grievances/templates/grievances/log_complaint.html:99
 msgid ""
@@ -768,7 +907,8 @@ msgstr "तक्रारीचे स्थान (ऐच्छिक)"
 #: grievances/templates/grievances/log_complaint.html:349
 #: grievances/templates/grievances/log_complaint.html:380
 msgid "No location selected yet. Click below to pick on map."
-msgstr "अद्याप कोणतेही स्थान निवडलेले नाही. नकाशावर निवडण्यासाठी खाली क्लिक करा."
+msgstr ""
+"अद्याप कोणतेही स्थान निवडलेले नाही. नकाशावर निवडण्यासाठी खाली क्लिक करा."
 
 #: grievances/templates/grievances/log_complaint.html:353
 msgid "Pick Location on Map"
@@ -802,10 +942,6 @@ msgstr "तक्रार यशस्वीरित्या सबमिट 
 #: grievances/templates/grievances/log_complaint.html:385
 msgid "Submission failed. Please try again."
 msgstr "सबमिशन अयशस्वी झाले. कृपया पुन्हा प्रयत्न करा."
-
-#: grievances/templates/grievances/log_complaint.html:386
-msgid "Network error. Please check your connection and try again."
-msgstr "नेटवर्क त्रुटी. कृपया तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा."
 
 #: staff/templates/staff/grievance_management.html:8
 msgid "GramSmart — Grievance Management"
@@ -1034,43 +1170,101 @@ msgstr "शासकीय उप-श्रेणी निवडीवरून
 msgid "Manually entered by citizen"
 msgstr "नागरिकाने स्वतः नोंदवले"
 
+#: templates/home.html:6
+msgid "One window for village grievances, certificates and notices"
+msgstr "गावातील तक्रारी, प्रमाणपत्रे आणि सूचनांसाठी एकच खिडकी"
+
+#: templates/home.html:9
 #, fuzzy
-#~| msgid "Actions"
+#| msgid "Regional Analytics Dashboard"
+msgid "Go to Dashboard"
+msgstr "प्रादेशिक विश्लेषण डॅशबोर्ड"
+
+#: templates/home.html:11 templates/partials/navbar.html:33
+msgid "Login"
+msgstr "लॉग इन"
+
+#: templates/partials/navbar.html:7
+msgid "Dashboard"
+msgstr "डॅशबोर्ड"
+
+#: templates/partials/navbar.html:8
+msgid "Notice Board"
+msgstr "सूचना फलक"
+
+#: templates/partials/navbar.html:11
+#, fuzzy
+#| msgid "Noise Complaint"
+msgid "Log Complaint"
+msgstr "आवाजाची तक्रार"
+
+#: templates/partials/navbar.html:12
+#, fuzzy
+#| msgid "New Complaints"
+msgid "My Complaints"
+msgstr "नवीन तक्रारी"
+
+#: templates/partials/navbar.html:13
+msgid "Apply for Certificate"
+msgstr "प्रमाणपत्रासाठी अर्ज करा"
+
+#: templates/partials/navbar.html:15
+msgid "My Tasks"
+msgstr "माझी कामे"
+
+#: templates/partials/navbar.html:16 templates/partials/navbar.html:20
+#, fuzzy
+#| msgid "← Workbench"
+msgid "Grievance Workbench"
+msgstr "← वर्कबेंच"
+
+#: templates/partials/navbar.html:17 templates/partials/navbar.html:22
+msgid "Token Queue"
+msgstr "टोकन रांग"
+
+#: templates/partials/navbar.html:19
+#, fuzzy
+#| msgid "Assign Field Worker"
+msgid "Assign Work"
+msgstr "फील्ड वर्कर नियुक्त करा"
+
+#: templates/partials/navbar.html:21
+msgid "Analytics"
+msgstr "विश्लेषण"
+
+#: templates/partials/navbar.html:30
+msgid "Logout"
+msgstr "लॉग आउट"
+
+#, fuzzy
 #~ msgid "Options"
 #~ msgstr "कृती"
 
 #, fuzzy
-#~| msgid "Please select a category to continue."
 #~ msgid "Press any key to continue..."
 #~ msgstr "पुढे जाण्यासाठी कृपया एक श्रेणी निवडा."
 
 #, fuzzy
-#~| msgid "Location"
 #~ msgid "Syndication"
 #~ msgstr "स्थान"
 
 #, fuzzy
-#~| msgid "Location"
 #~ msgid "Duration"
 #~ msgstr "स्थान"
 
 #, fuzzy
-#~| msgid "Time Ago"
 #~ msgid "Time"
 #~ msgstr "किती वेळापूर्वी"
 
 #, fuzzy
-#~| msgid "Enter your 10-digit phone number"
 #~ msgid "Enter a whole number."
 #~ msgstr "तुमचा 10 अंकी फोन नंबर टाका"
 
 #, fuzzy
-#~| msgid "Phone Number"
 #~ msgid "November"
 #~ msgstr "फोन नंबर"
 
 #, fuzzy
-#~| msgid "Phone Number"
 #~ msgctxt "alt. month"
 #~ msgid "November"
 #~ msgstr "फोन नंबर"

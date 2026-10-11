@@ -437,3 +437,22 @@ class RejectStaffView(APIView):
             "message": f"{staff_user.username} rejected.",
             "approval_status": staff_user.approval_status
         }, status=status.HTTP_200_OK)
+
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
+from .utils import get_dashboard_url
+
+@login_required(login_url='login-page')
+def dashboard(request):
+    return redirect(get_dashboard_url(request.user))
+
+@require_POST
+def logout_page(request):
+    logout(request)
+    return redirect('home')
+
+
+def login_landing(request):
+    return render(request, 'accounts/login_landing.html')

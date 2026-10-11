@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Login - GramSmart{% endblock %}
+{% block content %}
+<section class="max-w-4xl mx-auto py-10">
+  <h1 class="text-3xl font-bold text-blue-900 text-center">{% trans "Login as" %}</h1>
+  <p class="text-center text-gray-600 mt-2">{% trans "Choose your account type to continue" %}</p>
+
+  <div class="grid md:grid-cols-3 gap-6 mt-8">
+
+    <a href="{% url 'login-page' %}?role=citizen"
+       class="bg-white rounded-2xl shadow p-6 text-center hover:shadow-lg hover:-translate-y-1 transition">
+      <div class="text-5xl mb-3">🧑‍🌾</div>
+      <h2 class="text-xl font-bold text-gray-800">{% trans "Citizen" %}</h2>
+      <p class="text-sm text-gray-500 mt-2">{% trans "Log complaints, apply for certificates, view notices" %}</p>
+    </a>
+
+    <a href="{% url 'login-page' %}?role=staff"
+       class="bg-white rounded-2xl shadow p-6 text-center hover:shadow-lg hover:-translate-y-1 transition">
+      <div class="text-5xl mb-3">🧑‍💼</div>
+      <h2 class="text-xl font-bold text-gray-800">{% trans "Staff / Officer" %}</h2>
+      <p class="text-sm text-gray-500 mt-2">{% trans "Handle assigned tasks and grievances" %}</p>
+    </a>
+
+    <a href="{% url 'sarpanch-login-page' %}"
+       class="bg-white rounded-2xl shadow p-6 text-center hover:shadow-lg hover:-translate-y-1 transition border-2 border-blue-900">
+      <div class="text-5xl mb-3">🏛️</div>
+      <h2 class="text-xl font-bold text-gray-800">{% trans "Sarpanch / Nagarsevak" %}</h2>
+      <p class="text-sm text-gray-500 mt-2">{% trans "Password + OTP secured login" %}</p>
+    </a>
+
+  </div>
+
+  <p class="text-center text-sm text-gray-500 mt-8">
+    {% trans "Don't have an account?" %}
+    <a href="{% url 'register-landing' %}" class="text-blue-600 font-medium hover:underline">{% trans "Register" %}</a>
+  </p>
+</section>
+{% endblock %}

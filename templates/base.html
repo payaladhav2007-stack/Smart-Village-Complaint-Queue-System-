@@ -1,0 +1,19 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}GramSmart{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  {% include "partials/navbar.html" %}
+  <main class="flex-1 w-full max-w-6xl mx-auto p-4">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="text-center text-sm text-gray-500 p-4">GramSmart — Unified Rural Governance Platform</footer>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

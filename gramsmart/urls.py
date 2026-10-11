@@ -1,3 +1,4 @@
+from django.views.generic import TemplateView
 from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
@@ -10,8 +11,9 @@ def health_check(request):
     return JsonResponse({"status": "GramSmart server is running"})
 
 urlpatterns = [
+    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('health/', health_check),
     path('admin/', admin.site.urls),
-    path('', health_check),
     path('i18n/', include('django.conf.urls.i18n')),
     path('api/auth/', include('accounts.urls')),
     path('api/accounts/', include('accounts.urls')),
@@ -32,4 +34,3 @@ urlpatterns = [
     path('work/', include('work_assignment.urls')),
     path('api/notices/', include('notice_board.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    

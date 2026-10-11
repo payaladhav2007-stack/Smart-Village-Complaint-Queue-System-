@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
-from .views import RegisterView, LoginView, LogoutView, register_page, login_page, notice_board_page, register_landing, register_citizen_page, register_staff_page, register_sarpanch_page, SarpanchPasswordCheckView, SarpanchOTPVerifyView, SarpanchOTPResendView, sarpanch_login_page
+from .views import RegisterView, LoginView, LogoutView, register_page, login_page, notice_board_page, register_landing, register_citizen_page, register_staff_page, register_sarpanch_page, SarpanchPasswordCheckView, SarpanchOTPVerifyView, SarpanchOTPResendView, sarpanch_login_page, dashboard, logout_page, login_landing
 from .views import CitizenRegistrationView, StaffRegistrationView, SarpanchRegistrationView
 from .views import PendingStaffListView, ApproveStaffView, RejectStaffView
 
@@ -26,4 +26,7 @@ urlpatterns = [
     path('sarpanch/verify-otp/', SarpanchOTPVerifyView.as_view(), name='sarpanch-verify-otp'),
     path('sarpanch/resend-otp/', SarpanchOTPResendView.as_view(), name='sarpanch-resend-otp'),
     path('sarpanch-login/', sarpanch_login_page, name='sarpanch-login-page'),
+    path('dashboard/', dashboard, name='dashboard'),
+    path('logout-page/', logout_page, name='logout-page'),
+    path('login-landing/', login_landing, name='login-landing'),
 ]
