@@ -1,16 +1,107 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block title %}GramSmart{% endblock %}
+
 {% block content %}
-<section class="text-center py-12">
-  <h1 class="text-4xl font-bold text-blue-900">GramSmart</h1>
-  <p class="mt-3 text-gray-600">{% trans "One window for village grievances, certificates and notices" %}</p>
-  <div class="mt-8 flex justify-center gap-4 flex-wrap">
-    {% if user.is_authenticated %}
-      <a href="{% url 'dashboard' %}" class="bg-blue-900 text-white px-6 py-3 rounded">{% trans "Go to Dashboard" %}</a>
-    {% else %}
-      <a href="{% url 'login-landing' %}" class="bg-blue-900 text-white px-6 py-3 rounded">{% trans "Login" %}</a>
-      <a href="{% url 'register-landing' %}" class="bg-green-700 text-white px-6 py-3 rounded">{% trans "Register" %}</a>
-    {% endif %}
+
+<!-- Rural governance titles strip -->
+<div class="bg-[#fff3d6] text-[#8a5a00] font-bold text-sm px-4 py-2 rounded-lg flex flex-wrap justify-center gap-x-8 gap-y-1">
+  <span>{% trans "Gram Panchayat" %}</span>
+  <span>{% trans "Village Development" %}</span>
+  <span>{% trans "Public Services" %}</span>
+  <span>{% trans "Transparent Administration" %}</span>
+</div>
+
+<!-- Hero -->
+<section class="grid md:grid-cols-2 gap-10 items-center py-12">
+  <div>
+    <span class="inline-block bg-[#fff3d6] text-[#8a5a00] font-bold text-xs px-4 py-2 rounded-full">
+      {% trans "Digital window for your Gram Panchayat" %}
+    </span>
+    <h1 class="mt-5 mb-4 text-4xl md:text-5xl font-extrabold leading-tight text-[#1f2a8a]">
+      {% trans "One window for village grievances, certificates and notices" %}
+    </h1>
+    <p class="mb-8 text-lg text-gray-600 max-w-lg">
+      {% trans "Report a problem with a photo and map pin, book a certificate slot without standing in a queue, and read official announcements from your village office." %}
+    </p>
+    <div class="flex flex-wrap gap-4">
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="bg-[#1f2a8a] text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:-translate-y-0.5 transition">{% trans "Go to Dashboard" %}</a>
+      {% else %}
+        <a href="{% url 'login-chooser' %}" class="bg-[#1f2a8a] text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:-translate-y-0.5 transition">{% trans "Login" %}</a>
+        <a href="{% url 'register-landing' %}" class="bg-[#0f8a4b] text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:-translate-y-0.5 transition">{% trans "Register" %}</a>
+      {% endif %}
+    </div>
+    <p class="mt-6 text-sm text-gray-600">Available in English · हिन्दी · मराठी</p>
+  </div>
+
+  <!-- Sample tracker card (decorative) -->
+  <div class="bg-white rounded-3xl p-7 shadow-2xl">
+    <div class="flex justify-between items-center mb-5">
+      <strong>{% trans "Track your complaint" %}</strong>
+      <span class="bg-[#e3f6ec] text-[#0b6b3a] text-xs font-bold px-3 py-1 rounded-full">{% trans "In Progress" %}</span>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-4 mb-6">
+      <div class="font-bold text-sm">{% trans "Roads & Potholes" %}</div>
+      <div class="text-xs text-gray-600 mt-1">{% trans "Large pothole near the bus stop" %}</div>
+    </div>
+    <ul class="space-y-4 text-sm">
+      <li class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded-full bg-[#0f8a4b]"></span>{% trans "Submitted" %}</li>
+      <li class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded-full bg-[#0f8a4b]"></span>{% trans "Assigned to staff" %}</li>
+      <li class="flex items-center gap-3 font-bold"><span class="w-3.5 h-3.5 rounded-full bg-[#f2a516] ring-4 ring-[#fff3d6]"></span>{% trans "In progress" %}</li>
+      <li class="flex items-center gap-3 text-gray-400"><span class="w-3.5 h-3.5 rounded-full bg-gray-300"></span>{% trans "Resolved and rated" %}</li>
+    </ul>
   </div>
 </section>
+
+<!-- Feature cards -->
+<section class="pb-12">
+  <h2 class="text-3xl font-extrabold text-center mb-8">{% trans "Everything your village office offers, in one place" %}</h2>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl p-7 shadow hover:-translate-y-1 hover:shadow-xl transition">
+      <div class="w-12 h-12 rounded-xl bg-[#e8ebff] flex items-center justify-center mb-4">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1f2a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-2">{% trans "Public Grievances" %}</h3>
+      <p class="text-gray-600 text-sm leading-relaxed">{% trans "Report roads, water, electricity and sanitation issues with a photo and location, then follow every status change." %}</p>
+    </div>
+    <div class="bg-white rounded-2xl p-7 shadow hover:-translate-y-1 hover:shadow-xl transition">
+      <div class="w-12 h-12 rounded-xl bg-[#e3f6ec] flex items-center justify-center mb-4">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f8a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 13h6M10 17h6"/></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-2">{% trans "Certificates & Tokens" %}</h3>
+      <p class="text-gray-600 text-sm leading-relaxed">{% trans "Pick a time slot, get a digital token and see the live queue, so you arrive only when it is your turn." %}</p>
+    </div>
+    <div class="bg-white rounded-2xl p-7 shadow hover:-translate-y-1 hover:shadow-xl transition">
+      <div class="w-12 h-12 rounded-xl bg-[#fff3d6] flex items-center justify-center mb-4">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8a5a00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4l12 5V5z"/><path d="M16 9a3 3 0 0 1 0 6M7 14l1 6h3l-1-5"/></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-2">{% trans "Notice Board" %}</h3>
+      <p class="text-gray-600 text-sm leading-relaxed">{% trans "Read official announcements from your own village or city, posted by your Sarpanch and staff." %}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Login as (only for visitors) -->
+{% if not user.is_authenticated %}
+<section class="bg-[#1f2a8a] text-white rounded-3xl p-8 md:p-10 mb-8">
+  <h2 class="text-2xl font-extrabold text-center">{% trans "Login as" %}</h2>
+  <p class="text-center text-indigo-200 mb-6">{% trans "Choose your account type to continue" %}</p>
+  <div class="grid md:grid-cols-3 gap-5">
+    <a href="{% url 'login-page' %}?role=citizen" class="bg-white/10 border border-white/25 rounded-2xl p-6 hover:bg-white/20 transition">
+      <strong class="text-lg">{% trans "Citizen" %}</strong>
+      <p class="mt-2 text-sm text-indigo-100">{% trans "Log complaints, apply for certificates, view notices" %}</p>
+    </a>
+    <a href="{% url 'login-page' %}?role=staff" class="bg-white/10 border border-white/25 rounded-2xl p-6 hover:bg-white/20 transition">
+      <strong class="text-lg">{% trans "Staff / Officer" %}</strong>
+      <p class="mt-2 text-sm text-indigo-100">{% trans "Handle assigned tasks and grievances" %}</p>
+    </a>
+    <a href="{% url 'sarpanch-login-page' %}" class="bg-[#f2a516] text-[#14213d] rounded-2xl p-6 hover:brightness-105 transition">
+      <strong class="text-lg">{% trans "Sarpanch / Nagarsevak" %}</strong>
+      <p class="mt-2 text-sm">{% trans "Password + OTP secured login" %}</p>
+    </a>
+  </div>
+</section>
+{% endif %}
+
 {% endblock %}

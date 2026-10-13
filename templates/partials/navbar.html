@@ -1,7 +1,10 @@
 {% load i18n %}
 {% url 'notice_page' as notice_url %}
 <nav class="bg-blue-900 text-white p-3 flex flex-wrap gap-4 items-center">
-  <a href="{% url 'home' %}" class="font-bold text-lg">GramSmart</a>
+   <a href="{% url 'home' %}" class="flex flex-col leading-tight">
+     <span class="font-bold text-lg">GramSmart</span>
+     <span class="text-[11px] font-medium text-indigo-200 tracking-wide">{% trans "Rural Governance Platform" %}</span>
+   </a>
 
   {% if user.is_authenticated %}
     <a href="{% url 'dashboard' %}">{% trans "Dashboard" %}</a>
@@ -30,7 +33,7 @@
         <button class="bg-red-600 px-3 py-1 rounded">{% trans "Logout" %}</button>
       </form>
     {% else %}
-      <a href="{% url 'login-landing' %}">{% trans "Login" %}</a>
+      <a href="{% url 'login-chooser' %}">{% trans "Login" %}</a>
       <a href="{% url 'register-landing' %}" class="bg-white text-blue-900 px-3 py-1 rounded">{% trans "Register" %}</a>
     {% endif %}
 

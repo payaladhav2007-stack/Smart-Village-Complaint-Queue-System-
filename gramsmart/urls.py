@@ -1,3 +1,4 @@
+from accounts.views import login_landing
 from django.views.generic import TemplateView
 from django.contrib import admin
 from django.urls import path, include
@@ -12,6 +13,7 @@ def health_check(request):
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('login/', login_landing, name='login-chooser'),
     path('health/', health_check),
     path('admin/', admin.site.urls),
     path('i18n/', include('django.conf.urls.i18n')),
