@@ -38,6 +38,11 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
+            if user.role == 'sarpanch':
+                return Response(
+                    {"detail": "Sarpanch / Nagarsevak accounts must log in using the OTP login page."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
             login(request, user)
             return Response({
                 "message": "Login successful.",

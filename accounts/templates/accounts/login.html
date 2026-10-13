@@ -82,7 +82,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('login-form');
   const contactInput = document.getElementById('contact_number');
   const passwordInput = document.getElementById('password');
-  const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
+  function getCookie(name) {
+    const m = document.cookie.match('(^|;)\\s*' + name + '=([^;]*)');
+    return m ? decodeURIComponent(m[2]) : '';
+  }
 
   function showError(input, message) {
     clearError(input);
@@ -132,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetch('/api/auth/login/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
       body: JSON.stringify({ username: contactVal, password: passwordInput.value }),
       credentials: 'same-origin'
     })
@@ -146,21 +149,12 @@ document.addEventListener('DOMContentLoaded', function () {
       if (result.status === 200) {
         const role = result.data.user.role;
 
-        if (role === 'sarpanch') {
-          showMessage(MSG.sarpanch, true);
-          return;
-        }
 
-        sessionStorage.setItem('gramsmart_role', result.data.role);
-        sessionStorage.setItem('gramsmart_user', result.data.username);
+        sessionStorage.setItem('gramsmart_role', result.data.user.role);
+        sessionStorage.setItem('gramsmart_user', result.data.user.username);
         sessionStorage.setItem('gramsmart_logged_in', 'true');
 
-        const routes = {
-          admin: '/admin/',
-          staff: '/work/dashboard/staff/',
-          citizen: '/grievances/my-complaints/'
-        };
-        window.location.href = routes[role] || '/';
+        window.location.href = (role === 'admin') ? '/admin/' : '/';
       } else {
         const errorMsg = result.data.detail || result.data.non_field_errors || MSG.invalid;
         showMessage(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg, true);
